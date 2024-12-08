@@ -1,7 +1,5 @@
-import Image from "next/image";
 import styles from "./page.module.css";
-import Link from 'next/link';
-import Display from './masonry/display'
+import Display from '@/app/display/masonry'
 
 export default function Home() {
   return (

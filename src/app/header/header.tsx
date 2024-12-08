@@ -7,12 +7,7 @@ import './header.css';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: 'inherit',
-  boxShadow: 'none',
   transition: 'background-color 0.3s ease',
-  '&.scrolled': {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    backdropFilter: 'blur(10px)',
-  },
 }));
 
 const LogoImage = styled('img')({
@@ -41,7 +36,7 @@ const NavigationButton = styled(Button)(({ theme }) => ({
 const TransparentHeader = () => {
   return (
     <header>
-      <StyledAppBar classes={'styled-app-bar'} position="fixed">
+      <StyledAppBar position="fixed">
         <StyledToolbar>
           <IconButton
             edge="start"

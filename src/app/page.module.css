@@ -10,10 +10,10 @@
   grid-template-rows: 20px 1fr 20px;
   align-items: center;
   justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
+  padding: 20px;  /* 수정: 너무 큰 padding을 줄임 */
   gap: 64px;
   font-family: var(--font-geist-sans);
+  box-sizing: border-box;  /* padding 포함 크기 계산 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -69,9 +69,9 @@
   border: none;
   border: 1px solid transparent;
   transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
+          background 0.2s,
+          color 0.2s,
+          border-color 0.2s;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -93,7 +93,6 @@ a.secondary {
 }
 
 .footer {
-  grid-row-start: 3;
   display: flex;
   gap: 24px;
 }

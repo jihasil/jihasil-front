@@ -1,50 +1,38 @@
-import Image from "next/image";
-import styles from "../../page.module.css";
+import Image from 'next/image';
+import styles from '../../page.module.css';
 import Link from 'next/link';
+import './about.css'
 
 export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-          <li>This is about</li>
-        </ol>
+        <p>
+          <strong>「지하실(JIHASIL)」</strong> 은 테마에 맞는 영화를 선정해서 각 작품에 대해 심도높은 토의를 하기 의한 매거진이자 모임 포맷입니다. <br />
+          분기마다 출간되며, 오픈형 모임도 진행합니다. <br />
+          매거진 구매는 네이버 스토어와 아래 독립서점에서 진행 가능합니다.
+        </p>
+
+        <p>
+          <a
+            className="naver-link"
+            href="https://smartstore.naver.com/jihasil" target="_blank">
+            네이버 스토어
+          </a>
+        </p>
+
+        <p>
+          스토리지북앤필름(<a className="insta-link" target="_blank"
+                      href="https://www.instagram.com/storagebookandfilm/">@storagebookandfilm</a>) <br />
+          가가77페이지(<a className="insta-link" target="_blank" href="https://www.instagram.com/gaga77page/">@gaga77page</a>) <br />
+          종이잡지클럽(<a className="insta-link" target="_blank" href="https://www.instagram.com/the_magazine_club/">@the_magazine_club</a>) <br />
+          프루스트의 서재(<a className="insta-link" target="_blank" href="https://www.instagram.com/library_of_proust/">@library_of_proust</a>) <br />
+          올오어낫싱(<a className="insta-link" target="_blank"
+                   href="https://www.instagram.com/allornothing_deardark/">@allornothing_deardark</a>) <br />
+        </p>
 
         <div className={styles.ctas}>
-          <a
-              className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <Link
-            href="/public"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </Link>
+
         </div>
       </main>
     </div>
