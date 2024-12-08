@@ -16,7 +16,7 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 }));
 
 const LogoImage = styled('img')({
-  height: '40px',
+  height: '30px',
   width: 'auto',
 });
 
@@ -51,7 +51,7 @@ const TransparentHeader = () => {
             <Link
               href="/">
               <LogoImage
-                src="https://images.unsplash.com/photo-1618401471353-b98afee0b2eb"
+                src="/jihasil_logo.svg"
                 alt="Logo"
               />
             </Link>
@@ -62,7 +62,7 @@ const TransparentHeader = () => {
               aria-label="about page"
             >
               <Link
-                href="/about"
+                href="/pages/about"
               >
                 About
               </Link>
