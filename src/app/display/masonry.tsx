@@ -1,83 +1,92 @@
 'use client';
 import Masonry from '@mui/lab/Masonry';
 import * as React from 'react';
-import { Box, Fade, Modal } from '@mui/material';
+import ImageModal from './modal';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useEffect } from 'react';
+import { Post } from '@/app/api/post/route';
+import { Box, CircularProgress } from '@mui/material';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  border: '2px solid #000',
-};
+type PostResponseDTO = {
+  posts: Post[],
+  isLast: boolean
+}
 
 export default function ImageMasonry() {
+  let lastCreatedAt = {
+    createdAt: 'null',
+  };
+  let hasMore = true;
+
   const [open, setOpen] = React.useState(false);
-  const [imageData, setImageData] = React.useState<string[]>([]);
+  const [imageData, setImageData] = React.useState<Post[]>([]);
   const [image, setImage] = React.useState('');
+  const masonryRef = React.useRef<any>(null);
   const handleClose = () => setOpen(false);
   const handleImage = (value: string) => {
     setImage(value);
     setOpen(true);
   };
 
-  // useEffect 내에서 비동기 함수 호출
-  useEffect(() => {
-    const response = fetch('/api/fetchS3');
+  const fetchMore = async () => {
+    console.log('Fetching more');
+    const params = new URLSearchParams(lastCreatedAt);
+    const response = fetch(`/api/post/?${params.toString()}`, {
+      method: 'GET',
+    });
+
     response
       .then(async response => {
         if (response.ok) {
-          const data: string[] = await response.json();
-          setImageData(data);  // 응답 받은 데이터를 상태에 저장
+          const { posts, isLast }: PostResponseDTO = await response.json();
+          hasMore = !isLast;
+          lastCreatedAt.createdAt = posts[posts.length - 1].createdAt;
+          setImageData(prevState => [...prevState, ...posts]);
+          console.log(posts);
         }
       })
       .catch(err => {
-        console.error(err)
+        console.error(err);
       });
+  };
+
+  const forceUpdateLayout = () => {
+    if (masonryRef.current) {
+      // masonryRef.current.update();
+    }
+  }
+
+  // useEffect 내에서 비동기 함수 호출
+  useEffect(() => {
+    fetchMore();
   }, []);  // 빈 배열을 의존성 배열로 사용하여 최초 렌더링 시 한 번만 호출
 
   return (
-    <Masonry columns={{ xs: 3, sm: 4, md: 5 }} spacing={2}>
-      {imageData.map((item: string, index: number) => (
-        <div key={index}>
-          <img
-            onClick={() => handleImage(item)}
-            src={`${item}`}
-            alt={item}
-            loading="lazy"
-            style={{
-              borderRadius: 4,
-              display: 'block',
-              width: '100%',
-            }}
-          />
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={style}>
-              <Fade in={open} timeout={500}>
+    <div>
+      <Box id="scrolableDiv" sx={{ width: 800, height: 800, overflowY: 'scroll' }}>
+        <Masonry columns={{ xs: 3, sm: 4, md: 5 }} spacing={2} ref={masonryRef}>
+          <InfiniteScroll next={fetchMore} loader={hasMore ? <CircularProgress /> : null} hasMore={hasMore}
+                          dataLength={imageData.length}>
+            {imageData.map((item: Post) => (
+              <div key={item.postId}>
                 <img
-                  src={`${image}`}
-                  alt={item}
+                  onClick={() => handleImage(item.imageUrl)}
+                  src={`${item.imageUrl}?width=300`}
+                  alt={item.imageUrl}
                   loading="lazy"
                   style={{
+                    borderRadius: 4,
                     display: 'block',
                     width: '100%',
-                    border: '5px solid #fff', // 흰색 경계 추가
-                    borderRadius: '8px', // 경계에 둥근 모서리 추가
-                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)', // 부드러운 그림자 효과 추가
+                    minHeight: 30,
                   }}
                 />
-              </Fade>
-            </Box>
-          </Modal>
-        </div>
-      ))}
-    </Masonry>
+              </div>
+            ))}
+            <ImageModal open={open} handleClose={handleClose} image={image} />
+          </InfiniteScroll>
+        </Masonry>
+      </Box>
+    </div>
   );
 }
