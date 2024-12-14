@@ -1,19 +1,18 @@
 'use client';
-import * as React from 'react';
 import { MasonryInfiniteGrid } from '@egjs/react-infinitegrid';
 import { Box } from '@mui/material';
 import { Post, PostResponseDTO } from '@/app/api/post/route';
 import styles from './masonry.module.css';
 import { Thumbnail } from '@/app/display/thumbnail';
-import { useEffect } from 'react';
 import PostView from '@/app/display/post-view';
+import { useState } from 'react';
 
 export default function App() {
-  const [posts, setPosts] = React.useState<Post[]>([]);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
-  const [image, setImage] = React.useState('');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [image, setImage] = useState('');
   const handleClose = () => setOpen(false);
   const handleImage = (value: string) => {
     setImage(value);
@@ -23,9 +22,9 @@ export default function App() {
   const fetchMore = async () => {
     if (!hasMore || isLoading) return;
     setIsLoading(true);
-    console.log('Fetching more');
-    console.log(hasMore);
-    console.log(posts);
+    console.debug('Fetching more');
+    console.debug(hasMore);
+    console.debug(posts);
     const params = new URLSearchParams({ createdAt: posts.length > 0 ? posts[posts.length - 1].createdAt : '9999-99-99' });
     const response = await fetch(`/api/post/?${params.toString()}`, {
       method: 'GET',
@@ -36,17 +35,13 @@ export default function App() {
         const { posts, isLast }: PostResponseDTO = await response.json();
         setHasMore(!isLast);
         setPosts(prevState => [...prevState, ...posts]);
-        console.log(posts);
+        console.debug(posts);
       }
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log('tlqkf');
-  }, []);
 
   return (
     <div>

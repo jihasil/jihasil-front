@@ -22,19 +22,18 @@
     "@mui/material-nextjs": "^6.1.9",
     "@next/bundle-analyzer": "^15.0.4",
     "firebase-admin": "^13.0.1",
-    "next": "13.1.0",
+    "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-infinite-scroll-component": "^6.1.0",
-    "react-masonry-infinite": "^1.2.2",
-    "react-responsive-masonry": "^2.6.0"
+    "react-masonry-infinite": "^1.2.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^8",
+    "eslint": "^9.17.0",
     "eslint-config-next": "15.0.4",
+    "eslint-config-prettier": "^9.1.0",
     "typescript": "^5"
   }
 }
