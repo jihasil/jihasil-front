@@ -5,9 +5,10 @@ import { Post, PostResponseDTO } from '@/app/api/post/route';
 import styles from './masonry.module.css';
 import { Thumbnail } from '@/app/display/thumbnail';
 import PostView from '@/app/display/post-view';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function App() {
+  const [lastKey, setLastKey] = useState<any | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,23 +20,39 @@ export default function App() {
     setOpen(true);
   };
 
+  useEffect(() => {}
+    , [posts])
+
   const fetchMore = async () => {
     if (!hasMore || isLoading) return;
     setIsLoading(true);
     console.debug('Fetching more');
     console.debug(hasMore);
-    console.debug(posts);
-    const params = new URLSearchParams({ createdAt: posts.length > 0 ? posts[posts.length - 1].createdAt : '9999-99-99' });
-    const response = await fetch(`/api/post/?${params.toString()}`, {
+    console.info(posts);
+
+    let url
+    console.log(`lastKey: ${lastKey}`);
+    if (!lastKey) {
+      url = `/api/post`
+    } else {
+      const params = new URLSearchParams(lastKey)
+      url = `/api/post/?${params.toString()}`;
+    }
+
+    const response = await fetch(url, {
       method: 'GET',
     });
 
     try {
       if (response.ok) {
-        const { posts, isLast }: PostResponseDTO = await response.json();
+        const { posts, isLast, LastEvaluatedKey }: PostResponseDTO = await response.json();
         setHasMore(!isLast);
         setPosts(prevState => [...prevState, ...posts]);
-        console.debug(posts);
+        console.info(posts);
+        console.info(LastEvaluatedKey);
+        setLastKey(LastEvaluatedKey);
+      } else {
+        setHasMore(false);
       }
     } catch (error) {
     } finally {
@@ -52,8 +69,8 @@ export default function App() {
           gap={5}
           onRequestAppend={fetchMore}
         >
-          {posts.map((post) =>
-            <div key={post.postId} onClick={() => handleImage(post.imageUrl)}>
+          {posts.map((post: Post, index: number) =>
+            <div key={index} onClick={() => handleImage(post.imageUrl)}>
               <Thumbnail post={post} />
             </div>)
           }
