@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
 if (process.env.NEXT_PUBLIC_NODE_ENV === "prod") {
   nextConfig.compiler = {
     removeConsole: {
-      exclude: ["debug", "error", "warn"],
+      exclude: ["debug", "error", "warn", "info"],
     },
   };
 }
