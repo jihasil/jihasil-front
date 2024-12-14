@@ -57,7 +57,7 @@ const TransparentHeader = () => {
               aria-label="about page"
             >
               <Link
-                href="/pages/about"
+                href="/about"
               >
                 About
               </Link>

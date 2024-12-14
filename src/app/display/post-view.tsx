@@ -9,7 +9,7 @@ const style = {
   border: '2px solid #000',
 };
 
-export default function ImageModal(props:  {open: boolean, handleClose: () => void, image: string }) {
+export default function PostView(props:  {open: boolean, handleClose: () => void, image: string }) {
   const { open, handleClose, image } = props;
 
   return (
