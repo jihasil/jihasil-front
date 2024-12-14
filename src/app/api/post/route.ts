@@ -11,29 +11,48 @@ type Post = {
   createdAt: string
 }
 
-async function getPost(createdAt: string): Promise<[Post]> {
-  const snapshot = await db.collection(post)
-    .orderBy('createdAt', 'desc')
-    .limit(pageSize)
-    .startAt(createdAt)
-    .get()
-
-  return snapshot.docs.map(doc => {
-    return {
-      postId: doc.id,
-      ...doc.data()
-    }
-  }) as [Post]
+type PostResponseDTO = {
+  posts: Post[],
+  isLast: boolean,
 }
+//
+// async function getPost(createdAt: string): Promise<Post[]> {
+//   const snapshot = await db.collection(post)
+//     .orderBy('createdAt', 'desc')
+//     .limit(pageSize)
+//     .startAfter(createdAt)
+//     .get()
+//
+//   return snapshot.docs.map(doc => {
+//     return {
+//       postId: doc.id,
+//       ...doc.data()
+//     }
+//   }) as Post[]
+// }
 
 export async function GET(req: NextRequest) {
   const createdAt = req.nextUrl.searchParams.get('createdAt')
+  const getPost = async (createdAt: string) => {
+    const snapshot = await db.collection(post)
+      .orderBy('createdAt', 'desc')
+      .limit(pageSize)
+      .startAfter(createdAt)
+      .get()
+
+    return snapshot.docs.map(doc => {
+      return {
+        postId: doc.id,
+        ...doc.data()
+      }
+    }) as Post[]
+  }
 
   try {
     const posts = await getPost(createdAt as string)
-    const data = {
-      'posts': posts,
-      'isLast': posts.length < pageSize
+    const data: PostResponseDTO = {
+      posts: posts,
+      isLast: posts.length < pageSize
     }
     return new Response(JSON.stringify(data), {
       status: 200
@@ -46,4 +65,4 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export type { Post };
+export type { Post, PostResponseDTO };

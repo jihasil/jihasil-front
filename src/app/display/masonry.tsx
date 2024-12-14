@@ -1,67 +1,67 @@
-'use client'
-import { MasonryInfiniteGrid } from "@egjs/react-infinitegrid";
-
-import Image from "next/image";
-import {useState} from "react";
-import MasonryInfiniteScroller from 'react-masonry-infinite';
-
-export interface GroupData {
-  nextGroupKey: number;
-  count: number;
-}
-
-function getItems({ nextGroupKey, count }:GroupData) {
-  const nextItems = [];
-  const nextKey = nextGroupKey * count;
-
-  for (let i = 0; i < count; ++i) {
-    nextItems.push({
-      groupKey: nextGroupKey,
-      key: nextKey + i
-    });
-  }
-  return nextItems;
-}
+'use client';
+import * as React from 'react';
+import { MasonryInfiniteGrid } from '@egjs/react-infinitegrid';
+import { Box } from '@mui/material';
+import { Post, PostResponseDTO } from '@/app/api/post/route';
+import styles from './masonry.module.css';
 
 const Item = ({ num }: any) => {
   return (
-    <div style={{width: "250px"}}>
-      <div>
+    <div className={styles.item}>
+      <div className={styles.thumbnail}>
         <img
-          src={`https://naver.github.io/egjs-infinitegrid/assets/image/${(num % 33) + 1}.jpg`}
+          src={`${num}?width=300`}
           alt="egjs"
           style={{
-            width: "100%",
-            height: "auto",
-            borderRadius: 8
+            width: '100%',
+            height: 'auto',
+            borderRadius: 8,
           }}
-          width={500}
-          height={500}
         />
       </div>
-      <div>{`egjs ${num}`}</div>
-    </div>
-  );
-}
+    </div>);
+};
 
-export default function Page() {
-  const [items, setItems] = useState(() => getItems({ nextGroupKey: 0, count: 10 }));
+export default function App() {
+  const [posts, setPosts] = React.useState<Post[]>([]);
+  const [hasMore, setHasMore] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const fetchMore = async () => {
+    if (!hasMore || isLoading) return;
+    setIsLoading(true);
+    console.log('Fetching more');
+    const params = new URLSearchParams({ createdAt: posts.length > 0 ? posts[posts.length - 1].createdAt : '9999-99-99' });
+    const response = fetch(`/api/post/?${params.toString()}`, {
+      method: 'GET',
+    });
+
+    response
+      .then(async response => {
+        if (response.ok) {
+          const { posts, isLast }: PostResponseDTO = await response.json();
+          setHasMore(!isLast);
+          setPosts(prevState => [...prevState, ...posts]);
+          console.log(posts);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+      }).finally(() => setIsLoading(false));
+  };
 
   return (
-    <MasonryInfiniteScroller
-      pageStart={0}
-      loadMore={(e) => {
-        const nextGroupKey = (+e.groupKey! || 0);
-
-        setItems([
-          ...items,
-          ...getItems({ nextGroupKey: nextGroupKey, count: 10 }),
-        ]);
-      }
-    }
-      hasMore={true}
-      loader={<div>{'Loading ...'}</div>}>
-      {items.map((item, index) => <Item data-grid-groupkey={item.groupKey} key={index} num={item.key} />)}
-    </MasonryInfiniteScroller>
+    <div>
+      <Box className={styles.box} style ={{ width: '90vw', maxHeight: '80vh', overflowY: 'scroll'}} >
+        <MasonryInfiniteGrid
+          className={styles.container}
+          align={"center"}
+          gap={5}
+          onRequestAppend={fetchMore}
+        >
+          {posts.map((item) => <Item key={item.postId} num={item.imageUrl} />)}
+        </MasonryInfiniteGrid>
+      </Box>
+    </div>
   );
 }
