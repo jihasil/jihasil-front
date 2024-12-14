@@ -6,6 +6,8 @@ const Footer = styled('footer')({
   display: 'grid',
   alignItems: 'center',
   justifyContent: 'center',
+  position: 'fixed',
+  bottom: 0,
   width: '100%', // 화면 너비를 100%로 확장
   padding: '10px 0',
   color: '#fff', // 글자색
