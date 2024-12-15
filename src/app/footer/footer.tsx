@@ -8,6 +8,7 @@ const Footer = styled('footer')({
   justifyContent: 'center',
   position: 'fixed',
   bottom: 0,
+  minHeight: '10vh',
   width: '100%', // 화면 너비를 100%로 확장
   padding: '10px 0',
   color: '#fff', // 글자색

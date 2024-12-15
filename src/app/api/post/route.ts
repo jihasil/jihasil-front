@@ -1,68 +1,58 @@
-import { db } from '@/app/lib/firebase-db';
-import { NextApiRequest } from 'next';
 import { NextRequest } from 'next/server';
+import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { db } from '@/app/lib/dynamo-db';
 
-const post = 'post'
 const pageSize = 10
 
 type Post = {
-  postId: string,
+  issue_id: string,
   imageUrl: string,
-  createdAt: string
+  "created_at#issue_id": string
 }
 
 type PostResponseDTO = {
   posts: Post[],
   isLast: boolean,
+  LastEvaluatedKey: string,
 }
-//
-// async function getPost(createdAt: string): Promise<Post[]> {
-//   const snapshot = await db.collection(post)
-//     .orderBy('createdAt', 'desc')
-//     .limit(pageSize)
-//     .startAfter(createdAt)
-//     .get()
-//
-//   return snapshot.docs.map(doc => {
-//     return {
-//       postId: doc.id,
-//       ...doc.data()
-//     }
-//   }) as Post[]
-// }
 
-export async function GET(req: NextRequest) {
-  const createdAt = req.nextUrl.searchParams.get('createdAt')
-  const getPost = async (createdAt: string) => {
-    const snapshot = await db.collection(post)
-      .orderBy('createdAt', 'desc')
-      .limit(pageSize)
-      .startAfter(createdAt)
-      .get()
+const docClient = DynamoDBDocumentClient.from(db);
 
-    return snapshot.docs.map(doc => {
-      return {
-        postId: doc.id,
-        ...doc.data()
-      }
-    }) as Post[]
+export const GET = async (req: NextRequest) => {
+  const lastKey = req.nextUrl.searchParams
+
+  const param = {
+    TableName: 'post',
+    Limit: pageSize,
+    KeyConditionExpression: 'partition_key = :partition_key',
+    ExpressionAttributeValues: {
+      ":partition_key": "all_posts",
+    },
+    ScanIndexForward: false,
+    ...(lastKey.size > 0 && { ExclusiveStartKey: Object.fromEntries(lastKey) })
   }
 
+  const command = new QueryCommand(param)
+
   try {
-    const posts = await getPost(createdAt as string)
-    const data: PostResponseDTO = {
-      posts: posts,
-      isLast: posts.length < pageSize
-    }
+    // @ts-ignore
+    const { Items, LastEvaluatedKey } = await docClient.send(command);
+
+    const data = {
+      posts: Items, // 포스트 목록
+      isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
+      LastEvaluatedKey,
+    };
+
     return new Response(JSON.stringify(data), {
       status: 200
     })
   } catch (error) {
-    console.debug(error)
+    console.error('Error fetching posts:', error);
     return new Response(JSON.stringify("error!"), {
       status: 500
     })
   }
-}
+};
 
 export type { Post, PostResponseDTO };

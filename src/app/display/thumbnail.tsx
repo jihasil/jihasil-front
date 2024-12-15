@@ -4,12 +4,13 @@ import * as React from 'react';
 import { Post } from '@/app/api/post/route';
 
 export const Thumbnail = ({ post }: {post: Post}) => {
+  const thumbnailUrl = `${post.imageUrl}?width=300`
   return (
     <div className={styles.item}>
       <div className={styles.thumbnail}>
         <img
-          src={`${post.imageUrl}?width=300`}
-          alt="egjs"
+          src={thumbnailUrl}
+          alt={thumbnailUrl}
           style={{
             width: '100%',
             height: 'auto',
