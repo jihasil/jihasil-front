@@ -22,7 +22,7 @@
     "@mui/material": "^6.1.10",
     "@mui/material-nextjs": "^6.1.9",
     "@next/bundle-analyzer": "^15.0.4",
-    "@vercel/functions": "^1.5.2",
+    "@vercel/functions": "^1.5.0",
     "firebase-admin": "^13.0.1",
     "next": "15.1.0",
     "react": "^19.0.0",
