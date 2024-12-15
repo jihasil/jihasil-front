@@ -18,6 +18,7 @@
     transition-delay: 0.2s;
     opacity: 1;
 }
+
 .container {
     width: 100%;
     padding-top: 2dvh;
@@ -25,11 +26,11 @@
     padding-right: 2dvw;
 }
 
-.box::-webkit-scrollbar {
+.container::-webkit-scrollbar {
     width: 0px;
     background: transparent;
 }
 
-.box::-webkit-scrollbar {
+.container::-webkit-scrollbar {
     border:1px solid;
 }
