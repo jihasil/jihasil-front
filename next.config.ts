@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   swcMinify: true,
 };
 
-if (process.env.NEXT_PUBLIC_NODE_ENV === "prod") {
+if (process.env.NODE_ENV === "production") {
   nextConfig.compiler = {
     removeConsole: {
       exclude: ["debug", "error", "warn", "info"],
