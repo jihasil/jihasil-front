@@ -5,8 +5,8 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
-  border: '2px solid #000',
+  outline: 'none',
+  boxSizing: 'none',
 };
 
 export default function PostView(props:  {open: boolean, handleClose: () => void, image: string }) {
@@ -27,7 +27,7 @@ export default function PostView(props:  {open: boolean, handleClose: () => void
             loading="lazy"
             style={{
               display: 'block',
-              width: '100%',
+              maxWidth: '70vw',
               border: '5px solid #fff', // 흰색 경계 추가
               borderRadius: '8px', // 경계에 둥근 모서리 추가
               boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)', // 부드러운 그림자 효과 추가
