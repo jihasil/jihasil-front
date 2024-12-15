@@ -1,4 +1,3 @@
-
 import styles from '@/app/display/masonry.module.css';
 import * as React from 'react';
 import { Post } from '@/app/api/post/route';
@@ -13,7 +12,6 @@ export const Thumbnail = ({ post }: {post: Post}) => {
           alt={thumbnailUrl}
           style={{
             width: '100%',
-            height: 'auto',
             borderRadius: 8,
           }}
         />
