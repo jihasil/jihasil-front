@@ -2,6 +2,7 @@
 const nextConfig = {
   /* config options here */
   swcMinify: false,
+  reactStrictMode: false,
 };
 
 if (process.env.NODE_ENV === "production") {
@@ -16,4 +17,4 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
-module.exports = withBundleAnalyzer({})
+module.exports = withBundleAnalyzer(nextConfig)
