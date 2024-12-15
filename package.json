@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.712.0",
+    "@aws-sdk/credential-providers": "^3.712.0",
     "@aws-sdk/lib-dynamodb": "^3.321.1",
     "@egjs/react-infinitegrid": "^4.12.0",
     "@emotion/cache": "^11.13.5",
@@ -22,11 +23,9 @@
     "@mui/material": "^6.1.10",
     "@mui/material-nextjs": "^6.1.9",
     "@next/bundle-analyzer": "^15.0.4",
-    "@vercel/functions": "^1.5.2",
-    "firebase-admin": "^13.0.1",
-    "next": "14.2.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "next": "15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-masonry-infinite": "^1.2.2"
   },
   "devDependencies": {
