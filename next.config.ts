@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  swcMinify: true,
+  swcMinify: false,
 };
 
 if (process.env.NODE_ENV === "production") {
