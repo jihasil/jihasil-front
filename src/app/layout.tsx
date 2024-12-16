@@ -18,9 +18,9 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: '매거진 지하실',
-  description: '영화와 사람이 만나는 공간, 지하실',
+  description: '지하실(JIHASIL) / 영화와 사람이 만나는 공간',
   openGraph: {
-    description: '영화와 사람이 만나는 공간, 지하실',
+    description: '지하실(JIHASIL) / 영화와 사람이 만나는 공간',
     images: 'main.png',
     url: 'https://www.jihasil.com',
     type: 'website'
