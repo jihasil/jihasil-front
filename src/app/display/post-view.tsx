@@ -24,10 +24,10 @@ export default function PostView(props:  {open: boolean, handleClose: () => void
           <img
             src={`${image}`}
             alt={image}
-            loading="lazy"
             style={{
               display: 'block',
-              maxWidth: '70vw',
+              maxHeight: '70vh',
+              maxWidth: '90vw',
               border: '5px solid #fff', // 흰색 경계 추가
               borderRadius: '8px', // 경계에 둥근 모서리 추가
               boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)', // 부드러운 그림자 효과 추가
