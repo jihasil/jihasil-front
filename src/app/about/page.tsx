@@ -1,7 +1,14 @@
-import Image from 'next/image';
 import styles from '../page.module.css';
-import Link from 'next/link';
-import './about.css'
+import './about.css';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  openGraph: {
+    title: '지하실(JIHASIL)이란',
+    description: '지하실에 대한 설명과 구매처',
+    url: 'https://www.jihasil.com/about/',
+  },
+};
 
 export default function Home() {
   return (
@@ -24,17 +31,27 @@ export default function Home() {
         <p>
           스토리지북앤필름(<a className="insta-link" target="_blank"
                       href="https://www.instagram.com/storagebookandfilm/">@storagebookandfilm</a>) <br />
-          가가77페이지(<a className="insta-link" target="_blank" href="https://www.instagram.com/gaga77page/">@gaga77page</a>) <br />
-          종이잡지클럽(<a className="insta-link" target="_blank" href="https://www.instagram.com/the_magazine_club/">@the_magazine_club</a>) <br />
-          프루스트의 서재(<a className="insta-link" target="_blank" href="https://www.instagram.com/library_of_proust/">@library_of_proust</a>) <br />
+          가가77페이지(<a className="insta-link" target="_blank"
+                     href="https://www.instagram.com/gaga77page/">@gaga77page</a>) <br />
+          종이잡지클럽(<a className="insta-link" target="_blank"
+                    href="https://www.instagram.com/the_magazine_club/">@the_magazine_club</a>) <br />
+          프루스트의 서재(<a className="insta-link" target="_blank"
+                      href="https://www.instagram.com/library_of_proust/">@library_of_proust</a>) <br />
           올오어낫싱(<a className="insta-link" target="_blank"
                    href="https://www.instagram.com/allornothing_deardark/">@allornothing_deardark</a>) <br />
         </p>
 
-        <div className={styles.ctas}>
-
-        </div>
+        <p>
+          <a href="https://www.instagram.com/jihasil_co/" target={'_blank'}>
+            <img
+              width={30}
+              height={'auto'}
+              alt={'instagram_logo'}
+              src="https://static.cdnlogo.com/logos/i/92/instagram.svg" />
+          </a>
+        </p>
       </main>
     </div>
-  );
+  )
+    ;
 }
