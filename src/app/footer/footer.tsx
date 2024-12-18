@@ -1,9 +1,12 @@
 "use client"
 import React from 'react';
 import { styled } from '@mui/system';
+import Link from 'next/link';
 
 const Footer = styled('footer')({
-  display: 'grid',
+  display: 'flex',
+  flex: '1',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   position: 'fixed',
@@ -19,9 +22,10 @@ const Footer = styled('footer')({
 export default function footerFunction() {
   return (
     <Footer>
-      <h4>
+      <Link style={{ marginBottom:'5px' }} href="/subscribe">구독하기</Link>
+      <strong>
         Copyright 2024. Jihasil All rights reserved
-      </h4>
+      </strong>
     </Footer>
   );
 }
