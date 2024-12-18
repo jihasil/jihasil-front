@@ -61,10 +61,8 @@ export default function App() {
   };
 
   return (
-    <div>
-      <Box className={styles.box} style={{ width: '90vw', display: 'flex', flexDirection: 'column',}}>
+      <Box className={styles.box}>
         <MasonryInfiniteGrid
-          style={{ height: '100%', flexGrow: 1, overflowY: 'auto' }}
           className={styles.container}
           align={'center'}
           gap={5}
@@ -78,6 +76,5 @@ export default function App() {
         </MasonryInfiniteGrid>
         <PostView open={open} handleClose={handleClose} image={image} />
       </Box>
-    </div>
   );
 }

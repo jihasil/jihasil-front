@@ -35,8 +35,7 @@ const NavigationButton = styled(Button)(({ theme }) => ({
 
 const TransparentHeader = () => {
   return (
-    <header>
-      <StyledAppBar position="fixed">
+      <StyledAppBar>
         <StyledToolbar>
           <IconButton
             edge="start"
@@ -65,7 +64,6 @@ const TransparentHeader = () => {
           </Box>
         </StyledToolbar>
       </StyledAppBar>
-    </header>
   );
 };
 

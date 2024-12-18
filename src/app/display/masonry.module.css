@@ -1,8 +1,17 @@
+.box {
+    width: 90vw;
+}
+
+.container {
+    overflow-y: auto;
+}
+
 .item {
     display: inline-block;
     max-width: 80vw;
     opacity: 1;
 }
+
 .thumbnail {
     overflow: hidden;
     border-radius: 8px;
@@ -17,13 +26,6 @@
     transition: opacity ease 1s;
     transition-delay: 0.2s;
     opacity: 1;
-}
-
-.container {
-    width: 100%;
-    padding-top: 2dvh;
-    padding-left: 2dvw;
-    padding-right: 2dvw;
 }
 
 .container::-webkit-scrollbar {
