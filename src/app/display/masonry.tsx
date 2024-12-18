@@ -62,7 +62,7 @@ export default function App() {
 
   return (
     <div>
-      <Box className={styles.box} style={{ width: '90vw', maxHeight: '70vh',display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Box className={styles.box} style={{ width: '90vw', display: 'flex', flexDirection: 'column',}}>
         <MasonryInfiniteGrid
           style={{ height: '100%', flexGrow: 1, overflowY: 'auto' }}
           className={styles.container}
