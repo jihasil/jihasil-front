@@ -28,10 +28,9 @@ export default function RootLayout({
     <html lang="en">
     <body suppressHydrationWarning={true}>
       <Header />
-      <main
-      >
+      <div>
         {children}
-      </main>
+      </div>
       <Footer />
     </body>
     </html>

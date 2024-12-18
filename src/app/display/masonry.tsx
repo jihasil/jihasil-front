@@ -1,11 +1,11 @@
 'use client';
 import { MasonryInfiniteGrid } from '@egjs/react-infinitegrid';
-import { Box } from '@mui/material';
 import { Post, PostResponseDTO } from '@/app/api/post/route';
 import styles from './masonry.module.css';
 import { Thumbnail } from '@/app/display/thumbnail';
 import PostView from '@/app/display/post-view';
 import { useEffect, useState } from 'react';
+import { Box } from '@mui/material';
 
 export default function App() {
   const [lastKey, setLastKey] = useState<any | null>(null);
@@ -61,9 +61,9 @@ export default function App() {
   };
 
   return (
-      <Box className={styles.box}>
+      <div className="flex flex-col items-center w-screen">
         <MasonryInfiniteGrid
-          className={styles.container}
+          className="overflow-auto"
           align={'center'}
           gap={5}
           onRequestAppend={fetchMore}
@@ -75,6 +75,6 @@ export default function App() {
           }
         </MasonryInfiniteGrid>
         <PostView open={open} handleClose={handleClose} image={image} />
-      </Box>
+      </div>
   );
 }
