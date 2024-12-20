@@ -1,13 +1,10 @@
 'use client';
-import { MasonryInfiniteGrid } from '@egjs/react-infinitegrid';
 import { Post, PostResponseDTO } from '@/app/api/post/route';
-import styles from './masonry.module.css';
 import { Thumbnail } from '@/app/display/thumbnail';
 import PostView from '@/app/display/post-view';
-import { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
 
-export default function App() {
+export default function Masonry() {
   const [lastKey, setLastKey] = useState<any | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -20,9 +17,6 @@ export default function App() {
     setOpen(true);
   };
 
-  useEffect(() => {}
-    , [posts])
-
   const fetchMore = async () => {
     if (!hasMore || isLoading) return;
     setIsLoading(true);
@@ -30,12 +24,12 @@ export default function App() {
     console.debug(hasMore);
     console.info(posts);
 
-    let url
+    let url;
     console.log(`lastKey: ${lastKey}`);
     if (!lastKey) {
-      url = `/api/post`
+      url = `/api/post`;
     } else {
-      const params = new URLSearchParams(lastKey)
+      const params = new URLSearchParams(lastKey);
       url = `/api/post/?${params.toString()}`;
     }
 
@@ -60,21 +54,53 @@ export default function App() {
     }
   };
 
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = async () => {
+    const gallery = galleryRef.current;
+
+    if (gallery) {
+      const { scrollTop, scrollHeight, clientHeight } = gallery;
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        await fetchMore();
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchMore().catch((error) => {
+      console.error(error);
+    });
+  }, []);
+
+  useEffect(() => {
+    const gallery = galleryRef.current;
+
+    if (gallery) {
+      gallery.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (gallery) {
+        gallery.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [isLoading]);
+
   return (
-      <div className="flex flex-col items-center w-screen">
-        <MasonryInfiniteGrid
-          className="overflow-auto"
-          align={'center'}
-          gap={5}
-          onRequestAppend={fetchMore}
-        >
-          {posts.map((post: Post, index: number) =>
+    <div className="w-full flex justify-center overflow-hidden">
+      <div ref={galleryRef} className="w-full overflow-y-auto flex flex-col">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
+          {posts.map((post, index) => (
             <div key={index} onClick={() => handleImage(post.imageUrl)}>
-              <Thumbnail post={post} />
-            </div>)
-          }
-        </MasonryInfiniteGrid>
-        <PostView open={open} handleClose={handleClose} image={image} />
+              <Thumbnail
+                post={post}
+              />
+            </div>
+          ))}
+        </div>
       </div>
+      <PostView open={open} handleClose={handleClose} image={image} />
+    </div>
   );
 }

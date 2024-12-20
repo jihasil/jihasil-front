@@ -3,26 +3,29 @@ import './header.css';
 
 const TransparentHeader = () => {
   return (
-    <header>
-      <nav>
-      <button className='back'>
-        <Link
-          href="/">
-          <img
-            src="/jihasil_logo.svg"
-            alt="Logo"
-          />
-        </Link>
-      </button>
+    <header className="bg-inherit w-screen fixed top-0 h-16">
+      <div className="flex w-full justify-between h-full p-5">
+        <div className="flex items-center">
+          <button>
+            <Link
+              href="/">
+              <img
+                className="h-8 w-full"
+                src="/jihasil_logo.svg"
+                alt="Logo"
+              />
+            </Link>
+          </button>
+        </div>
 
-      <div>
-        <button>
-          <Link href="/about">
-            About
-          </Link>
-        </button>
+        <div className="flex items-center">
+          <button>
+            <Link href="/about">
+              ABOUT
+            </Link>
+          </button>
+        </div>
       </div>
-      </nav>
     </header>
   );
 };

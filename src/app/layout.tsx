@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
     <body suppressHydrationWarning={true}>
       <Header />
-      <div>
+      <div className="pt-16 pb-8 px-8 my-5">
         {children}
       </div>
       <Footer />
