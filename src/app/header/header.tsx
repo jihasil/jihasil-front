@@ -3,7 +3,7 @@ import './header.css';
 
 const TransparentHeader = () => {
   return (
-    <header className="bg-inherit w-screen fixed top-0 h-16">
+    <header className="bg-inherit w-screen sticky top-0">
       <div className="flex w-full justify-between h-full p-5">
         <div className="flex items-center">
           <button>

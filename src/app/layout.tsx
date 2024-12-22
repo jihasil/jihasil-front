@@ -3,6 +3,7 @@ import './globals.css';
 import Header from '@/app/header/header';
 import React from 'react';
 import Footer from '@/app/footer/footer';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: '지하실(JIHASIL)',
@@ -28,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
     <body suppressHydrationWarning={true}>
       <Header />
-      <div className="pt-16 pb-8 px-8 my-5">
+      <div className="px-8 my-5 flex-1">
         {children}
       </div>
       <Footer />

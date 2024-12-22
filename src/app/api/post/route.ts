@@ -2,24 +2,31 @@ import { NextRequest } from 'next/server';
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { db } from '@/app/lib/dynamo-db';
 
-const pageSize = 10
-
 type Post = {
   issue_id: string,
   imageUrl: string,
   "created_at#issue_id": string
 }
 
+type LastPostKey = {
+  "created_at#issue_id": string,
+  partition_key: string,
+}
+
 type PostResponseDTO = {
   posts: Post[],
   isLast: boolean,
-  LastEvaluatedKey: string,
+  LastEvaluatedKey: LastPostKey,
 }
 
 const docClient = DynamoDBDocumentClient.from(db);
 
 export const GET = async (req: NextRequest) => {
-  const lastKey = req.nextUrl.searchParams
+  const lastPostKeyJson = req.nextUrl.searchParams.get('lastPostKey');
+  const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson): null;
+
+  const issueId = req.nextUrl.searchParams.get('issueId');
+  const pageSize = Number(req.nextUrl.searchParams.get('pageSize'));
 
   const param = {
     TableName: 'post',
@@ -29,7 +36,7 @@ export const GET = async (req: NextRequest) => {
       ":partition_key": "all_posts",
     },
     ScanIndexForward: false,
-    ...(lastKey.size > 0 && { ExclusiveStartKey: Object.fromEntries(lastKey) })
+    ...(lastPostKey !== null && { ExclusiveStartKey: lastPostKey })
   }
 
   const command = new QueryCommand(param)
@@ -55,4 +62,4 @@ export const GET = async (req: NextRequest) => {
   }
 };
 
-export type { Post, PostResponseDTO };
+export type { Post, PostResponseDTO, LastPostKey };

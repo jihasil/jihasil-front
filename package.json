@@ -26,6 +26,7 @@
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-masonry-infinite": "^1.2.2"
   },
   "devDependencies": {
