@@ -3,14 +3,14 @@ import './header.css';
 
 const TransparentHeader = () => {
   return (
-    <header className="bg-inherit w-screen sticky top-0">
+    <header className="bg-inherit w-screen flex sticky top-0">
       <div className="flex w-full justify-between h-full p-5">
-        <div className="flex items-center">
+        <div>
           <button>
             <Link
               href="/">
               <img
-                className="h-8 w-full"
+                className="h-8"
                 src="/jihasil_logo.svg"
                 alt="Logo"
               />
@@ -18,7 +18,7 @@ const TransparentHeader = () => {
           </button>
         </div>
 
-        <div className="flex items-center">
+        <div>
           <button>
             <Link href="/about">
               ABOUT

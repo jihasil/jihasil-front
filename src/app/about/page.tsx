@@ -1,5 +1,7 @@
 import './about.css';
 import { Metadata } from 'next';
+import Link from 'next/link';
+import React from 'react';
 
 export const metadata: Metadata = {
   openGraph: {
@@ -57,6 +59,16 @@ export default function Home() {
         <p>
         </p>
       </div>
+
+      <button className="w-fit">
+        <Link href="/subscribe">구독하기
+        </Link>
+      </button>
+
+      <button className="w-fit">
+        <Link href="/login">멤버이신가요?
+        </Link>
+      </button>
 
     </div>
   )

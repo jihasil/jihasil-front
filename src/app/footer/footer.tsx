@@ -3,9 +3,10 @@ import Link from 'next/link';
 
 export default function footerFunction() {
   return (
-    <footer className="flex justify-center items-center">
-      <Link href="/subscribe">구독하기
-      </Link>
+    <footer className="flex justify-center items-center p-4">
+      <p>
+        Copyright 2024. Jihasil All rights reserved.
+      </p>
     </footer>
   );
 }
