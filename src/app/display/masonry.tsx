@@ -1,27 +1,27 @@
 'use client';
-import { MasonryInfiniteGrid } from '@egjs/react-infinitegrid';
-import { Box } from '@mui/material';
-import { Post, PostResponseDTO } from '@/app/api/post/route';
-import styles from './masonry.module.css';
-import { Thumbnail } from '@/app/display/thumbnail';
+import { LastPostKey, Post, PostResponseDTO } from '@/app/api/post/route';
+import { Thumbnail } from '@/elements/thumbnail';
 import PostView from '@/app/display/post-view';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { RoundBox } from '@/components/ui/RoundBox';
+import Link from 'next/link';
 
-export default function App() {
-  const [lastKey, setLastKey] = useState<any | null>(null);
+export default function Masonry() {
+  const [lastPostKey, setLastPostKey] = useState<LastPostKey | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [image, setImage] = useState('');
+
+  const smSize = window.matchMedia('(min-width: 640px)')
+  const lgSize = window.matchMedia('(min-width: 1024px)')
+
   const handleClose = () => setOpen(false);
   const handleImage = (value: string) => {
     setImage(value);
     setOpen(true);
   };
-
-  useEffect(() => {}
-    , [posts])
 
   const fetchMore = async () => {
     if (!hasMore || isLoading) return;
@@ -30,16 +30,33 @@ export default function App() {
     console.debug(hasMore);
     console.info(posts);
 
-    let url
-    console.log(`lastKey: ${lastKey}`);
-    if (!lastKey) {
-      url = `/api/post`
-    } else {
-      const params = new URLSearchParams(lastKey)
-      url = `/api/post/?${params.toString()}`;
+    let url = "/api/post/"
+    const searchParams = new URLSearchParams();
+
+    if (lastPostKey) {
+      const lastPostKeyJson = JSON.stringify(lastPostKey);
+      searchParams.append("lastPostKey", lastPostKeyJson);
     }
 
-    const response = await fetch(url, {
+    const isSmallScreen = smSize.matches; // sm 기준
+    const isLargeScreen = lgSize.matches; // lg 기준
+    console.log(isLargeScreen);
+
+    let pageSize: number;
+    if (isLargeScreen) {
+      pageSize = 30;
+    } else if (isSmallScreen) {
+      pageSize = 20;
+    } else {
+      pageSize = 10;
+    }
+
+    searchParams.append("pageSize", pageSize.toString())
+
+    url += `?${searchParams.toString()}`;
+    console.log(url.toString());
+
+    const response = await fetch(url.toString(), {
       method: 'GET',
     });
 
@@ -50,7 +67,7 @@ export default function App() {
         setPosts(prevState => [...prevState, ...posts]);
         console.info(posts);
         console.info(LastEvaluatedKey);
-        setLastKey(LastEvaluatedKey);
+        setLastPostKey(LastEvaluatedKey);
       } else {
         setHasMore(false);
       }
@@ -60,24 +77,45 @@ export default function App() {
     }
   };
 
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = async () => {
+    const scrollTop = window.scrollY; // Pixels scrolled from the top
+    const windowHeight = window.innerHeight; // Visible area height
+    const documentHeight = document.documentElement.scrollHeight; // Total page height
+
+    // Check if scrolled beyond 70%
+    if (scrollTop / (documentHeight - windowHeight) >= 0.7) {
+      await fetchMore();
+    }
+  };
+
+  useEffect(() => {
+    fetchMore().catch((error) => {
+      console.error(error);
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [posts, hasMore, isLoading]);
+
   return (
-    <div>
-      <Box className={styles.box} style={{ width: '90vw', display: 'flex', flexDirection: 'column',}}>
-        <MasonryInfiniteGrid
-          style={{ height: '100%', flexGrow: 1, overflowY: 'auto' }}
-          className={styles.container}
-          align={'center'}
-          gap={5}
-          onRequestAppend={fetchMore}
-        >
-          {posts.map((post: Post, index: number) =>
-            <div key={index} onClick={() => handleImage(post.imageUrl)}>
-              <Thumbnail post={post} />
-            </div>)
-          }
-        </MasonryInfiniteGrid>
-        <PostView open={open} handleClose={handleClose} image={image} />
-      </Box>
+    <div ref={galleryRef} className="overflow-y-auto">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
+          {posts.map((post, index) => (
+            <div key={index} onClick={() => handleImage(post.imageUrl)} className="flex">
+              <Thumbnail
+                post={post}
+              />
+            </div>
+          ))}
+        </div>
+      <PostView open={open} handleClose={handleClose} image={image} />
     </div>
   );
 }
