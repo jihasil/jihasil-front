@@ -1,10 +1,16 @@
+User-agent: *
+Disallow: /
+
 User-agent: Googlebot
-Disallow:
+Allow: /
 
 User-agent: AdsBot-Google
-Disallow:
+Allow: /
 
 User-agent: Googlebot-Image
-Disallow:
+Allow: /
+
+User-agent: Yeti
+Allow: /
 
 Sitemap: https://www.jihasil.com/sitemap.xml
