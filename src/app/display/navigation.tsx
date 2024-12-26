@@ -1,35 +1,33 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
+import * as React from 'react';
+
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Dispatch, SetStateAction } from 'react';
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-export default function Navigation(props: {setIssueFilter: Dispatch<SetStateAction<string>> }) {
-  const { setIssueFilter } = props;
-  const [position, setPosition] = React.useState("all")
+export default function Navigation(props: { onValueChange: (value: string) => void }) {
+  const { onValueChange } = props;
 
   return (
-    <nav>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button className="bg-inherit hover:bg-white hover:text-black" variant="outline">이슈</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 bg-black">
-          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-            <DropdownMenuRadioItem value="all" onClick={() => setIssueFilter('')}>전체 보기</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="issue_001" onClick={() => setIssueFilter('issue_001')}>프레임 속의 프레임</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="issue_002" onClick={() => setIssueFilter('issue_002')}>돌아오기 위한 여정</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </nav>
+    <div className="w-full flex justify-start">
+      <Select defaultValue="all" onValueChange={(value: string) => onValueChange(value)}>
+        <SelectTrigger className="w-fit">
+          <SelectValue placeholder="이슈를 선택해주세요" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="all">모든 이슈</SelectItem>
+            <SelectItem value="issue_001">1. 프레임 속의 프레임</SelectItem>
+            <SelectItem value="issue_002">2. 돌아오기 위한 여정</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

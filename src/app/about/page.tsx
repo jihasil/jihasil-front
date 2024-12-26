@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <p className="text-2xl font-bold">
+        <p className="text-2xl font-bold py-3">
           지하실(JIHASIL)이란?
         </p>
         <p>
@@ -33,7 +33,7 @@ export default function Home() {
       </div>
 
       <div>
-        <p className="text-2xl font-bold">
+        <p className="text-2xl font-bold py-3">
           구매처
         </p>
         <p>

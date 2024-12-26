@@ -22,28 +22,41 @@ type PostResponseDTO = {
 const docClient = DynamoDBDocumentClient.from(db);
 
 export const GET = async (req: NextRequest) => {
+  console.log(req.nextUrl.searchParams)
+
   const lastPostKeyJson = req.nextUrl.searchParams.get('lastPostKey');
   const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson): null;
 
-  const issueId = req.nextUrl.searchParams.get('issueId');
-  const pageSize = Number(req.nextUrl.searchParams.get('pageSize'));
+  const issueId = req.nextUrl.searchParams.get('issueId') ?? null;
+  const pageSize = Number(req.nextUrl.searchParams.get('pageSize')) ?? 10;
 
   const param = {
     TableName: 'post',
     Limit: pageSize,
-    KeyConditionExpression: 'partition_key = :partition_key',
-    ExpressionAttributeValues: {
-      ":partition_key": "all_posts",
-    },
+    ...(issueId !== null ? {
+      IndexName: 'issue_id_index',
+      KeyConditionExpression: 'issue_id = :issue_id',
+      ExpressionAttributeValues: {
+        ":issue_id": issueId,
+      },
+    }: {
+      KeyConditionExpression: 'partition_key = :partition_key',
+      ExpressionAttributeValues: {
+        ":partition_key": "all_posts",
+      },
+    }),
     ScanIndexForward: false,
-    ...(lastPostKey !== null && { ExclusiveStartKey: lastPostKey })
+    ...(lastPostKey !== null && { ExclusiveStartKey: lastPostKey }),
   }
+
+  console.log(param)
 
   const command = new QueryCommand(param)
 
   try {
     // @ts-ignore
     const { Items, LastEvaluatedKey } = await docClient.send(command);
+    console.log(Items)
 
     const data = {
       posts: Items, // 포스트 목록

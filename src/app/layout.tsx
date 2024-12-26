@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
     <body suppressHydrationWarning={true}>
       <Header />
-      <div className="px-8 my-5 flex-1">
+      <div className="px-8 my-3 flex-1">
         {children}
       </div>
       <Footer />
