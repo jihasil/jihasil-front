@@ -1,6 +1,7 @@
-import styles from '../page.module.css';
 import './about.css';
 import { Metadata } from 'next';
+import Link from 'next/link';
+import React from 'react';
 
 export const metadata: Metadata = {
   openGraph: {
@@ -12,14 +13,29 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <div className="flex flex-col gap-5">
+      <div>
+        <p className="text-2xl font-bold py-3">
+          지하실(JIHASIL)이란?
+        </p>
         <p>
-          <strong>「지하실(JIHASIL)」</strong> 은 테마에 맞는 영화를 선정해서 각 작품에 대해 심도높은 토의를 하기 의한 매거진이자 모임 포맷입니다. <br />
+          <strong>「지하실(JIHASIL)」</strong>
+          <a href="https://www.instagram.com/jihasil_co/" className="w-fit h-fit" target={'_blank'}>
+            <img
+              className="h-4 justify-center inline-flex me-2"
+              alt={'instagram_logo'}
+              src="https://static.cdnlogo.com/logos/i/92/instagram.svg" />
+          </a>
+          은 테마에 맞는 영화를 선정해서 각 작품에 대해 심도높은 토의를 하기 의한 매거진이자 모임 포맷입니다. <br />
           분기마다 출간되며, 오픈형 모임도 진행합니다. <br />
           매거진 구매는 네이버 스토어와 아래 독립서점에서 진행 가능합니다.
         </p>
+      </div>
 
+      <div>
+        <p className="text-2xl font-bold py-3">
+          구매처
+        </p>
         <p>
           <a
             className="naver-link"
@@ -27,7 +43,6 @@ export default function Home() {
             네이버 스토어
           </a>
         </p>
-
         <p>
           스토리지북앤필름(<a className="insta-link" target="_blank"
                       href="https://www.instagram.com/storagebookandfilm/">@storagebookandfilm</a>) <br />
@@ -42,15 +57,19 @@ export default function Home() {
         </p>
 
         <p>
-          <a href="https://www.instagram.com/jihasil_co/" target={'_blank'}>
-            <img
-              width={30}
-              height={'auto'}
-              alt={'instagram_logo'}
-              src="https://static.cdnlogo.com/logos/i/92/instagram.svg" />
-          </a>
         </p>
-      </main>
+      </div>
+
+      <button className="w-fit">
+        <Link href="/subscribe">구독하기
+        </Link>
+      </button>
+
+      <button className="w-fit">
+        <Link href="/login">멤버이신가요?
+        </Link>
+      </button>
+
     </div>
   )
     ;

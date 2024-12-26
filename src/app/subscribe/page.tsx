@@ -1,4 +1,3 @@
-import styles from '../page.module.css';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -11,10 +10,8 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h3>곧 시작합니다!</h3>
-      </main>
+    <div>
+      <h3>곧 시작합니다!</h3>
     </div>
   )
     ;
