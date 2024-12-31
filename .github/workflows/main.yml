@@ -20,7 +20,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.PERSONAL_TOKEN }}
         with:
-          source-directory: 'output'
+          source-directory: "output"
           destination-github-username: jkjan
           destination-repository-name: jihasil-front
           commit-message: ${{ github.event.commits[0].message }}

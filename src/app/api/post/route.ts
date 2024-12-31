@@ -1,62 +1,66 @@
-import { NextRequest } from 'next/server';
-import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { db } from '@/app/lib/dynamo-db';
+import { NextRequest } from "next/server";
+
+import { db } from "@/app/lib/dynamo-db";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 type Post = {
-  issue_id: string,
-  imageUrl: string,
-  "created_at#issue_id": string
-}
+  title: string | null;
+  issue_id: string;
+  imageUrl: string;
+  "created_at#issue_id": string;
+};
 
 type LastPostKey = {
-  "created_at#issue_id": string,
-  partition_key: string,
-}
+  "created_at#issue_id": string;
+  partition_key: string;
+};
 
 type PostResponseDTO = {
-  posts: Post[],
-  isLast: boolean,
-  LastEvaluatedKey: LastPostKey,
-}
+  posts: Post[];
+  isLast: boolean;
+  LastEvaluatedKey: LastPostKey;
+};
 
 const docClient = DynamoDBDocumentClient.from(db);
 
 export const GET = async (req: NextRequest) => {
-  console.log(req.nextUrl.searchParams)
+  console.log(req.nextUrl.searchParams);
 
-  const lastPostKeyJson = req.nextUrl.searchParams.get('lastPostKey');
-  const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson): null;
+  const lastPostKeyJson = req.nextUrl.searchParams.get("lastPostKey");
+  const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson) : null;
 
-  const issueId = req.nextUrl.searchParams.get('issueId') ?? null;
-  const pageSize = Number(req.nextUrl.searchParams.get('pageSize')) ?? 10;
+  const issueId = req.nextUrl.searchParams.get("issueId") ?? null;
+  const pageSize = Number(req.nextUrl.searchParams.get("pageSize") ?? 10);
 
   const param = {
-    TableName: 'post',
+    TableName: "post",
     Limit: pageSize,
-    ...(issueId !== null ? {
-      IndexName: 'issue_id_index',
-      KeyConditionExpression: 'issue_id = :issue_id',
-      ExpressionAttributeValues: {
-        ":issue_id": issueId,
-      },
-    }: {
-      KeyConditionExpression: 'partition_key = :partition_key',
-      ExpressionAttributeValues: {
-        ":partition_key": "all_posts",
-      },
-    }),
+    ...(issueId !== null
+      ? {
+          IndexName: "issue_id_index",
+          KeyConditionExpression: "issue_id = :issue_id",
+          ExpressionAttributeValues: {
+            ":issue_id": issueId,
+          },
+        }
+      : {
+          KeyConditionExpression: "partition_key = :partition_key",
+          ExpressionAttributeValues: {
+            ":partition_key": "all_posts",
+          },
+        }),
     ScanIndexForward: false,
     ...(lastPostKey !== null && { ExclusiveStartKey: lastPostKey }),
-  }
+  };
 
-  console.log(param)
+  console.log(param);
 
-  const command = new QueryCommand(param)
+  const command = new QueryCommand(param);
 
   try {
-    // @ts-ignore
+    // @ts-expect-error 타입을 일일히 지정할 수 없음
     const { Items, LastEvaluatedKey } = await docClient.send(command);
-    console.log(Items)
+    console.log(Items);
 
     const data = {
       posts: Items, // 포스트 목록
@@ -65,13 +69,13 @@ export const GET = async (req: NextRequest) => {
     };
 
     return new Response(JSON.stringify(data), {
-      status: 200
-    })
+      status: 200,
+    });
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error("Error fetching posts:", error);
     return new Response(JSON.stringify("error!"), {
-      status: 500
-    })
+      status: 500,
+    });
   }
 };
 
