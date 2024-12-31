@@ -1,15 +1,18 @@
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 
 const TransparentHeader = () => {
   return (
-    <header className="bg-inherit w-screen flex sticky top-0">
+    <header className="bg-background flex sticky top-0 z-10">
       <div className="flex w-full justify-between h-full p-5 px-8">
         <div className="flex items-center">
           <button>
-            <Link
-              href="/">
-              <img
-                className="h-5"
+            <Link href="/">
+              <Image
+                width={1000}
+                height={1000}
+                className="h-5 w-auto"
                 src="/jihasil_logo.svg"
                 alt="Logo"
               />
@@ -19,9 +22,7 @@ const TransparentHeader = () => {
 
         <div className="flex items-center">
           <button>
-            <Link href="/about">
-              ABOUT
-            </Link>
+            <Link href="/about">ABOUT</Link>
           </button>
         </div>
       </div>
