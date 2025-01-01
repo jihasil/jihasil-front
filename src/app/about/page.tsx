@@ -110,7 +110,7 @@ export default function Home() {
       </button>
 
       <button className="w-fit">
-        <Link href="/login">멤버이신가요?</Link>
+        <Link href="/api/auth/signin">멤버이신가요?</Link>
       </button>
     </div>
   );
