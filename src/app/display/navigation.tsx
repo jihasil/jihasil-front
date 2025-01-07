@@ -1,7 +1,3 @@
-'use client';
-
-import * as React from 'react';
-
 import {
   Select,
   SelectContent,
@@ -9,14 +5,17 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
-export default function Navigation(props: { onValueChange: (value: string) => void }) {
+export default function Navigation(props: { onValueChange: any }) {
   const { onValueChange } = props;
 
   return (
     <div className="w-full flex justify-start">
-      <Select defaultValue="all" onValueChange={(value: string) => onValueChange(value)}>
+      <Select
+        defaultValue="all"
+        onValueChange={(value: string) => onValueChange(value)}
+      >
         <SelectTrigger className="w-fit">
           <SelectValue placeholder="이슈를 선택해주세요" />
         </SelectTrigger>
