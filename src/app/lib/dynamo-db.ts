@@ -1,5 +1,5 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { fromTemporaryCredentials } from '@aws-sdk/credential-providers';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { fromTemporaryCredentials } from "@aws-sdk/credential-providers";
 
 const AWS_ROLE_ARN = process.env.AWS_ROLE_ARN;
 
