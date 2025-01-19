@@ -2,7 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const TransparentHeader = () => {
+import { auth } from "@/auth";
+
+const TransparentHeader = async () => {
+  const session = await auth();
+  const name = session?.user?.name;
+
   return (
     <header className="bg-background flex sticky top-0 z-10">
       <div className="flex w-full justify-between h-full p-5 px-8">
@@ -21,6 +26,7 @@ const TransparentHeader = () => {
         </div>
 
         <div className="flex items-center">
+          <p>Hello {name}!</p>
           <button>
             <Link href="/about">ABOUT</Link>
           </button>

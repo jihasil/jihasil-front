@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 
-import { db } from "@/app/lib/dynamo-db";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { dynamoClient } from "@/lib/dynamo-db";
+import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 type Post = {
   title: string | null;
@@ -20,8 +20,6 @@ type PostResponseDTO = {
   isLast: boolean;
   LastEvaluatedKey: LastPostKey;
 };
-
-const docClient = DynamoDBDocumentClient.from(db);
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
@@ -59,7 +57,7 @@ export const GET = async (req: NextRequest) => {
 
   try {
     // @ts-expect-error 타입을 일일히 지정할 수 없음
-    const { Items, LastEvaluatedKey } = await docClient.send(command);
+    const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
     console.log(Items);
 
     const data = {
