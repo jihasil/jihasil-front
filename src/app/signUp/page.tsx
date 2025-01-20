@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -29,6 +30,10 @@ const signUpSchema = z.object({
 });
 
 export default function SignUpPage() {
+  if (process.env.NEXT_PUBLIC_ENV !== "development") {
+    notFound();
+  }
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),

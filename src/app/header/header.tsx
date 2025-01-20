@@ -5,10 +5,24 @@ import React from "react";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 
-const TransparentHeader = async () => {
+const userSection = async () => {
   const session = await auth();
   const name = session?.user?.name;
 
+  if (name) {
+    // 로그인 돼있는 경우
+    return (
+      <div className="flex justify-center items-center gap-5">
+        <p>안녕하세요, {name} 님!</p>
+        <Button>글쓰기</Button>
+      </div>
+    );
+  } else {
+    return null;
+  }
+};
+
+const TransparentHeader = () => {
   return (
     <header className="bg-background flex sticky top-0 z-10">
       <div className="flex w-full justify-between h-full p-5 px-8">
@@ -27,12 +41,7 @@ const TransparentHeader = async () => {
         </div>
 
         <div className="flex items-center gap-5">
-          {name ? (
-            <div className="flex justify-center items-center gap-5">
-              <p>안녕하세요, {name} 님!</p>
-              <Button>글쓰기</Button>
-            </div>
-          ) : null}
+          {userSection()}
           <button>
             <Link href="/about">ABOUT</Link>
           </button>
