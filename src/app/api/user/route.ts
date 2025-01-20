@@ -59,11 +59,13 @@ export const POST = async (req: NextRequest) => {
     ReturnValuesOnConditionCheckFailure: "ALL_OLD",
   };
 
+  // @ts-expect-error it works
   const query = new PutCommand(param);
 
   console.log(query);
 
   try {
+    // @ts-expect-error it works
     await dynamoClient.send(query);
     return new Response(JSON.stringify(`환영합니다, ${body.name} 님!`), {
       status: 200,

@@ -29,6 +29,10 @@ export default function SignInPage() {
   // 1. Define your form.
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
+    defaultValues: {
+      id: "",
+      password: "",
+    },
   });
 
   // 2. Define a submit handler.
@@ -37,7 +41,11 @@ export default function SignInPage() {
     // ✅ This will be type-safe and validated.
     console.log(values);
     const signInData = await signInSchema.parseAsync(values);
-    await requestSignIn(signInData);
+
+    const result = await requestSignIn(signInData);
+    if (!result) {
+      alert("아이디와 비밀번호를 확인해주세요.");
+    }
   }
 
   return (

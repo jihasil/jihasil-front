@@ -32,6 +32,11 @@ export default function SignUpPage() {
   // 1. Define your form.
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      id: "",
+      name: "",
+      password: "",
+    },
   });
 
   // 2. Define a submit handler.
@@ -117,8 +122,6 @@ export default function SignUpPage() {
                   <br />
                   You should contact the developer if you forget this and
                   he&#39;ll make a new one for you.
-                  <br />
-                  And <strong>THAT GON MAKE HIM MAD</strong>
                 </FormDescription>
                 <FormMessage />
               </FormItem>
