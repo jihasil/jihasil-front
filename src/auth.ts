@@ -1,18 +1,12 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { validatePassword } from "@/app/utils/password";
+import { getUser, validatePassword } from "@/app/utils/user";
 import { db } from "@/lib/dynamo-db";
 import { DynamoDBAdapter } from "@auth/dynamodb-adapter";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 
 const docClient = DynamoDBDocument.from(db);
-
-type User = {
-  id: string;
-  name: string;
-  password: string;
-};
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -26,15 +20,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
         console.log(credentials);
 
-        const response = await fetch(
-          `${process.env.URL}/api/user/?id=${credentials.id}`,
-          {
-            method: "GET",
-          },
-        );
+        const user = await getUser(credentials.id as string);
 
-        if (response.status === 200) {
-          const user: User = await response.json();
+        if (user !== null) {
           const isValid = await validatePassword(
             credentials.password as string,
             user.password,
