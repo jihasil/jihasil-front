@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -14,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const signInSchema = z.object({
@@ -49,7 +51,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="w-1/2">
+    <div className="w-1/2 flex flex-col gap-5">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -87,6 +89,15 @@ export default function SignInPage() {
           <Button type="submit">Submit</Button>
         </form>
       </Form>
+      {process.env.NEXT_PUBLIC_ENV === "development" ? (
+        <div className="flex flex-col gap-5">
+          <Separator />
+          or
+          <Button type="submit" className="w-fit">
+            <Link href="/signUp">Sign Up</Link>
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
