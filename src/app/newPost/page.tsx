@@ -1,15 +1,21 @@
 import { Toaster } from "sonner";
 
 import { PlateEditor } from "@/components/editor/plate-editor";
-import { SettingsProvider } from "@/components/editor/settings";
+import { Button } from "@/components/ui/button";
 
 export default function writeNewPost() {
   return (
-    <div className="rounded-lg border w-full">
-      <SettingsProvider>
+    <div className="flex flex-col gap-5">
+      <div
+        className="rounded-lg border h-full w-full dark"
+        data-registry="plate"
+      >
         <PlateEditor />
-      </SettingsProvider>
-      <Toaster />
+        <Toaster />
+      </div>
+      <div>
+        <Button>버튼</Button>
+      </div>
     </div>
   );
 }
