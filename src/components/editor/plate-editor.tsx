@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -112,13 +112,14 @@ import { BaseAlignPlugin } from "@udecode/plate-alignment";
 import { BaseLineHeightPlugin } from "@udecode/plate-line-height";
 import { EditorStatic } from "@/components/plate-ui/editor-static";
 import Prism from "prismjs";
+import { Button } from "@/components/ui/button";
 
 const siteUrl = "https://platejs.org";
 
-export function PlateEditor() {
+export const PlateEditor = React.forwardRef((props, ref) => {
   const editor = useCreateEditor();
 
-  const exportToHtml = async () => {
+  const exportToHtml = async (): Promise<void> => {
     const components = {
       [BaseAudioPlugin.key]: MediaAudioElementStatic,
       [BaseBlockquotePlugin.key]: BlockquoteElementStatic,
@@ -288,17 +289,29 @@ export function PlateEditor() {
         ${editorHtml}
       </body>
     </html>`;
+
+    console.log(html);
   };
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Plate editor={editor}>
-        <EditorContainer>
-          <Editor />
-        </EditorContainer>
+  const getThumbnail = () => {
+    editor.api.me;
+  };
 
-        <SettingsDialog />
-      </Plate>
-    </DndProvider>
+  useImperativeHandle(ref, () => ({
+    exportToHtml,
+  }));
+
+  return (
+    <div>
+      <DndProvider backend={HTML5Backend}>
+        <Plate editor={editor}>
+          <EditorContainer>
+            <Editor />
+          </EditorContainer>
+
+          <SettingsDialog />
+        </Plate>
+      </DndProvider>
+    </div>
   );
-}
+});
