@@ -9,8 +9,6 @@
 }
 
 body {
-    color: #ededed;
-    background: #0a0a0a;
     font-family: Arial, Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -77,6 +75,7 @@ a {
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
+        --radius: 0.5rem;
     }
 
     [data-registry="plate"].dark {

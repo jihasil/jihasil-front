@@ -1,25 +1,10 @@
+import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
+import { v4 } from "uuid";
 
+import { PostInput } from "@/app/utils/post";
 import { dynamoClient } from "@/lib/dynamo-db";
-import { QueryCommand } from "@aws-sdk/lib-dynamodb";
-
-type Post = {
-  title: string | null;
-  issue_id: string;
-  imageUrl: string;
-  "created_at#issue_id": string;
-};
-
-type LastPostKey = {
-  "created_at#issue_id": string;
-  partition_key: string;
-};
-
-type PostResponseDTO = {
-  posts: Post[];
-  isLast: boolean;
-  LastEvaluatedKey: LastPostKey;
-};
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
@@ -77,4 +62,52 @@ export const GET = async (req: NextRequest) => {
   }
 };
 
-export type { Post, PostResponseDTO, LastPostKey };
+export const POST = async (req: NextRequest) => {
+  // TODO: dynamodb 업로드
+  const postInput: PostInput = await req.json();
+  const created_at = new Date().toISOString();
+  const issue_id = postInput.metadata.issue_id;
+
+  postInput.metadata["partition_key"] = "all_posts";
+  postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
+  postInput.metadata["is_deleted"] = false;
+
+  if (postInput.metadata.uuid === undefined) {
+    postInput.metadata.uuid = v4();
+  }
+
+  const metadataPutParam = {
+    TableName: "post",
+    Item: postInput.metadata,
+  };
+
+  const metadataPutQuery = new PutCommand(metadataPutParam);
+
+  const contentPutParam = {
+    TableName: "post-content",
+    Item: {
+      uuid: postInput.metadata.uuid,
+      html: postInput.html,
+    },
+  };
+
+  const contentPutQuery = new PutCommand(contentPutParam);
+
+  try {
+    // @ts-expect-error it works
+    await dynamoClient.send(metadataPutQuery);
+
+    // @ts-expect-error it works
+    await dynamoClient.send(contentPutQuery);
+
+    return new Response(JSON.stringify({ uuid: postInput.metadata.uuid }), {
+      status: 200,
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    return new Response(JSON.stringify(`Unknown Error: ${error.name}`), {
+      status: 500,
+    });
+  }
+};

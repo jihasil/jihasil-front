@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-import { LastPostKey, Post, PostResponseDTO } from "@/app/api/post/route";
+import { LastPostKey, Metadata, Post, PostResponseDTO } from "@/app/utils/post";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,7 +37,7 @@ export default function Home() {
   };
 
   const [lastPostKey, setLastPostKey] = useState<LastPostKey | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [metadata, setMetadata] = useState<Metadata[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [issueFilter, setIssueFilter] = useState("all");
@@ -45,7 +45,7 @@ export default function Home() {
   const [progress, setProgress] = useState(0);
 
   const changeIssue = (issueFilter: string) => {
-    setPosts([]);
+    setMetadata([]);
     setLastPostKey(null);
     setHasMore(true);
     setIsLoading(false);
@@ -57,7 +57,7 @@ export default function Home() {
     setIsLoading(true);
     console.debug("Fetching more");
     console.debug(hasMore);
-    console.info(posts);
+    console.info(metadata);
     setProgress(13);
 
     let url = "/api/post/";
@@ -91,7 +91,7 @@ export default function Home() {
           await response.json();
         setHasMore(!isLast);
         setProgress(100);
-        setPosts((prevState) => [...prevState, ...posts]);
+        setMetadata((prevState) => [...prevState, ...posts]);
         console.info(posts);
         console.info(LastEvaluatedKey);
         setLastPostKey(LastEvaluatedKey);
@@ -135,33 +135,35 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [posts, hasMore, isLoading]);
+  }, [metadata, hasMore, isLoading]);
 
   return (
-    <div className="flex flex-col gap-5 items-center">
-      <Navigation selects={issueDisplay} onValueChange={changeIssue} />
-      <div ref={galleryRef} className="overflow-y-auto w-fit">
+    <div className="flex flex-col gap-5">
+      <div className="w-fit">
+        <Navigation selects={issueDisplay} onValueChange={changeIssue} />
+      </div>
+      <div ref={galleryRef} className="flex overflow-y-auto justify-center">
         {initiating ? (
-          <div className="flex flex-col gap-5 items-center">
+          <div className="flex flex-col gap-5 w-fit">
             <p>이미지를 불러오는 중입니다...</p>
             <Progress value={progress} className="w-full" />
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
-            {posts.map((post, index) => (
+            {metadata.map((item, index) => (
               <div key={index} className="flex w-fit">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button className="w-full h-full p-0 m-0" variant="ghost">
                       <ImageLoader
-                        src={`${post.imageUrl}?width=300`}
-                        alt={`${post.title ?? "jihasil image"}`}
+                        src={`${item.imageUrl ?? item.thumbnail}?width=300`}
+                        alt={`${item.title ?? "jihasil image"}`}
                       />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="w-[90vw]">
-                    <DialogTitle>{post.title ?? null}</DialogTitle>
-                    <PostView post={post} />
+                    <DialogTitle>{item.title ?? null}</DialogTitle>
+                    <PostView post={item} />
                   </DialogContent>
                 </Dialog>
               </div>

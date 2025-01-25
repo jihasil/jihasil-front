@@ -22,16 +22,14 @@ export default function Navigation(props: {
   );
 
   return (
-    <div className="w-full flex justify-start">
-      <Select
-        defaultValue={props.selects?.[0].value}
-        onValueChange={(value: string) => props.onValueChange(value)}
-      >
-        <SelectTrigger className="w-fit">
-          <SelectValue placeholder="선택하세요" />
-        </SelectTrigger>
-        <SelectContent>{selectGroup}</SelectContent>
-      </Select>
-    </div>
+    <Select
+      defaultValue={props.selects?.[0].value}
+      onValueChange={(value: string) => props.onValueChange(value)}
+    >
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="선택하세요" />
+      </SelectTrigger>
+      <SelectContent>{selectGroup}</SelectContent>
+    </Select>
   );
 }

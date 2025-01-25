@@ -119,7 +119,11 @@ const siteUrl = "https://platejs.org";
 export const PlateEditor = React.forwardRef((props, ref) => {
   const editor = useCreateEditor();
 
-  const exportToHtml = async (): Promise<void> => {
+  const exportToHtml = async (): Promise<string> => {
+    if (editor.api.isEmpty()) {
+      return "";
+    }
+
     const components = {
       [BaseAudioPlugin.key]: MediaAudioElementStatic,
       [BaseBlockquotePlugin.key]: BlockquoteElementStatic,
@@ -290,11 +294,7 @@ export const PlateEditor = React.forwardRef((props, ref) => {
       </body>
     </html>`;
 
-    console.log(html);
-  };
-
-  const getThumbnail = () => {
-    editor.api.me;
+    return html;
   };
 
   useImperativeHandle(ref, () => ({
