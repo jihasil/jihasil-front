@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,9 @@ const userSection = async () => {
     return (
       <div className="flex justify-center items-center gap-5">
         <p>안녕하세요, {name} 님!</p>
-        <Button>글쓰기</Button>
+        <Button>
+          <Link href="/post/edit">글쓰기</Link>
+        </Button>
       </div>
     );
   } else {

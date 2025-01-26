@@ -4,14 +4,17 @@ import { AuthError } from "next-auth";
 
 import { signIn } from "@/auth";
 
-export async function requestSignIn(signInData: {
-  id: string;
-  password: string;
-}) {
+export async function requestSignIn(
+  signInData: {
+    id: string;
+    password: string;
+  },
+  redirectTo: string,
+) {
   try {
     await signIn("credentials", {
       ...signInData,
-      redirectTo: "/",
+      redirectTo,
     });
     return true;
   } catch (error) {
