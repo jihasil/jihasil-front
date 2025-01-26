@@ -5,16 +5,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 import { LastPostKey, Metadata, Post, PostResponseDTO } from "@/app/utils/post";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { ImageLoader } from "@/components/ui/image-loader";
-import Navigation from "@/components/ui/navigation";
-import PostView from "@/components/ui/post-view";
+import { Navigation } from "@/components/ui/navigation";
+import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import { Progress } from "@/components/ui/progress";
 import { issueDisplay } from "@/const/issue";
 
@@ -153,16 +145,13 @@ export default function Home() {
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
             {metadata.map((item, index) => (
-              <div key={index} className="flex w-fit h-fit">
+              <div key={index} className="mb-5 w-fit h-fit">
                 <Link
                   href={{
                     pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
                   }}
                 >
-                  <ImageLoader
-                    src={`${item.thumbnail_url ?? item.thumbnail ?? item.imageUrl}?width=300`}
-                    alt={`${item.title ?? "jihasil image"}`}
-                  />
+                  <PostThumbnail metadata={item} />
                 </Link>
               </div>
             ))}

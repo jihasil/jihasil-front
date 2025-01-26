@@ -1,9 +1,10 @@
 import Link from "next/link";
+import Script from "next/script";
 
 import { getPost } from "@/app/utils/post";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { ImageLoader } from "@/components/ui/image-loader";
+import { PostThumbnail } from "@/components/ui/post-thumbnail";
 
 export default async function PageViewer({
   params,
@@ -34,26 +35,16 @@ export default async function PageViewer({
           </Link>
         </div>
       ) : null}
-      <div className="h-2/3 lg:col-span-3 md:col-span-2 col-span-4">
-        <div className="flex flex-col">
-          {/*// TODO: ui component 로 작성*/}
-          <ImageLoader
-            src={post?.metadata?.thumbnail_url}
-            alt={"thumbnail"}
-            className="w-full h-auto"
-          />
-          <p>{post?.metadata?.title}</p>
-          <p>{post?.metadata?.subtitle}</p>
-          <div className="flex">
-            <p>{post?.metadata?.category}</p>
-            <p>|</p>
-            <p>{post?.metadata?.author}</p>
-          </div>
-        </div>
+      <div className="lg:col-span-3 md:col-span-2 col-span-4">
+        <PostThumbnail metadata={post?.metadata} />
       </div>
-      {/*// TODO: html 삽입*/}
-      <div className="w-full h-2/3 lg:col-span-9 md:col-span-6 col-span-4 bg-blue-500">
-        {post?.html}
+      <div className="w-full lg:col-span-9 md:col-span-6 col-span-4">
+        <div
+          id="post-content"
+          dangerouslySetInnerHTML={{
+            __html: post?.html,
+          }}
+        />
       </div>
     </div>
   );

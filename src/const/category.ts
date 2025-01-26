@@ -8,9 +8,17 @@ export const CategoryKey = {
 
 export type CategoryUnion = (typeof CategoryKey)[keyof typeof CategoryKey];
 
-let cachedCategorySelection;
+function invertObject(obj) {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    return { ...acc, [value]: key };
+  }, {});
+}
+
+export const CategoryValue = invertObject(CategoryKey);
 
 // categorySelection을 동적으로 생성하는 함수
+let cachedCategorySelection;
+
 function createCategorySelection(categoryKey: typeof CategoryKey) {
   if (!cachedCategorySelection) {
     return Object.entries(categoryKey).map(([display, value]) => ({

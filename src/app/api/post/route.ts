@@ -87,7 +87,7 @@ export const POST = async (req: NextRequest) => {
     // 새로 생성
     const created_at = new Date().toISOString();
     const issue_id = postInput.metadata.issue_id;
-
+    postInput.metadata["partition_key"] = "all_posts";
     postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
     postInput.metadata.post_uuid = v4();
   }

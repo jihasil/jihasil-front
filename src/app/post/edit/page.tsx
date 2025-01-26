@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Navigation from "@/components/ui/navigation";
+import { Navigation } from "@/components/ui/navigation";
 import { CategoryUnion, categorySelection } from "@/const/category";
 import { IssueUnion, issueOnNewPost } from "@/const/issue";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,6 @@ export default function EditPost() {
   const router = useRouter();
   const postUuid = useSearchParams().get("postUuid");
   const [post, setPost] = useState<Post>();
-  const [loadedHtml, setLoadedHtml] = useState<string>();
   const [initiated, setInitiated] = useState<boolean>(false);
 
   const initiatePost = () => {
@@ -44,7 +43,6 @@ export default function EditPost() {
         res.json().then((data: Post) => {
           console.log(data);
           setPost(data);
-          setLoadedHtml(data.html);
         });
       })
       .finally(() => {
@@ -110,8 +108,6 @@ export default function EditPost() {
         }
       }, "썸네일 파일을 입력해주세요.")
       .refine((file: FileList) => {
-        console.log(file);
-        console.log(typeof file);
         return (
           post?.metadata?.thumbnail_url ||
           ACCEPTED_IMAGE_TYPES.includes(file[0]?.type)
@@ -153,7 +149,7 @@ export default function EditPost() {
       author: post?.metadata?.author ?? "",
       issue_id:
         post?.metadata?.issue_id ?? (issueOnNewPost[0].value as IssueUnion),
-      is_approved: true,
+      is_approved: post?.metadata?.is_approved ?? true,
     },
     mode: "onChange",
     values: post?.metadata,
@@ -241,8 +237,17 @@ export default function EditPost() {
                   <FormLabel>카테고리</FormLabel>
                   <FormControl>
                     <Navigation
-                      onValueChange={field.onChange}
+                      onValueChange={(value: CategoryUnion) => {
+                        setPost({
+                          ...post,
+                          metadata: {
+                            ...post?.metadata,
+                            category: value,
+                          },
+                        });
+                      }}
                       selects={categorySelection}
+                      default={post?.metadata?.category}
                       {...field}
                     />
                   </FormControl>
@@ -259,8 +264,17 @@ export default function EditPost() {
                   <FormLabel>이슈</FormLabel>
                   <FormControl>
                     <Navigation
-                      onValueChange={field.onChange}
+                      onValueChange={(value: IssueUnion) => {
+                        setPost({
+                          ...post,
+                          metadata: {
+                            ...post?.metadata,
+                            issue_id: value,
+                          },
+                        });
+                      }}
                       selects={issueOnNewPost}
+                      default={post?.metadata?.issue_id}
                       {...field}
                     />
                   </FormControl>
@@ -291,7 +305,7 @@ export default function EditPost() {
             className="rounded-lg border h-full w-full dark"
             data-registry="plate"
           >
-            <PlateEditor ref={plateEditorRef} data={loadedHtml} />
+            <PlateEditor ref={plateEditorRef} data={post?.html} />
             <Toaster />
           </div>
 
