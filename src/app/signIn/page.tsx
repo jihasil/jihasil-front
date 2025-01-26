@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -28,6 +29,8 @@ const signInSchema = z.object({
 });
 
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -43,8 +46,8 @@ export default function SignInPage() {
     // ✅ This will be type-safe and validated.
     console.log(values);
     const signInData = await signInSchema.parseAsync(values);
-
-    const result = await requestSignIn(signInData);
+    const next = searchParams.get("from") ?? "/";
+    const result = await requestSignIn(signInData, next);
     if (!result) {
       alert("아이디와 비밀번호를 확인해주세요.");
     }

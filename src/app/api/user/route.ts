@@ -1,50 +1,13 @@
 import { NextRequest } from "next/server";
 
-import { saltAndHashPassword } from "@/app/utils/password";
+import { saltAndHashPassword } from "@/app/utils/user";
 import { dynamoClient } from "@/lib/dynamo-db";
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 type UserSignUpRequest = {
   id: string;
   name: string;
   password: string;
-};
-
-export const GET = async (req: NextRequest) => {
-  const id = req.nextUrl.searchParams.get("id");
-
-  const param = {
-    TableName: "user",
-    KeyConditionExpression: "id = :id",
-    ExpressionAttributeValues: {
-      ":id": id,
-    },
-  };
-
-  const command = new QueryCommand(param);
-  console.log(command);
-
-  try {
-    // @ts-expect-error asdf
-    const { Items } = await dynamoClient.send(command);
-    console.log(Items);
-
-    if (!Items || Items.length !== 1) {
-      return new Response(
-        JSON.stringify(`Unique user for ID ${id} not found`),
-        {
-          status: 404,
-        },
-      );
-    } else {
-      return new Response(JSON.stringify(Items[0]), {
-        status: 200,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return new Response(JSON.stringify(error), { status: 500 });
-  }
 };
 
 export const POST = async (req: NextRequest) => {
