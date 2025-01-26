@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 import { v4 } from "uuid";
 
@@ -8,6 +7,14 @@ import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
+
+  if (
+    req.nextUrl.searchParams.size === 1 &&
+    req.nextUrl.searchParams.has("uuid")
+  ) {
+    const uuid = req.nextUrl.searchParams.get("uuid") as string;
+    return await getContent(uuid);
+  }
 
   const lastPostKeyJson = req.nextUrl.searchParams.get("lastPostKey");
   const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson) : null;
@@ -63,16 +70,16 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
-  // TODO: dynamodb 업로드
   const postInput: PostInput = await req.json();
-  const created_at = new Date().toISOString();
-  const issue_id = postInput.metadata.issue_id;
-
-  postInput.metadata["partition_key"] = "all_posts";
-  postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
   postInput.metadata["is_deleted"] = false;
 
   if (postInput.metadata.uuid === undefined) {
+    // 새로 생성
+    const created_at = new Date().toISOString();
+    const issue_id = postInput.metadata.issue_id;
+
+    postInput.metadata["partition_key"] = "all_posts";
+    postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
     postInput.metadata.uuid = v4();
   }
 
@@ -109,5 +116,33 @@ export const POST = async (req: NextRequest) => {
     return new Response(JSON.stringify(`Unknown Error: ${error.name}`), {
       status: 500,
     });
+  }
+};
+
+const getContent = async (uuid: string) => {
+  const param = {
+    TableName: "post-content",
+    KeyConditionExpression: "uuid = :uuid",
+    ExpressionAttributeValues: {
+      ":uuid": uuid,
+    },
+  };
+
+  const query = new QueryCommand(param);
+
+  try {
+    // @ts-expect-error it works
+    const { Items } = await dynamoClient.send(query);
+    if (Items.length === 0) {
+      return new Response(null, {
+        status: 404,
+      });
+    } else if (Items.length === 1) {
+      return new Response(JSON.stringify(Items[0]), {
+        status: 200,
+      });
+    }
+  } catch (error) {
+    console.error(error);
   }
 };

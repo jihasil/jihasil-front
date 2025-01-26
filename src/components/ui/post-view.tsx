@@ -7,7 +7,7 @@ export default function PostView(props: { post: Metadata }) {
   return (
     <div>
       <ImageLoader
-        src={post.imageUrl ?? post.thumbnail}
+        src={post.imageUrl ?? (post.thumbnail as string)}
         alt={post.title ?? "jihasil post"}
         className="w-full h-auto"
       />

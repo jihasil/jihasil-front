@@ -46,9 +46,11 @@ export default function EditPost(props: { default: Post | undefined }) {
   };
 
   const submit = async (values: PostInput) => {
-    values.metadata.thumbnail = (await uploadThumbnail(
-      values.metadata.thumbnail[0] as File,
-    )) as string;
+    if (values.metadata.thumbnail_file?.length === 1) {
+      values.metadata.thumbnail_url = (await uploadThumbnail(
+        values.metadata.thumbnail_file[0] as File,
+      )) as string;
+    }
 
     const response = await fetch("/api/post", {
       method: "POST",
@@ -72,16 +74,23 @@ export default function EditPost(props: { default: Post | undefined }) {
   ];
 
   const metadataSchema = z.object({
-    thumbnail: z
+    thumbnail_file: z
       .instanceof(FileList)
-      .refine(
-        (file: FileList) => file.length === 1,
-        "썸네일 파일을 입력해주세요.",
-      )
+      .refine((file: FileList) => {
+        // 기본값 있으면 (있는 글 수정이면 파일 없어도 됨)
+        if (props.default?.metadata?.thumbnail_url) return true;
+        else {
+          // 없으면 파일 있어야 함
+          return file.length === 1;
+        }
+      }, "썸네일 파일을 입력해주세요.")
       .refine((file: FileList) => {
         console.log(file);
         console.log(typeof file);
-        return ACCEPTED_IMAGE_TYPES.includes(file[0]?.type);
+        return (
+          props.default?.metadata?.thumbnail_url ||
+          ACCEPTED_IMAGE_TYPES.includes(file[0]?.type)
+        );
       }, "jpg, png, webp 이미지를 입력해주세요."),
     title: z.string().min(1, "제목을 입력해주세요."),
     subtitle: z.string().min(1, "부제목을 입력해주세요."),
@@ -113,9 +122,13 @@ export default function EditPost(props: { default: Post | undefined }) {
     defaultValues: {
       title: props.default?.metadata?.title ?? "",
       subtitle: props.default?.metadata?.subtitle ?? "",
-      category: categorySelection[0].value as CategoryUnion,
+      category:
+        props.default?.metadata?.category ??
+        (categorySelection[0].value as CategoryUnion),
       author: props.default?.metadata?.author ?? "",
-      issue_id: issueOnNewPost[0].value as IssueUnion,
+      issue_id:
+        props.default?.metadata?.issue_id ??
+        (issueOnNewPost[0].value as IssueUnion),
       is_approved: true,
     },
   });
@@ -137,7 +150,10 @@ export default function EditPost(props: { default: Post | undefined }) {
         try {
           await submit({
             html,
-            metadata: values,
+            metadata: {
+              ...values,
+              thumbnail_url: props.default?.metadata?.thumbnail_url,
+            },
           });
 
           router.push("/");
@@ -153,7 +169,7 @@ export default function EditPost(props: { default: Post | undefined }) {
     }
   }
 
-  const fileRef = form.register("thumbnail");
+  const fileRef = form.register("thumbnail_file");
 
   return (
     <div className="flex flex-col gap-5">
@@ -253,7 +269,7 @@ export default function EditPost(props: { default: Post | undefined }) {
           <div className="w-fit flex flex-col gap-5">
             <FormField
               control={form.control}
-              name="thumbnail"
+              name="thumbnail_file"
               render={() => (
                 <FormItem>
                   <FormLabel>썸네일</FormLabel>

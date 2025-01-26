@@ -14,7 +14,7 @@ const userSection = async () => {
       <div className="flex justify-center items-center gap-5">
         <p>안녕하세요, {name} 님!</p>
         <Button>
-          <Link href="/post">글쓰기</Link>
+          <Link href="/post/edit">글쓰기</Link>
         </Button>
       </div>
     );

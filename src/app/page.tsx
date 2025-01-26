@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
 import { LastPostKey, Metadata, Post, PostResponseDTO } from "@/app/utils/post";
@@ -151,21 +153,17 @@ export default function Home() {
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
             {metadata.map((item, index) => (
-              <div key={index} className="flex w-fit">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full h-full p-0 m-0" variant="ghost">
-                      <ImageLoader
-                        src={`${item.imageUrl ?? item.thumbnail}?width=300`}
-                        alt={`${item.title ?? "jihasil image"}`}
-                      />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="w-[90vw]">
-                    <DialogTitle>{item.title ?? null}</DialogTitle>
-                    <PostView post={item} />
-                  </DialogContent>
-                </Dialog>
+              <div key={index} className="flex w-fit h-fit">
+                <Link
+                  href={{
+                    pathname: `/post/view/${item.uuid}`,
+                  }}
+                >
+                  <ImageLoader
+                    src={`${item.thumbnail_url ?? item.thumbnail ?? item.imageUrl}?width=300`}
+                    alt={`${item.title ?? "jihasil image"}`}
+                  />
+                </Link>
               </div>
             ))}
           </div>

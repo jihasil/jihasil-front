@@ -2,11 +2,13 @@ import { CategoryUnion } from "@/const/category";
 import { IssueUnion } from "@/const/issue";
 
 export type Metadata = {
+  thumbnail?: string | undefined;
   partition_key?: string;
   "created_at#issue_id"?: string;
   uuid?: string;
 
-  thumbnail: string | FileList;
+  thumbnail_url?: string;
+  thumbnail_file?: FileList;
   title: string;
   subtitle: string;
   category: CategoryUnion;
