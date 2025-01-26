@@ -1,9 +1,9 @@
 "use client";
 
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { className } from "postcss-selector-parser";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster, toast } from "sonner";
 import { z } from "zod";
@@ -27,7 +27,33 @@ import { IssueUnion, issueOnNewPost } from "@/const/issue";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function EditPost(props: { default: Post | undefined }) {
+export default function EditPost() {
+  const router = useRouter();
+  const postUuid = useSearchParams().get("postUuid");
+  const [post, setPost] = useState<Post>();
+  const [loadedHtml, setLoadedHtml] = useState<string>();
+  const [initiated, setInitiated] = useState<boolean>(false);
+
+  const initiatePost = () => {
+    if (!postUuid || initiated) return;
+
+    fetch(`/api/post?postUuid=${postUuid}`, {
+      method: "GET",
+    })
+      .then((res) => {
+        res.json().then((data: Post) => {
+          console.log(data);
+          setPost(data);
+          setLoadedHtml(data.html);
+        });
+      })
+      .finally(() => {
+        setInitiated(true);
+      });
+  };
+
+  useEffect(initiatePost, []);
+
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
     const { presignedUrl, fileUrl } = await fetch("/api/upload", {
@@ -63,7 +89,6 @@ export default function EditPost(props: { default: Post | undefined }) {
   };
 
   const plateEditorRef = useRef<{ exportToHtml: () => Promise<string> }>(null);
-  const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const ACCEPTED_IMAGE_TYPES = [
@@ -75,10 +100,10 @@ export default function EditPost(props: { default: Post | undefined }) {
 
   const metadataSchema = z.object({
     thumbnail_file: z
-      .instanceof(FileList)
+      .any()
       .refine((file: FileList) => {
         // 기본값 있으면 (있는 글 수정이면 파일 없어도 됨)
-        if (props.default?.metadata?.thumbnail_url) return true;
+        if (post?.metadata?.thumbnail_url) return true;
         else {
           // 없으면 파일 있어야 함
           return file.length === 1;
@@ -88,7 +113,7 @@ export default function EditPost(props: { default: Post | undefined }) {
         console.log(file);
         console.log(typeof file);
         return (
-          props.default?.metadata?.thumbnail_url ||
+          post?.metadata?.thumbnail_url ||
           ACCEPTED_IMAGE_TYPES.includes(file[0]?.type)
         );
       }, "jpg, png, webp 이미지를 입력해주세요."),
@@ -120,17 +145,18 @@ export default function EditPost(props: { default: Post | undefined }) {
   const form = useForm<z.infer<typeof metadataSchema>>({
     resolver: zodResolver(metadataSchema),
     defaultValues: {
-      title: props.default?.metadata?.title ?? "",
-      subtitle: props.default?.metadata?.subtitle ?? "",
+      title: post?.metadata?.title ?? "",
+      subtitle: post?.metadata?.subtitle ?? "",
       category:
-        props.default?.metadata?.category ??
+        post?.metadata?.category ??
         (categorySelection[0].value as CategoryUnion),
-      author: props.default?.metadata?.author ?? "",
+      author: post?.metadata?.author ?? "",
       issue_id:
-        props.default?.metadata?.issue_id ??
-        (issueOnNewPost[0].value as IssueUnion),
+        post?.metadata?.issue_id ?? (issueOnNewPost[0].value as IssueUnion),
       is_approved: true,
     },
+    mode: "onChange",
+    values: post?.metadata,
   });
 
   // 2. Define a submit handler.
@@ -152,11 +178,14 @@ export default function EditPost(props: { default: Post | undefined }) {
             html,
             metadata: {
               ...values,
-              thumbnail_url: props.default?.metadata?.thumbnail_url,
+              post_uuid: post?.metadata?.post_uuid,
+              thumbnail_url: post?.metadata?.thumbnail_url,
+              partition_key: post?.metadata?.partition_key,
+              "created_at#issue_id": post?.metadata?.["created_at#issue_id"],
             },
           });
 
-          router.push("/");
+          await router.push("/");
         } catch (e) {
           toast("업로드에 실패했습니다.");
           console.error(e);
@@ -175,7 +204,7 @@ export default function EditPost(props: { default: Post | undefined }) {
     <div className="flex flex-col gap-5">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="w-full justify-items-stretch grid lg:grid-cols-12 md:grid-cols-8 sm:grid-cols-4 gap-3">
+          <div className="w-full justify-items-stretch grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4 gap-3">
             <FormField
               control={form.control}
               name="title"
@@ -262,7 +291,7 @@ export default function EditPost(props: { default: Post | undefined }) {
             className="rounded-lg border h-full w-full dark"
             data-registry="plate"
           >
-            <PlateEditor ref={plateEditorRef} />
+            <PlateEditor ref={plateEditorRef} data={loadedHtml} />
             <Toaster />
           </div>
 

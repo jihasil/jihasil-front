@@ -1,19 +1,29 @@
 import { NextRequest } from "next/server";
 import { v4 } from "uuid";
 
-import { PostInput } from "@/app/utils/post";
+import { PostInput, getPost } from "@/app/utils/post";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
 
+  // uuid 딸린 게시물 하나
   if (
     req.nextUrl.searchParams.size === 1 &&
-    req.nextUrl.searchParams.has("uuid")
+    req.nextUrl.searchParams.has("postUuid")
   ) {
-    const uuid = req.nextUrl.searchParams.get("uuid") as string;
-    return await getContent(uuid);
+    const postUuid = req.nextUrl.searchParams.get("postUuid") as string;
+    const post = await getPost(postUuid);
+    if (!post) {
+      return new Response(null, {
+        status: 404,
+      });
+    } else {
+      return new Response(JSON.stringify(post), {
+        status: 200,
+      });
+    }
   }
 
   const lastPostKeyJson = req.nextUrl.searchParams.get("lastPostKey");
@@ -73,16 +83,16 @@ export const POST = async (req: NextRequest) => {
   const postInput: PostInput = await req.json();
   postInput.metadata["is_deleted"] = false;
 
-  if (postInput.metadata.uuid === undefined) {
+  if (postInput.metadata.post_uuid === undefined) {
     // 새로 생성
     const created_at = new Date().toISOString();
     const issue_id = postInput.metadata.issue_id;
 
-    postInput.metadata["partition_key"] = "all_posts";
     postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
-    postInput.metadata.uuid = v4();
+    postInput.metadata.post_uuid = v4();
   }
 
+  delete postInput.metadata.thumbnail_file;
   const metadataPutParam = {
     TableName: "post",
     Item: postInput.metadata,
@@ -93,7 +103,7 @@ export const POST = async (req: NextRequest) => {
   const contentPutParam = {
     TableName: "post-content",
     Item: {
-      uuid: postInput.metadata.uuid,
+      post_uuid: postInput.metadata.post_uuid,
       html: postInput.html,
     },
   };
@@ -107,42 +117,17 @@ export const POST = async (req: NextRequest) => {
     // @ts-expect-error it works
     await dynamoClient.send(contentPutQuery);
 
-    return new Response(JSON.stringify({ uuid: postInput.metadata.uuid }), {
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({ uuid: postInput.metadata.post_uuid }),
+      {
+        status: 200,
+      },
+    );
   } catch (error: any) {
     console.log(error);
 
     return new Response(JSON.stringify(`Unknown Error: ${error.name}`), {
       status: 500,
     });
-  }
-};
-
-const getContent = async (uuid: string) => {
-  const param = {
-    TableName: "post-content",
-    KeyConditionExpression: "uuid = :uuid",
-    ExpressionAttributeValues: {
-      ":uuid": uuid,
-    },
-  };
-
-  const query = new QueryCommand(param);
-
-  try {
-    // @ts-expect-error it works
-    const { Items } = await dynamoClient.send(query);
-    if (Items.length === 0) {
-      return new Response(null, {
-        status: 404,
-      });
-    } else if (Items.length === 1) {
-      return new Response(JSON.stringify(Items[0]), {
-        status: 200,
-      });
-    }
-  } catch (error) {
-    console.error(error);
   }
 };

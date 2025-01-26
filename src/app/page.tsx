@@ -156,7 +156,7 @@ export default function Home() {
               <div key={index} className="flex w-fit h-fit">
                 <Link
                   href={{
-                    pathname: `/post/view/${item.uuid}`,
+                    pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
                   }}
                 >
                   <ImageLoader
