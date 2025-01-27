@@ -27,10 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true} className="lg:mx-6 md:mx-5 mx-4">
         <div className="w-full min-h-[100vh] flex flex-col xl:max-w-7xl mx-auto">
           <Header />
-          <div className="px-8 my-3 flex-1">{children}</div>
+          <div className="flex-1">{children}</div>
           <Footer />
         </div>
       </body>

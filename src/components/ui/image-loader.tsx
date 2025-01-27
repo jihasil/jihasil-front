@@ -24,7 +24,7 @@ export const ImageLoader = ({
         event.currentTarget.setAttribute("data-loaded", "true");
       }}
       className={cn(
-        "rounded-lg data-[loaded=false]:animate-pulse data-[loaded=false]:bg-gray-100/10",
+        "object-cover data-[loaded=false]:animate-pulse data-[loaded=false]:bg-gray-100/10 aspect-square",
         className,
       )}
       loading="lazy"

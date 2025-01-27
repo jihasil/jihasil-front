@@ -29,7 +29,7 @@ export type PostInput = {
 export type Post = {
   "created_at#issue_id": string; // legacy
   imageUrl?: string; // legacy
-  metadata?: Metadata;
+  metadata: Metadata;
   html: string;
 };
 

@@ -11,12 +11,9 @@ const userSection = async () => {
   if (name) {
     // 로그인 돼있는 경우
     return (
-      <div className="flex justify-center items-center gap-5">
-        <p>안녕하세요, {name} 님!</p>
-        <Button>
-          <Link href="/post/edit">글쓰기</Link>
-        </Button>
-      </div>
+      <button className="lg:px-6 md:px-5 px-4 bg-transparent hover:bg-white hover:text-black text-white transition-all duration-300 ease-in-out">
+        <Link href="/post/edit">ADMIN</Link>
+      </button>
     );
   } else {
     return null;
@@ -25,25 +22,24 @@ const userSection = async () => {
 
 const TransparentHeader = () => {
   return (
-    <header className="bg-background flex sticky top-0 z-10">
-      <div className="flex w-full justify-between h-full p-5 px-8">
-        <div className="flex items-center gap-5">
-          <button>
+    <header className="bg-background sticky top-0 z-50 ">
+      <div className="grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4 lg:gap-6 md:gap-5 gap-4">
+        <div className="w-full lg:col-span-2 md:col-span-2 col-span-1">
+          <button className="align-middle">
             <Link href="/">
               <Image
                 width={1000}
                 height={1000}
-                className="h-5 w-auto"
+                className="w-full h-auto lg:py-6 md:py-5 py-4"
                 src="/jihasil_logo.svg"
                 alt="Logo"
               />
             </Link>
           </button>
         </div>
-
-        <div className="flex items-center gap-5">
+        <div className="col-span-2 -col-end-1 flex w-full justify-end">
           {userSection()}
-          <button>
+          <button className="lg:px-6 md:px-5 px-4 bg-transparent hover:bg-white hover:text-black text-white transition-all duration-300 ease-in-out">
             <Link href="/about">ABOUT</Link>
           </button>
         </div>

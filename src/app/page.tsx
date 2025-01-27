@@ -11,8 +11,8 @@ import { Progress } from "@/components/ui/progress";
 import { issueDisplay } from "@/const/issue";
 
 export default function Home() {
-  let smSize: MediaQueryList;
-  let lgSize: MediaQueryList;
+  const smSize = window.matchMedia("(min-width: 640px)");
+  const lgSize = window.matchMedia("(min-width: 1024px)");
 
   const getPageSize = () => {
     if (smSize === undefined || lgSize === undefined) return 10;
@@ -113,9 +113,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    smSize = window.matchMedia("(min-width: 640px)");
-    lgSize = window.matchMedia("(min-width: 1024px)");
-
     setInitiating(true);
 
     fetchMore().finally(() => {
@@ -132,20 +129,22 @@ export default function Home() {
   }, [metadata, hasMore, isLoading]);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="w-fit">
-        <Navigation selects={issueDisplay} onValueChange={changeIssue} />
+    <div className="flex flex-1 flex-col my-gap w-full items-center">
+      <div className="w-full grid my-gap lg:grid-cols-12 md:grid-cols-8 grid-cols-6">
+        <div className="w-full col-span-2">
+          <Navigation selects={issueDisplay} onValueChange={changeIssue} />
+        </div>
       </div>
-      <div ref={galleryRef} className="flex overflow-y-auto justify-center">
+      <div ref={galleryRef} className="overflow-y-auto">
         {initiating ? (
-          <div className="flex flex-col gap-5 w-fit">
+          <div className="flex flex-col my-gap w-fit justify-center">
             <p>이미지를 불러오는 중입니다...</p>
             <Progress value={progress} className="w-full" />
           </div>
         ) : (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid my-gap sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 w-full justify-center">
             {metadata.map((item, index) => (
-              <div key={index} className="mb-5 w-fit h-fit">
+              <div key={index} className="lg:mb-6 md:mb-5 mb-4 w-full h-fit">
                 <Link
                   href={{
                     pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
