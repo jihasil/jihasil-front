@@ -81,13 +81,6 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
-  const session = await auth();
-  if (!session?.user) {
-    return new Response("로그인하시거나 개발자에게 연락하세요", {
-      status: 403,
-    });
-  }
-
   const postInput: PostInput = await req.json();
   postInput.metadata["is_deleted"] = false;
 

@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { requestSignIn } from "@/app/signIn/action";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,42 +16,50 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const signInSchema = z.object({
-  id: z
-    .string({ required_error: "A unique ID is required" })
-    .min(1, "A unique ID is required."),
-  password: z
-    .string({ required_error: "Password is required" })
-    .min(1, "Password is required."),
+const signUpSchema = z.object({
+  id: z.string().min(1, "ID를 입력해주세요."),
+  name: z.string().min(1, "이름을 입력해주세요."),
+  password: z.string().min(1, "비밀번호를 입력해주세요."),
 });
 
-export default function SignIn() {
-  const searchParams = useSearchParams();
-
+export default function SignUpPage() {
   // 1. Define your form.
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       id: "",
+      name: "",
       password: "",
     },
   });
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof signInSchema>) {
+  async function onSubmit(values: z.infer<typeof signUpSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
-    const signInData = await signInSchema.parseAsync(values);
-    const next = searchParams.get("from") ?? "/";
-    const result = await requestSignIn(signInData, next);
-    if (!result) {
-      alert("아이디와 비밀번호를 확인해주세요.");
+    try {
+      const signUpData = await signUpSchema.parseAsync(values);
+      const response = await fetch("/api/user", {
+        method: "POST",
+        body: JSON.stringify(signUpData),
+      });
+
+      if (response.status === 200) {
+        alert("회원가입 성공!");
+      } else if (response.status === 400) {
+        alert("이미 있는 ID입니다.");
+      } else {
+        alert("회원가입 실패. 개발자에게 문의하세요.");
+      }
+    } catch (error: any) {
+      console.error(error);
+      alert("회원가입 실패. 개발자에게 문의하세요.");
     }
   }
 
   return (
-    <div className="flex w-fit flex-col my-gap">
+    <div className="w-fit">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -75,6 +81,20 @@ export default function SignIn() {
 
           <FormField
             control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>이름</FormLabel>
+                <FormControl>
+                  <Input placeholder="홍길동" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="password"
             render={({ field }) => (
               <FormItem>
@@ -86,20 +106,18 @@ export default function SignIn() {
                     {...field}
                   />
                 </FormControl>
+                <FormDescription>
+                  비밀번호는 개발자도 볼 수 없습니다. <br />
+                  비밀번호 재발급은 개발자에게 문의하세요.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button type="submit">로그인</Button>
+          <Button type="submit">회원가입</Button>
         </form>
       </Form>
-      <div className="flex flex-col my-gap">
-        혹은
-        <Button type="submit" className="w-fit">
-          <Link href="/signUp">회원가입</Link>
-        </Button>
-      </div>
     </div>
   );
 }

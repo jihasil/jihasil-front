@@ -11,12 +11,6 @@ type UserSignUpRequest = {
 };
 
 export const POST = async (req: NextRequest) => {
-  if (process.env.NODE_ENV !== "development") {
-    return new Response("일반 환경에선 회원가입이 불가능합니다.", {
-      status: 403,
-    });
-  }
-
   const body: UserSignUpRequest = await req.json();
 
   body.password = await saltAndHashPassword(body.password);
