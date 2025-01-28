@@ -31,3 +31,15 @@ export const issueDisplay = [
 ];
 
 export const issueOnNewPost = [...issueSelection];
+
+export const issueTextColor = {
+  none: "text-issue-none",
+  issue_001: "text-issue-001",
+  issue_002: "text-issue-002",
+};
+
+export const issueBackgroundColor = {
+  none: "bg-issue-none",
+  issue_001: "bg-issue-001",
+  issue_002: "bg-issue-002",
+};
