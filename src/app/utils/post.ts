@@ -76,11 +76,14 @@ export const getPost = async (postUuid: string) => {
     console.log(content);
     console.log(metadata);
 
+    // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
     if (content.Items.length !== 1 || metadata.Items.length !== 1) {
       return null;
     } else {
       const post: Post = {
+        // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
         ...content.Items[0],
+        // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
         metadata: { ...metadata.Items[0] },
       };
       return post;

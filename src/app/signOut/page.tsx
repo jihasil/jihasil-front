@@ -1,16 +1,19 @@
 import { signOut } from "@/auth";
+import { Button } from "@/components/ui/button";
 
 export default async function signOutPage() {
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signOut({
-          redirectTo: "/",
-        });
-      }}
-    >
-      <button type="submit">Sign Out</button>
-    </form>
+    <div className="flex justify-center">
+      <form
+        action={async () => {
+          "use server";
+          await signOut({
+            redirectTo: "/",
+          });
+        }}
+      >
+        <Button type="submit">로그아웃</Button>
+      </form>
+    </div>
   );
 }

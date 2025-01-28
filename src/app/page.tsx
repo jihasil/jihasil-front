@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 import React, { useEffect, useRef, useState } from "react";
 
-import { LastPostKey, Metadata, Post, PostResponseDTO } from "@/app/utils/post";
+import { LastPostKey, Metadata, PostResponseDTO } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
 import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import { Progress } from "@/components/ui/progress";
+import ShowNonApproved from "@/components/ui/show-non-approved";
 import { issueDisplay } from "@/const/issue";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 export default function Home() {
-  const smSize = window.matchMedia("(min-width: 640px)");
-  const lgSize = window.matchMedia("(min-width: 1024px)");
-
   const getPageSize = () => {
+    const smSize = window.matchMedia("(min-width: 640px)");
+    const lgSize = window.matchMedia("(min-width: 1024px)");
+
     if (smSize === undefined || lgSize === undefined) return 10;
 
     let pageSize: number;
@@ -37,12 +39,17 @@ export default function Home() {
   const [issueFilter, setIssueFilter] = useState("all");
   const [initiating, setInitiating] = useState<boolean>(true);
   const [progress, setProgress] = useState(0);
+  const [showNonApproved, setShowNonApproved] = useState<CheckedState>(false);
 
-  const changeIssue = (issueFilter: string) => {
+  const initiate = () => {
     setMetadata([]);
     setLastPostKey(null);
     setHasMore(true);
     setIsLoading(false);
+  };
+
+  const changeIssue = (issueFilter: string) => {
+    initiate();
     setIssueFilter(issueFilter);
   };
 
@@ -51,7 +58,6 @@ export default function Home() {
     setIsLoading(true);
     console.debug("Fetching more");
     console.debug(hasMore);
-    console.info(metadata);
     setProgress(13);
 
     let url = "/api/post/";
@@ -86,7 +92,6 @@ export default function Home() {
         setHasMore(!isLast);
         setProgress(100);
         setMetadata((prevState) => [...prevState, ...posts]);
-        console.info(posts);
         console.info(LastEvaluatedKey);
         setLastPostKey(LastEvaluatedKey);
       } else {
@@ -131,8 +136,13 @@ export default function Home() {
   return (
     <div className="flex flex-1 flex-col my-gap w-full items-center">
       <div className="w-full grid my-gap lg:grid-cols-12 md:grid-cols-8 grid-cols-6">
-        <div className="w-full col-span-2">
+        <div className="col-span-2">
           <Navigation selects={issueDisplay} onValueChange={changeIssue} />
+        </div>
+        <div className="lg:col-span-1 md:col-span-1 col-span-2">
+          <SessionProvider>
+            <ShowNonApproved onCheckedChange={setShowNonApproved} />
+          </SessionProvider>
         </div>
       </div>
       <div ref={galleryRef} className="overflow-y-auto">
@@ -142,18 +152,20 @@ export default function Home() {
             <Progress value={progress} className="w-full" />
           </div>
         ) : (
-          <div className="grid my-gap sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 w-full justify-center">
-            {metadata.map((item, index) => (
-              <div key={index} className="lg:mb-6 md:mb-5 mb-4 w-full h-fit">
-                <Link
-                  href={{
-                    pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
-                  }}
-                >
-                  <PostThumbnail metadata={item} />
-                </Link>
-              </div>
-            ))}
+          <div className="grid my-gap sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
+            {metadata
+              .filter((item) => showNonApproved || (item.is_approved ?? true))
+              .map((item, index) => (
+                <div key={index} className="w-full h-fit">
+                  <Link
+                    href={{
+                      pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
+                    }}
+                  >
+                    <PostThumbnail metadata={item} />
+                  </Link>
+                </div>
+              ))}
           </div>
         )}
       </div>

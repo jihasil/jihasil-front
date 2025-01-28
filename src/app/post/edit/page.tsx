@@ -240,6 +240,7 @@ export default function EditPost() {
                       onValueChange={(value: CategoryUnion) => {
                         setPost({
                           ...post,
+                          // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
                           metadata: {
                             ...post?.metadata,
                             category: value,
@@ -267,6 +268,7 @@ export default function EditPost() {
                       onValueChange={(value: IssueUnion) => {
                         setPost({
                           ...post,
+                          // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
                           metadata: {
                             ...post?.metadata,
                             issue_id: value,

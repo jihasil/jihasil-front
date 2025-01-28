@@ -4,6 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 export const metadata: Metadata = {
+  title: "지하실(JIHASIL)이란",
   openGraph: {
     title: "지하실(JIHASIL)이란",
     description: "지하실에 대한 설명과 구매처",

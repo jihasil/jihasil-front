@@ -111,10 +111,9 @@ import {
 import { BaseAlignPlugin } from "@udecode/plate-alignment";
 import { BaseLineHeightPlugin } from "@udecode/plate-line-height";
 import { EditorStatic } from "@/components/plate-ui/editor-static";
-import Prism from "prismjs";
-import { Button } from "@/components/ui/button";
 
-const siteUrl = "https://platejs.org";
+// @ts-expect-error 오류 안 남
+import Prism from "prismjs";
 
 export const PlateEditor = React.forwardRef(
   (props: { data: string | undefined }, ref) => {
@@ -122,6 +121,7 @@ export const PlateEditor = React.forwardRef(
     const editor = useCreateEditor();
 
     if (props.data) {
+      // @ts-expect-error 오류 안 남
       editor.children = editor.api.html.deserialize({
         element: props.data,
       });
