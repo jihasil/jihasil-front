@@ -27,5 +27,11 @@ export async function middleware(request: NextRequest) {
       // 이미 로그인 돼있을 시 유저 페이지로 리다이렉트
       return NextResponse.redirect(new URL(`/myPage`, request.url));
     }
+  } else if (request.nextUrl.pathname.startsWith("/signIn")) {
+    const session = await auth();
+
+    if (session?.user) {
+      return NextResponse.redirect(new URL(`/myPage`, request.url));
+    }
   }
 }

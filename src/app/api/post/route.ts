@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { v4 } from "uuid";
 
 import { PostInput, getPost } from "@/app/utils/post";
+import { auth } from "@/auth";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
@@ -80,6 +81,13 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
+  const session = await auth();
+  if (!session?.user) {
+    return new Response("로그인하시거나 개발자에게 연락하세요", {
+      status: 403,
+    });
+  }
+
   const postInput: PostInput = await req.json();
   postInput.metadata["is_deleted"] = false;
 

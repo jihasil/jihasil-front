@@ -27,10 +27,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body suppressHydrationWarning={true}>
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        />
+      </head>
+      <body className="lg:mx-6 md:mx-5 mx-4" suppressHydrationWarning={true}>
         <div className="w-full min-h-[100vh] flex flex-col xl:max-w-7xl mx-auto">
           <Header />
-          <div className="px-8 my-3 flex-1">{children}</div>
+          <div className="flex-1">{children}</div>
           <Footer />
         </div>
       </body>
