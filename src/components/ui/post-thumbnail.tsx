@@ -4,20 +4,25 @@ import { CategoryValue } from "@/const/category";
 import { Separator } from "@/components/ui/separator";
 import { issueBackgroundColor, issueTextColor } from "@/const/issue";
 
-const PostThumbnail = (props: { metadata: Metadata }) => {
+const PostThumbnail = (props: { metadata: Metadata; size?: number }) => {
   let divClassName = "w-full flex flex-col my-gap ";
   const textColor = issueTextColor[props.metadata.issue_id ?? "none"];
   divClassName += textColor;
 
+  let thumbnailUrl =
+    props?.metadata.thumbnail_url ??
+    props?.metadata.imageUrl ??
+    props?.metadata.thumbnail ??
+    "https://d5ws8pqr5saw9.cloudfront.net/jihasil-stage/post-media/main.png"; // default image
+
+  if (props.size) {
+    thumbnailUrl += `?width=${props.size}`;
+  }
+
   return (
     <div className={divClassName}>
       <ImageLoader
-        src={
-          props?.metadata.thumbnail_url ??
-          props?.metadata.imageUrl ??
-          props?.metadata.thumbnail ??
-          "https://d5ws8pqr5saw9.cloudfront.net/jihasil-stage/post-media/main.png" // default image
-        }
+        src={thumbnailUrl}
         alt={"thumbnail"}
         className="w-full h-auto"
       />

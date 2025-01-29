@@ -2,15 +2,52 @@
 
 import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { LastPostKey, Metadata, PostResponseDTO } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
 import { PostThumbnail } from "@/components/ui/post-thumbnail";
-import { Progress } from "@/components/ui/progress";
 import ShowNonApproved from "@/components/ui/show-non-approved";
+import { Skeleton } from "@/components/ui/skeleton";
 import { issueDisplay } from "@/const/issue";
+import { useSessionStorage } from "@/hooks/use-session-storage";
 import { CheckedState } from "@radix-ui/react-checkbox";
+
+function Images(props: {
+  metadata: Metadata[];
+  showNonApproved: CheckedState;
+}) {
+  const smSize = window.matchMedia("(min-width: 640px)");
+  const thumbnailSize = smSize.matches ? 700 : 500;
+  console.log(thumbnailSize);
+
+  const dom = props.metadata
+    .filter((item) => props.showNonApproved || (item.is_approved ?? true))
+    .map((item, index) => (
+      <div
+        key={index}
+        className="w-full h-fit transform transition duration-500 hover:scale-90"
+      >
+        <Link href={`/post/view/${item.post_uuid ?? item.uuid}`}>
+          <PostThumbnail metadata={item} size={thumbnailSize} />
+        </Link>
+      </div>
+    ));
+  return dom;
+}
+
+function SkeletonImages() {
+  return [...Array(15)].map((e, index) => (
+    <div key={index} className="w-full h-fit flex flex-col my-gap ">
+      <Skeleton className="w-full h-auto aspect-square" />
+      <div className="flex flex-col gap-1">
+        <Skeleton className="w-[75%] lg:h-6 md:h-5 h-4" />
+        <Skeleton className="w-[50%] lg:h-6 md:h-5 h-4" />
+      </div>
+      <Skeleton className="w-[25%] lg:h-6 md:h-5 h-4" />
+    </div>
+  ));
+}
 
 export default function Home() {
   const getPageSize = () => {
@@ -36,10 +73,15 @@ export default function Home() {
   const [metadata, setMetadata] = useState<Metadata[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [issueFilter, setIssueFilter] = useState("all");
+  const [issueFilter, setIssueFilter] = useSessionStorage<string>(
+    "issueFilter",
+    "all",
+  );
   const [initiating, setInitiating] = useState<boolean>(true);
-  const [progress, setProgress] = useState(0);
-  const [showNonApproved, setShowNonApproved] = useState<CheckedState>(false);
+  const [showNonApproved, setShowNonApproved] = useSessionStorage<CheckedState>(
+    "showNonApproved",
+    false,
+  );
 
   const initiate = () => {
     setMetadata([]);
@@ -53,12 +95,11 @@ export default function Home() {
     setIssueFilter(issueFilter);
   };
 
-  const fetchMore = async () => {
+  const fetchMore = useCallback(async () => {
     if (!hasMore || isLoading) return;
     setIsLoading(true);
     console.debug("Fetching more");
     console.debug(hasMore);
-    setProgress(13);
 
     let url = "/api/post/";
     const searchParams = new URLSearchParams();
@@ -78,7 +119,6 @@ export default function Home() {
 
     url += `?${searchParams.toString()}`;
     console.log(url.toString());
-    setProgress(33);
 
     const response = await fetch(url.toString(), {
       method: "GET",
@@ -86,11 +126,9 @@ export default function Home() {
 
     try {
       if (response.ok) {
-        setProgress(80);
         const { posts, isLast, LastEvaluatedKey }: PostResponseDTO =
           await response.json();
         setHasMore(!isLast);
-        setProgress(100);
         setMetadata((prevState) => [...prevState, ...posts]);
         console.info(LastEvaluatedKey);
         setLastPostKey(LastEvaluatedKey);
@@ -102,11 +140,9 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [hasMore, isLoading, issueFilter, lastPostKey]);
 
-  const galleryRef = useRef<HTMLDivElement>(null);
-
-  const handleScroll = async () => {
+  const handleScroll = useCallback(async () => {
     const scrollTop = window.scrollY; // Pixels scrolled from the top
     const windowHeight = window.innerHeight; // Visible area height
     const documentHeight = document.documentElement.scrollHeight; // Total page height
@@ -115,7 +151,7 @@ export default function Home() {
     if (scrollTop / (documentHeight - windowHeight) >= 0.7) {
       await fetchMore();
     }
-  };
+  }, [fetchMore]);
 
   useEffect(() => {
     setInitiating(true);
@@ -123,7 +159,7 @@ export default function Home() {
     fetchMore().finally(() => {
       setInitiating(false);
     });
-  }, [issueFilter]);
+  }, [issueFilter, fetchMore]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -131,43 +167,35 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [metadata, hasMore, isLoading]);
+  }, [metadata, hasMore, isLoading, handleScroll]);
 
   return (
     <div className="flex flex-1 flex-col my-gap w-full items-center">
       <div className="w-full grid my-gap lg:grid-cols-12 md:grid-cols-8 grid-cols-6">
         <div className="col-span-2">
-          <Navigation selects={issueDisplay} onValueChange={changeIssue} />
+          <Navigation
+            selects={issueDisplay}
+            onValueChange={changeIssue}
+            default={issueFilter}
+          />
         </div>
         <div className="lg:col-span-1 md:col-span-1 col-span-2">
           <SessionProvider>
-            <ShowNonApproved onCheckedChange={setShowNonApproved} />
+            <ShowNonApproved
+              onCheckedChange={setShowNonApproved}
+              checked={showNonApproved}
+            />
           </SessionProvider>
         </div>
       </div>
-      <div ref={galleryRef} className="overflow-y-auto">
-        {initiating ? (
-          <div className="flex flex-col my-gap w-fit justify-center">
-            <p>이미지를 불러오는 중입니다...</p>
-            <Progress value={progress} className="w-full" />
-          </div>
-        ) : (
-          <div className="grid my-gap sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
-            {metadata
-              .filter((item) => showNonApproved || (item.is_approved ?? true))
-              .map((item, index) => (
-                <div key={index} className="w-full h-fit">
-                  <Link
-                    href={{
-                      pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
-                    }}
-                  >
-                    <PostThumbnail metadata={item} />
-                  </Link>
-                </div>
-              ))}
-          </div>
-        )}
+      <div className="overflow-y-auto w-full overflow-x-hidden">
+        <div className="grid my-gap w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
+          {initiating ? (
+            <SkeletonImages />
+          ) : (
+            <Images metadata={metadata} showNonApproved={showNonApproved} />
+          )}
+        </div>
       </div>
     </div>
   );

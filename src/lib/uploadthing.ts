@@ -10,7 +10,6 @@ import type {
 import { z } from "zod";
 
 import type { OurFileRouter } from "@/app/api/uploadthing/route";
-import { generateReactHelpers } from "@uploadthing/react";
 
 export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}
 
@@ -87,9 +86,6 @@ export function useUploadFile({
     uploadingFile,
   };
 }
-
-export const { uploadFiles, useUploadThing } =
-  generateReactHelpers<OurFileRouter>();
 
 export function getErrorMessage(err: unknown) {
   const unknownError = "Something went wrong, please try again later.";

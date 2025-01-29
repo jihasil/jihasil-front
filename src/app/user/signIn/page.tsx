@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 
-import SignIn from "@/app/signIn/SignIn";
+import SignIn from "@/app/user/signIn/SignIn";
 
 export default function SignInPage() {
   return (

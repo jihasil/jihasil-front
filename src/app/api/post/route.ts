@@ -1,8 +1,7 @@
+import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
-import { v4 } from "uuid";
 
 import { PostInput, getPost } from "@/app/utils/post";
-import { auth } from "@/auth";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
@@ -81,13 +80,6 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
-  const session = await auth();
-  if (!session?.user) {
-    return new Response("로그인하시거나 개발자에게 연락하세요", {
-      status: 403,
-    });
-  }
-
   const postInput: PostInput = await req.json();
   postInput.metadata["is_deleted"] = false;
 
@@ -97,7 +89,7 @@ export const POST = async (req: NextRequest) => {
     const issue_id = postInput.metadata.issue_id;
     postInput.metadata["partition_key"] = "all_posts";
     postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
-    postInput.metadata.post_uuid = v4();
+    postInput.metadata.post_uuid = nanoid(10);
   }
 
   delete postInput.metadata.thumbnail_file;
@@ -126,7 +118,7 @@ export const POST = async (req: NextRequest) => {
     await dynamoClient.send(contentPutQuery);
 
     return new Response(
-      JSON.stringify({ uuid: postInput.metadata.post_uuid }),
+      JSON.stringify({ postUuid: postInput.metadata.post_uuid }),
       {
         status: 200,
       },
