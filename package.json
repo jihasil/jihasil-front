@@ -83,6 +83,7 @@
     "@udecode/plate-table": "^42.2.2",
     "@udecode/plate-toggle": "^42.0.0",
     "@udecode/plate-trailing-block": "^42.0.0",
+    "@vercel/speed-insights": "^1.1.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
