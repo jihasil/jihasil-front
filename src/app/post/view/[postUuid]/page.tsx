@@ -45,15 +45,12 @@ export default async function PageViewer({
 
   return (
     <div className="grid my-col my-gap w-full">
-      <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky md:top-[76px] lg:top-[80px]">
+      <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky md:top-[84px] lg:top-[92px]">
         <PostThumbnail metadata={post.metadata} />
         {session?.user ? (
           <Link
             href={{
-              pathname: "/post/edit",
-              query: {
-                postUuid: postUuid,
-              },
+              pathname: `/post/edit/${postUuid}`,
             }}
           >
             <Button className="w-full">수정</Button>

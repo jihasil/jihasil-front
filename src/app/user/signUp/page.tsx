@@ -1,9 +1,12 @@
 "use client";
 
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Toaster, toast } from "sonner";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import PreventRoute from "@/app/prevent-route";
+import { requestSignIn } from "@/app/user/signIn/action";
 import {
   Form,
   FormControl,
@@ -14,21 +17,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import SubmitButton from "@/components/ui/submit-button";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const signUpSchema = z.object({
-  id: z
-    .string({ required_error: "A unique ID is required" })
-    .min(1, "A unique ID is required."),
-  name: z
-    .string({ required_error: "A unique name is required" })
-    .min(1, "A valid name is required."),
-  password: z
-    .string({ required_error: "Password is required" })
-    .min(1, "Password is required."),
-});
-
 export default function SignUpPage() {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const signUpSchema = z.object({
+    id: z.string().min(1, "ID를 입력해주세요."),
+    name: z.string().min(1, "이름을 입력해주세요."),
+    password: z.string().min(1, "비밀번호를 입력해주세요."),
+  });
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -41,31 +41,39 @@ export default function SignUpPage() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
+    if (isUploading) return;
+    setIsUploading(true);
+
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
+
     try {
       const signUpData = await signUpSchema.parseAsync(values);
       const response = await fetch("/api/user", {
         method: "POST",
         body: JSON.stringify(signUpData),
       });
+      const body = response.json();
+      toast.info(body);
+      setIsUploading(false);
 
-      if (response.status === 200) {
-        alert("회원가입 성공!");
-      } else if (response.status === 400) {
-        alert("이미 있는 ID입니다.");
-      } else {
-        alert("회원가입 실패. 개발자에게 문의하세요.");
-      }
+      await requestSignIn(
+        { id: signUpData.id, password: signUpData.password },
+        "/",
+      );
     } catch (error: any) {
       console.error(error);
-      alert("회원가입 실패. 개발자에게 문의하세요.");
+      toast.error("회원가입 실패. 개발자에게 문의하세요.");
+    } finally {
+      setIsUploading(false);
     }
   }
 
   return (
     <div className="w-fit">
+      <PreventRoute isUploading={isUploading} />
+      <Toaster />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -121,7 +129,7 @@ export default function SignUpPage() {
             )}
           />
 
-          <Button type="submit">회원가입</Button>
+          <SubmitButton isUploading={isUploading} text={"가입하기"} />
         </form>
       </Form>
     </div>

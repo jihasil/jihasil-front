@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Toaster, toast } from "sonner";
 import { z } from "zod";
 
-import { requestSignIn } from "@/app/signIn/action";
+import PreventRoute from "@/app/prevent-route";
+import { requestSignIn } from "@/app/user/signIn/action";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,19 +19,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import SubmitButton from "@/components/ui/submit-button";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-const signInSchema = z.object({
-  id: z
-    .string({ required_error: "A unique ID is required" })
-    .min(1, "A unique ID is required."),
-  password: z
-    .string({ required_error: "Password is required" })
-    .min(1, "Password is required."),
-});
 
 export default function SignIn() {
   const searchParams = useSearchParams();
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+
+  const signInSchema = z.object({
+    id: z
+      .string({ required_error: "A unique ID is required" })
+      .min(1, "A unique ID is required."),
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(1, "Password is required."),
+  });
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -43,17 +48,21 @@ export default function SignIn() {
   async function onSubmit(values: z.infer<typeof signInSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    if (isUploading) return;
+
+    setIsUploading(true);
     const signInData = await signInSchema.parseAsync(values);
     const next = searchParams.get("from") ?? "/";
     const result = await requestSignIn(signInData, next);
     if (!result) {
-      alert("아이디와 비밀번호를 확인해주세요.");
+      toast.error("아이디와 비밀번호를 확인해주세요.");
     }
+    setIsUploading(false);
   }
 
   return (
     <div className="flex w-fit flex-col my-gap">
+      <PreventRoute isUploading={isUploading} />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -91,15 +100,16 @@ export default function SignIn() {
             )}
           />
 
-          <Button type="submit">로그인</Button>
+          <SubmitButton isUploading={isUploading} text={"로그인"} />
         </form>
       </Form>
       <div className="flex flex-col my-gap">
         혹은
         <Button type="submit" className="w-fit">
-          <Link href="/signUp">회원가입</Link>
+          <Link href="/user/signUp">회원가입</Link>
         </Button>
       </div>
+      <Toaster />
     </div>
   );
 }

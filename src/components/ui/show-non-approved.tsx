@@ -9,8 +9,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
-export default function ShowNonApproved(props: { onCheckedChange: any }) {
+export default function ShowNonApproved(props: {
+  onCheckedChange: any;
+  checked: CheckedState;
+}) {
   const { data: session, status } = useSession();
   console.log(session?.user);
   console.log(status);
@@ -22,7 +26,7 @@ export default function ShowNonApproved(props: { onCheckedChange: any }) {
           <TooltipTrigger asChild>
             <div className="w-full h-full flex items-center gap-2">
               <Checkbox
-                defaultChecked={false}
+                checked={props.checked}
                 onCheckedChange={props.onCheckedChange}
               />
               <p>전체</p>

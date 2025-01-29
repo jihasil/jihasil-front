@@ -9,7 +9,7 @@ export async function requestSignIn(
     id: string;
     password: string;
   },
-  redirectTo: string,
+  redirectTo?: string,
 ) {
   try {
     await signIn("credentials", {
