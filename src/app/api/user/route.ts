@@ -1,8 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { requestSignIn } from "@/app/user/signIn/action";
 import { saltAndHashPassword } from "@/app/utils/user";
-import { auth } from "@/auth";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
@@ -14,7 +12,6 @@ type UserSignUpRequest = {
 
 export const POST = async (req: NextRequest) => {
   const body: UserSignUpRequest = await req.json();
-  const { id, password } = body;
   body.password = await saltAndHashPassword(body.password);
 
   const param = {

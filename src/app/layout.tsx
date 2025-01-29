@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { NavigationGuardProvider } from "next-navigation-guard";
 import React from "react";
 
 import Footer from "@/app/footer/footer";
 import Header from "@/app/header/header";
-import PreventRoute from "@/app/prevent-route";
 
 export const metadata: Metadata = {
   title: "지하실(JIHASIL)",

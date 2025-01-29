@@ -24,21 +24,11 @@ import { Navigation } from "@/components/ui/navigation";
 import SubmitButton from "@/components/ui/submit-button";
 import { CategoryUnion, categorySelection } from "@/const/category";
 import { IssueUnion, issueOnNewPost } from "@/const/issue";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function EditPost(props: { post?: Post }) {
   const router = useRouter();
   const { post } = props;
-
-  useEffect(() => {
-    if (post) {
-      Object.entries(post).forEach(([key, value]) => {
-        // @ts-expect-error form setValue 는 key 가 없으면 오류를 발생하지 않고 그냥 동작 안 함
-        form.setValue(key, value);
-      });
-    }
-  }, []);
 
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
@@ -184,6 +174,15 @@ export default function EditPost(props: { post?: Post }) {
   }
 
   const fileRef = form.register("thumbnail_file");
+
+  useEffect(() => {
+    if (post) {
+      Object.entries(post).forEach(([key, value]) => {
+        // @ts-expect-error form setValue 는 key 가 없으면 오류를 발생하지 않고 그냥 동작 안 함
+        form.setValue(key, value);
+      });
+    }
+  }, [form, post]);
 
   return (
     <div className="flex flex-col gap-5">

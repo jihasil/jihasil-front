@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster, toast } from "sonner";
@@ -8,7 +7,6 @@ import { z } from "zod";
 
 import PreventRoute from "@/app/prevent-route";
 import { requestSignIn } from "@/app/user/signIn/action";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -23,7 +21,6 @@ import SubmitButton from "@/components/ui/submit-button";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
 
   const signUpSchema = z.object({

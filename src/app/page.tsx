@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { LastPostKey, Metadata, PostResponseDTO } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
@@ -95,7 +95,7 @@ export default function Home() {
     setIssueFilter(issueFilter);
   };
 
-  const fetchMore = async () => {
+  const fetchMore = useCallback(async () => {
     if (!hasMore || isLoading) return;
     setIsLoading(true);
     console.debug("Fetching more");
@@ -140,9 +140,9 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [hasMore, isLoading, issueFilter, lastPostKey]);
 
-  const handleScroll = async () => {
+  const handleScroll = useCallback(async () => {
     const scrollTop = window.scrollY; // Pixels scrolled from the top
     const windowHeight = window.innerHeight; // Visible area height
     const documentHeight = document.documentElement.scrollHeight; // Total page height
@@ -151,7 +151,7 @@ export default function Home() {
     if (scrollTop / (documentHeight - windowHeight) >= 0.7) {
       await fetchMore();
     }
-  };
+  }, [fetchMore]);
 
   useEffect(() => {
     setInitiating(true);
@@ -159,7 +159,7 @@ export default function Home() {
     fetchMore().finally(() => {
       setInitiating(false);
     });
-  }, [issueFilter]);
+  }, [issueFilter, fetchMore]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -167,7 +167,7 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [metadata, hasMore, isLoading]);
+  }, [metadata, hasMore, isLoading, handleScroll]);
 
   return (
     <div className="flex flex-1 flex-col my-gap w-full items-center">

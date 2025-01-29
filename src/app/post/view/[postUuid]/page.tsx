@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import PreventRoute from "@/app/prevent-route";
 import { getPost } from "@/app/utils/post";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";

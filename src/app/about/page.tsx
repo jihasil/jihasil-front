@@ -4,6 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
+import { ImageLoader } from "@/components/ui/image-loader";
 
 export const metadata: Metadata = {
   title: "지하실(JIHASIL)이란",
@@ -27,8 +28,8 @@ export default function Home() {
             target={"_blank"}
             rel="noreferrer"
           >
-            <img
-              className="h-4 justify-center inline-flex me-2"
+            <ImageLoader
+              className="w-fit h-4 justify-center inline-flex me-2"
               alt={"instagram_logo"}
               src="https://static.cdnlogo.com/logos/i/92/instagram.svg"
             />

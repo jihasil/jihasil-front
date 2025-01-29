@@ -35,7 +35,7 @@ export default function PreventRoute(props: {
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [message]);
 
   // 새로고침, 나가기 제한
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function PreventRoute(props: {
     return () => {
       router.push = originalPush;
     };
-  }, [isUploading]);
+  }, [isUploading, message, router]);
 
   return <div />;
 }
