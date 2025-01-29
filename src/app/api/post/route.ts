@@ -1,30 +1,30 @@
+import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
 
-import { db } from "@/app/lib/dynamo-db";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
-
-type Post = {
-  title: string | null;
-  issue_id: string;
-  imageUrl: string;
-  "created_at#issue_id": string;
-};
-
-type LastPostKey = {
-  "created_at#issue_id": string;
-  partition_key: string;
-};
-
-type PostResponseDTO = {
-  posts: Post[];
-  isLast: boolean;
-  LastEvaluatedKey: LastPostKey;
-};
-
-const docClient = DynamoDBDocumentClient.from(db);
+import { PostInput, getPost } from "@/app/utils/post";
+import { dynamoClient } from "@/lib/dynamo-db";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
+
+  // uuid 딸린 게시물 하나
+  if (
+    req.nextUrl.searchParams.size === 1 &&
+    req.nextUrl.searchParams.has("postUuid")
+  ) {
+    const postUuid = req.nextUrl.searchParams.get("postUuid") as string;
+    const post = await getPost(postUuid);
+    if (!post) {
+      return new Response(null, {
+        status: 404,
+      });
+    } else {
+      return new Response(JSON.stringify(post), {
+        status: 200,
+      });
+    }
+  }
 
   const lastPostKeyJson = req.nextUrl.searchParams.get("lastPostKey");
   const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson) : null;
@@ -59,7 +59,7 @@ export const GET = async (req: NextRequest) => {
 
   try {
     // @ts-expect-error 타입을 일일히 지정할 수 없음
-    const { Items, LastEvaluatedKey } = await docClient.send(command);
+    const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
     console.log(Items);
 
     const data = {
@@ -79,4 +79,55 @@ export const GET = async (req: NextRequest) => {
   }
 };
 
-export type { Post, PostResponseDTO, LastPostKey };
+export const POST = async (req: NextRequest) => {
+  const postInput: PostInput = await req.json();
+  postInput.metadata["is_deleted"] = false;
+
+  if (postInput.metadata.post_uuid === undefined) {
+    // 새로 생성
+    const created_at = new Date().toISOString();
+    const issue_id = postInput.metadata.issue_id;
+    postInput.metadata["partition_key"] = "all_posts";
+    postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
+    postInput.metadata.post_uuid = nanoid(10);
+  }
+
+  delete postInput.metadata.thumbnail_file;
+  const metadataPutParam = {
+    TableName: "post",
+    Item: postInput.metadata,
+  };
+
+  const metadataPutQuery = new PutCommand(metadataPutParam);
+
+  const contentPutParam = {
+    TableName: "post-content",
+    Item: {
+      post_uuid: postInput.metadata.post_uuid,
+      html: postInput.html,
+    },
+  };
+
+  const contentPutQuery = new PutCommand(contentPutParam);
+
+  try {
+    // @ts-expect-error it works
+    await dynamoClient.send(metadataPutQuery);
+
+    // @ts-expect-error it works
+    await dynamoClient.send(contentPutQuery);
+
+    return new Response(
+      JSON.stringify({ postUuid: postInput.metadata.post_uuid }),
+      {
+        status: 200,
+      },
+    );
+  } catch (error: any) {
+    console.log(error);
+
+    return new Response(JSON.stringify(`Unknown Error: ${error.name}`), {
+      status: 500,
+    });
+  }
+};

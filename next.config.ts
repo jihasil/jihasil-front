@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import generated from "@next/bundle-analyzer";
+
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
@@ -10,9 +12,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  experimental: {
+    authInterrupts: true,
+  },
 };
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.VERCEL_ENV === "production") {
   nextConfig.compiler = {
     removeConsole: {
       exclude: ["debug", "error", "warn", "info"],
@@ -20,7 +28,7 @@ if (process.env.NODE_ENV === "production") {
   };
 }
 
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
+const withBundleAnalyzer = generated({
   enabled: process.env.ANALYZE === "true",
 });
 

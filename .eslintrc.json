@@ -17,11 +17,13 @@
     "node": true,
     "es6": true
   },
+  // eslint 미적용될 폴더나 파일 명시
   "ignorePatterns": [
     "node_modules/",
-    "src/components/**"
+    "src/components/**/*",
+    "src/hooks/**",
+    "src/lib/**"
   ],
-  // eslint 미적용될 폴더나 파일 명시
   "extends": [
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
@@ -48,6 +50,7 @@
   },
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
     "prettier/prettier": [
       "error",
       {

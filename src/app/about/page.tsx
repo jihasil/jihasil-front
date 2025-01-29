@@ -3,7 +3,11 @@ import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
 
+import { Button } from "@/components/ui/button";
+import { ImageLoader } from "@/components/ui/image-loader";
+
 export const metadata: Metadata = {
+  title: "지하실(JIHASIL)이란",
   openGraph: {
     title: "지하실(JIHASIL)이란",
     description: "지하실에 대한 설명과 구매처",
@@ -13,9 +17,9 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col my-gap">
       <div>
-        <p className="text-2xl font-bold py-3">지하실(JIHASIL)이란?</p>
+        <p className="text-2xl font-bold">지하실(JIHASIL)이란?</p>
         <p>
           <strong>「지하실(JIHASIL)」</strong>
           <a
@@ -24,8 +28,8 @@ export default function Home() {
             target={"_blank"}
             rel="noreferrer"
           >
-            <img
-              className="h-4 justify-center inline-flex me-2"
+            <ImageLoader
+              className="w-fit h-4 justify-center inline-flex me-2"
               alt={"instagram_logo"}
               src="https://static.cdnlogo.com/logos/i/92/instagram.svg"
             />
@@ -38,7 +42,7 @@ export default function Home() {
       </div>
 
       <div>
-        <p className="text-2xl font-bold py-3">구매처</p>
+        <p className="text-2xl font-bold">구매처</p>
         <p>
           <a
             className="naver-link"
@@ -105,13 +109,9 @@ export default function Home() {
         <p></p>
       </div>
 
-      <button className="w-fit">
+      <Button className="w-fit">
         <Link href="/subscribe">구독하기</Link>
-      </button>
-
-      <button className="w-fit">
-        <Link href="/login">멤버이신가요?</Link>
-      </button>
+      </Button>
     </div>
   );
 }

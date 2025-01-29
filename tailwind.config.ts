@@ -1,4 +1,6 @@
+import tailwind_scrollbar_hide from "tailwind-scrollbar-hide";
 import type { Config } from "tailwindcss";
+import tailwindcss_animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -14,6 +16,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        "issue-001": "var(--color-issue-001)",
+        "issue-002": "var(--color-issue-002)",
+        "issue-none": "var(--color-issue-none)",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -54,7 +59,57 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+        },
+        highlight: {
+          DEFAULT: "hsl(var(--highlight))",
+          foreground: "hsl(var(--highlight-foreground))",
+        },
+      },
+      fontFamily: {
+        heading: [
+          "var(--font-heading)",
+          "ui-sans-serif",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI Variable Display",
+          "Segoe UI",
+          "Helvetica",
+          "Apple Color Emoji",
+          "Arial",
+          "sans-serif",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "Noto Color Emoji",
+        ],
+        mono: [
+          "var(--font-mono)",
+          ...require("tailwindcss/defaultTheme").fontFamily.mono,
+        ],
+        sans: [
+          "var(--font-sans)",
+          "ui-sans-serif",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI Variable Display",
+          "Segoe UI",
+          "Helvetica",
+          "Apple Color Emoji",
+          "Arial",
+          "sans-serif",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "Noto Color Emoji",
+        ],
+      },
+      screens: {
+        "main-hover": {
+          raw: "(hover: hover)",
+        },
       },
     },
   },
+  plugins: [tailwindcss_animate, tailwind_scrollbar_hide],
 } satisfies Config;
