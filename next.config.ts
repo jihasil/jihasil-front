@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    authInterrupts: true,
+  },
 };
 
 if (process.env.NODE_ENV === "production") {

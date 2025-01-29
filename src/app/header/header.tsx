@@ -6,7 +6,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -14,7 +13,6 @@ import {
 
 const TransparentHeader = async () => {
   const session = await auth();
-  const name = session?.user?.name;
 
   const buttonStyle =
     "lg:px-6 md:px-5 px-4 hover:bg-white hover:text-background text-foreground transition-all duration-300 ease-in-out w-full h-full flex items-center justify-center md:py-0 py-4 ";
@@ -31,14 +29,14 @@ const TransparentHeader = async () => {
     <Link key="myPage" href="/user/myPage" className={userOnlyButton}>
       MYPAGE
     </Link>,
-    <Link key="write" href="/post/edit" className={userOnlyButton}>
+    <Link key="write" href="/post/new" className={userOnlyButton}>
       WRITE
-    </Link>,
-    <Link key="signIn" href="/user/signIn" className={signInButton}>
-      LOGIN
     </Link>,
     <Link key="about" href="/about" className={buttonStyle}>
       ABOUT
+    </Link>,
+    <Link key="signIn" href="/user/signIn" className={signInButton}>
+      LOGIN
     </Link>,
   ];
 
@@ -51,6 +49,7 @@ const TransparentHeader = async () => {
               <Image
                 width={1000}
                 height={1000}
+                priority={true}
                 className="w-full h-auto"
                 src="/jihasil_logo.svg"
                 alt="Logo"

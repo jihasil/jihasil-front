@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { className } from "postcss-selector-parser";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,30 +27,19 @@ import { IssueUnion, issueOnNewPost } from "@/const/issue";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function EditPost() {
+export default function EditPost(props: { post?: Post }) {
   const router = useRouter();
-  const postUuid = useSearchParams().get("postUuid");
-  const [post, setPost] = useState<Post>();
-  const [initiated, setInitiated] = useState<boolean>(false);
+  const { post } = props;
 
-  const initiatePost = () => {
-    if (!postUuid || initiated) return;
-
-    fetch(`/api/post?postUuid=${postUuid}`, {
-      method: "GET",
-    })
-      .then((res) => {
-        res.json().then((data: Post) => {
-          console.log(data);
-          setPost(data);
-        });
-      })
-      .finally(() => {
-        setInitiated(true);
+  useEffect(() => {
+    if (post) {
+      Object.entries(post).forEach(([key, value]) => {
+        // @ts-expect-error form setValue 는 key 가 없으면 오류를 발생하지 않고 그냥 동작 안 함
+        form.setValue(key, value);
       });
-  };
-
-  useEffect(initiatePost, []);
+    } else {
+    }
+  }, []);
 
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
@@ -84,6 +73,9 @@ export default function EditPost() {
     if (!response.ok) {
       throw new Error("Failed to upload");
     }
+
+    const { postUuid } = await response.json();
+    return postUuid;
   };
 
   const plateEditorRef = useRef<{ exportToHtml: () => Promise<string> }>(null);
@@ -151,8 +143,6 @@ export default function EditPost() {
         post?.metadata?.issue_id ?? (issueOnNewPost[0].value as IssueUnion),
       is_approved: post?.metadata?.is_approved ?? true,
     },
-    mode: "onChange",
-    values: post?.metadata,
   });
 
   // 2. Define a submit handler.
@@ -170,7 +160,7 @@ export default function EditPost() {
         setIsUploading(true);
 
         try {
-          await submit({
+          const postUuid = await submit({
             html,
             metadata: {
               ...values,
@@ -181,7 +171,7 @@ export default function EditPost() {
             },
           });
 
-          await router.push("/");
+          router.push(`/post/view/${postUuid}`);
         } catch (e) {
           toast("업로드에 실패했습니다.");
           console.error(e);
@@ -238,14 +228,7 @@ export default function EditPost() {
                   <FormControl>
                     <Navigation
                       onValueChange={(value: CategoryUnion) => {
-                        setPost({
-                          ...post,
-                          // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
-                          metadata: {
-                            ...post?.metadata,
-                            category: value,
-                          },
-                        });
+                        form.setValue("category", value);
                       }}
                       selects={categorySelection}
                       default={post?.metadata?.category}
@@ -266,14 +249,7 @@ export default function EditPost() {
                   <FormControl>
                     <Navigation
                       onValueChange={(value: IssueUnion) => {
-                        setPost({
-                          ...post,
-                          // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
-                          metadata: {
-                            ...post?.metadata,
-                            issue_id: value,
-                          },
-                        });
+                        form.setValue("issue_id", value);
                       }}
                       selects={issueOnNewPost}
                       default={post?.metadata?.issue_id}
@@ -369,6 +345,7 @@ export default function EditPost() {
           </Button>
         </form>
       </Form>
+      <Toaster />
     </div>
   );
 }

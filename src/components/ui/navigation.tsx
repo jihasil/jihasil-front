@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { forwardRef, useRef } from "react";
 
 export const Navigation = (props: {
   onValueChange: any;
@@ -25,8 +24,7 @@ export const Navigation = (props: {
 
   return (
     <Select
-      value={props.default}
-      defaultValue={props.selects?.[0].value}
+      defaultValue={props.default ?? props.selects[0].value}
       onValueChange={props.onValueChange}
     >
       <SelectTrigger className="w-full">

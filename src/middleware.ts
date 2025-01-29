@@ -1,4 +1,3 @@
-import { forbidden } from "next/navigation";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -12,16 +11,18 @@ export async function middleware(request: NextRequest) {
   ) {
     const session = await auth();
     if (
-      !session?.user ||
+      !session?.user &&
       !(
         request.nextUrl.pathname.startsWith("/api/user") &&
         process.env.NODE_ENV === "development"
       )
     ) {
-      return new NextResponse(null, { status: 403 });
+      return new NextResponse(null, { status: 401 });
     }
-  } else if (request.nextUrl.pathname.startsWith("/post/edit")) {
-    // 글쓰기 페이지 제한
+  }
+
+  // 글쓰기 페이지 제한
+  if (request.nextUrl.pathname.startsWith("/post/edit")) {
     const session = await auth();
 
     if (!session?.user) {
@@ -30,8 +31,10 @@ export async function middleware(request: NextRequest) {
       signInUrl.searchParams.set("from", request.nextUrl.pathname);
       return NextResponse.redirect(signInUrl);
     }
-  } else if (request.nextUrl.pathname.startsWith("/user/signUp")) {
-    // 회원가입 페이지 제한
+  }
+
+  // 회원가입 페이지 제한
+  if (request.nextUrl.pathname.startsWith("/user/signUp")) {
     const session = await auth();
 
     if (!session?.user) {
@@ -41,19 +44,27 @@ export async function middleware(request: NextRequest) {
       }
     } else {
       // 이미 로그인 돼있을 시 유저 페이지로 리다이렉트
-      return NextResponse.redirect(new URL(`/myPage`, request.url));
+      return NextResponse.redirect(new URL(`/user/myPage`, request.url));
     }
-  } else if (request.nextUrl.pathname.startsWith("/user/signIn")) {
+  }
+
+  // 로그인 페이지 제한
+  if (request.nextUrl.pathname.startsWith("/user/signIn")) {
     const session = await auth();
 
     if (session?.user) {
       // 이미 로그인 돼있을 시 유저 페이지로 리다이렉트
       return NextResponse.redirect(new URL(`/user/myPage`, request.url));
     }
-  } else if (request.nextUrl.pathname.startsWith("/user/myPage")) {
+  }
+
+  // 유저 페이지 제한
+  if (request.nextUrl.pathname.startsWith("/user/myPage")) {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.redirect(new URL(`/forbidden`, request.url));
+      const signInUrl = new URL("/user/signIn", request.url);
+      signInUrl.searchParams.set("from", request.nextUrl.pathname);
+      return NextResponse.redirect(signInUrl);
     }
   }
 }

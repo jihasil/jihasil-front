@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { v4 } from "uuid";
 
 import { PostInput, getPost } from "@/app/utils/post";
-import { auth } from "@/auth";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
@@ -119,7 +118,7 @@ export const POST = async (req: NextRequest) => {
     await dynamoClient.send(contentPutQuery);
 
     return new Response(
-      JSON.stringify({ uuid: postInput.metadata.post_uuid }),
+      JSON.stringify({ postUuid: postInput.metadata.post_uuid }),
       {
         status: 200,
       },

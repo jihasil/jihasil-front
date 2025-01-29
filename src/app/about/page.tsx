@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
 
+import { Button } from "@/components/ui/button";
+
 export const metadata: Metadata = {
   title: "지하실(JIHASIL)이란",
   openGraph: {
@@ -106,9 +108,9 @@ export default function Home() {
         <p></p>
       </div>
 
-      <button className="w-fit">
+      <Button className="w-fit">
         <Link href="/subscribe">구독하기</Link>
-      </button>
+      </Button>
     </div>
   );
 }
