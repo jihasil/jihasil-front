@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import EditPost from "@/app/post/edit-post";
 import { Post, getPost } from "@/app/utils/post";

@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
 
     if (!session?.user) {
       // 개발자 서버 아니면 회원가입 제한
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV !== "development") {
         return new NextResponse(
           "회원가입을 하실 수 없습니다. 개발자에게 문의하세요.",
           { status: 401 },

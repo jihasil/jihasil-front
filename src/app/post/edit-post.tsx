@@ -2,16 +2,15 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { className } from "postcss-selector-parser";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster, toast } from "sonner";
 import { z } from "zod";
 
+import PreventRoute from "@/app/prevent-route";
 import { Post, PostInput } from "@/app/utils/post";
 import { PlateEditor } from "@/components/editor/plate-editor";
 import { Checkbox } from "@/components/plate-ui/checkbox";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/ui/navigation";
+import SubmitButton from "@/components/ui/submit-button";
 import { CategoryUnion, categorySelection } from "@/const/category";
 import { IssueUnion, issueOnNewPost } from "@/const/issue";
 import { cn } from "@/lib/utils";
@@ -37,7 +37,6 @@ export default function EditPost(props: { post?: Post }) {
         // @ts-expect-error form setValue 는 key 가 없으면 오류를 발생하지 않고 그냥 동작 안 함
         form.setValue(key, value);
       });
-    } else {
     }
   }, []);
 
@@ -188,6 +187,7 @@ export default function EditPost(props: { post?: Post }) {
 
   return (
     <div className="flex flex-col gap-5">
+      <PreventRoute isUploading={isUploading} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="w-full justify-items-stretch grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4 gap-3">
@@ -323,26 +323,7 @@ export default function EditPost(props: { post?: Post }) {
               )}
             />
           </div>
-          <Button disabled={isUploading} type="submit">
-            {isUploading ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={cn("animate-spin", className)}
-              >
-                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-              </svg>
-            ) : (
-              "제출"
-            )}
-          </Button>
+          <SubmitButton isUploading={isUploading} text={"제출하기"} />
         </form>
       </Form>
       <Toaster />

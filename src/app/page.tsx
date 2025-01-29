@@ -10,6 +10,7 @@ import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import ShowNonApproved from "@/components/ui/show-non-approved";
 import { Skeleton } from "@/components/ui/skeleton";
 import { issueDisplay } from "@/const/issue";
+import { useSessionStorage } from "@/hooks/use-session-storage";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 function Images(props: {
@@ -25,14 +26,9 @@ function Images(props: {
     .map((item, index) => (
       <div
         key={index}
-        className="w-full h-fit cursor-pointer py-6 rounded-lg
-                                transform transition duration-500 hover:scale-90"
+        className="w-full h-fit transform transition duration-500 hover:scale-90"
       >
-        <Link
-          href={{
-            pathname: `/post/view/${item.post_uuid ?? item.uuid}`,
-          }}
-        >
+        <Link href={`/post/view/${item.post_uuid ?? item.uuid}`}>
           <PostThumbnail metadata={item} size={thumbnailSize} />
         </Link>
       </div>
@@ -77,9 +73,15 @@ export default function Home() {
   const [metadata, setMetadata] = useState<Metadata[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [issueFilter, setIssueFilter] = useState("all");
+  const [issueFilter, setIssueFilter] = useSessionStorage<string>(
+    "issueFilter",
+    "all",
+  );
   const [initiating, setInitiating] = useState<boolean>(true);
-  const [showNonApproved, setShowNonApproved] = useState<CheckedState>(false);
+  const [showNonApproved, setShowNonApproved] = useSessionStorage<CheckedState>(
+    "showNonApproved",
+    false,
+  );
 
   const initiate = () => {
     setMetadata([]);
@@ -171,11 +173,18 @@ export default function Home() {
     <div className="flex flex-1 flex-col my-gap w-full items-center">
       <div className="w-full grid my-gap lg:grid-cols-12 md:grid-cols-8 grid-cols-6">
         <div className="col-span-2">
-          <Navigation selects={issueDisplay} onValueChange={changeIssue} />
+          <Navigation
+            selects={issueDisplay}
+            onValueChange={changeIssue}
+            default={issueFilter}
+          />
         </div>
         <div className="lg:col-span-1 md:col-span-1 col-span-2">
           <SessionProvider>
-            <ShowNonApproved onCheckedChange={setShowNonApproved} />
+            <ShowNonApproved
+              onCheckedChange={setShowNonApproved}
+              checked={showNonApproved}
+            />
           </SessionProvider>
         </div>
       </div>

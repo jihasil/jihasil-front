@@ -1,5 +1,5 @@
+import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
-import { v4 } from "uuid";
 
 import { PostInput, getPost } from "@/app/utils/post";
 import { dynamoClient } from "@/lib/dynamo-db";
@@ -89,7 +89,7 @@ export const POST = async (req: NextRequest) => {
     const issue_id = postInput.metadata.issue_id;
     postInput.metadata["partition_key"] = "all_posts";
     postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
-    postInput.metadata.post_uuid = v4();
+    postInput.metadata.post_uuid = nanoid(10);
   }
 
   delete postInput.metadata.thumbnail_file;
