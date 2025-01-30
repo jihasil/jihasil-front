@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
   },
+  reactStrictMode: false,
 };
 
 if (process.env.VERCEL_ENV === "production") {
