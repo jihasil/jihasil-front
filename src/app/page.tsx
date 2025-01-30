@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { LastPostKey, Metadata, PostResponseDTO } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
@@ -24,12 +24,13 @@ function Images(props: {
   const dom = props.metadata
     .filter((item) => props.showNonApproved || (item.is_approved ?? true))
     .map((item, index) => (
-      <div
-        key={index}
-        className="w-full h-fit transform transition duration-500 hover:scale-90"
-      >
+      <div key={index} className="w-full h-fit">
         <Link href={`/post/view/${item.post_uuid ?? item.uuid}`}>
-          <PostThumbnail metadata={item} size={thumbnailSize} />
+          <PostThumbnail
+            metadata={item}
+            imageSize={thumbnailSize}
+            isClickable={true}
+          />
         </Link>
       </div>
     ));
@@ -77,7 +78,7 @@ export default function Home() {
     "issueFilter",
     "all",
   );
-  const [initiating, setInitiating] = useState<boolean>(true);
+  const isInitiated = useRef(false);
   const [showNonApproved, setShowNonApproved] = useSessionStorage<CheckedState>(
     "showNonApproved",
     false,
@@ -154,10 +155,9 @@ export default function Home() {
   }, [fetchMore]);
 
   useEffect(() => {
-    setInitiating(true);
-
+    isInitiated.current = false;
     fetchMore().finally(() => {
-      setInitiating(false);
+      isInitiated.current = true;
     });
   }, [issueFilter, fetchMore]);
 
@@ -190,7 +190,7 @@ export default function Home() {
       </div>
       <div className="overflow-y-auto w-full overflow-x-hidden">
         <div className="grid my-gap w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
-          {initiating ? (
+          {!isInitiated.current ? (
             <SkeletonImages />
           ) : (
             <Images metadata={metadata} showNonApproved={showNonApproved} />
