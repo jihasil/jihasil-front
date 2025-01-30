@@ -43,7 +43,7 @@ const PostThumbnail = (props: {
         <p className="font-bold text-xl text-opacity-100">
           {props?.metadata?.title ?? "테스트 제목"}
         </p>
-        <p className="text-sm text-opacity-70 text-ellipsis overflow-hidden whitespace-nowrap">
+        <p className="text-sm text-opacity-70">
           {props?.metadata?.subtitle ?? "테스트 부제목에 관한 고찰"}
         </p>
       </div>

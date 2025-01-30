@@ -21,7 +21,7 @@ function Images(props: {
   const thumbnailSize = smSize.matches ? 700 : 500;
   console.log(thumbnailSize);
 
-  const dom = props.metadata
+  return props.metadata
     .filter((item) => props.showNonApproved || (item.is_approved ?? true))
     .map((item, index) => (
       <div key={index} className="w-full h-fit">
@@ -34,7 +34,6 @@ function Images(props: {
         </Link>
       </div>
     ));
-  return dom;
 }
 
 function SkeletonImages() {
