@@ -63,8 +63,8 @@ export default function EditPost(props: { post?: Post }) {
       throw new Error("Failed to upload");
     }
 
-    const { postUuid } = await response.json();
-    return postUuid;
+    const { postId } = await response.json();
+    return postId;
   };
 
   const plateEditorRef = useRef<{ exportToHtml: () => Promise<string> }>(null);
@@ -82,7 +82,7 @@ export default function EditPost(props: { post?: Post }) {
       .any()
       .refine((file: FileList) => {
         // 기본값 있으면 (있는 글 수정이면 파일 없어도 됨)
-        if (post?.metadata?.thumbnail_url) return true;
+        if (post?.postMetadata?.thumbnail_url) return true;
         else {
           // 없으면 파일 있어야 함
           return file.length === 1;
@@ -90,7 +90,7 @@ export default function EditPost(props: { post?: Post }) {
       }, "썸네일 파일을 입력해주세요.")
       .refine((file: FileList) => {
         return (
-          post?.metadata?.thumbnail_url ||
+          post?.postMetadata?.thumbnail_url ||
           ACCEPTED_IMAGE_TYPES.includes(file[0]?.type)
         );
       }, "jpg, png, webp 이미지를 입력해주세요."),
@@ -122,15 +122,15 @@ export default function EditPost(props: { post?: Post }) {
   const form = useForm<z.infer<typeof metadataSchema>>({
     resolver: zodResolver(metadataSchema),
     defaultValues: {
-      title: post?.metadata?.title ?? "",
-      subtitle: post?.metadata?.subtitle ?? "",
+      title: post?.postMetadata?.title ?? "",
+      subtitle: post?.postMetadata?.subtitle ?? "",
       category:
-        post?.metadata?.category ??
+        post?.postMetadata?.category ??
         (categorySelection[0].value as CategoryUnion),
-      author: post?.metadata?.author ?? "",
+      author: post?.postMetadata?.author ?? "",
       issue_id:
-        post?.metadata?.issue_id ?? (issueOnNewPost[0].value as IssueUnion),
-      is_approved: post?.metadata?.is_approved ?? true,
+        post?.postMetadata?.issue_id ?? (issueOnNewPost[0].value as IssueUnion),
+      is_approved: post?.postMetadata?.is_approved ?? true,
     },
   });
 
@@ -149,18 +149,18 @@ export default function EditPost(props: { post?: Post }) {
         setIsUploading(true);
 
         try {
-          const postUuid = await submit({
+          const postId = await submit({
             html,
             metadata: {
               ...values,
-              post_uuid: post?.metadata?.post_uuid,
-              thumbnail_url: post?.metadata?.thumbnail_url,
-              partition_key: post?.metadata?.partition_key,
-              "created_at#issue_id": post?.metadata?.["created_at#issue_id"],
+              post_id: post?.postMetadata?.post_id,
+              thumbnail_url: post?.postMetadata?.thumbnail_url,
+              board: post?.postMetadata?.board,
+              created_at: post?.postMetadata?.created_at,
             },
           });
 
-          router.push(`/post/view/${postUuid}`);
+          router.push(`/post/view/${postId}`);
         } catch (e) {
           toast("업로드에 실패했습니다.");
           console.error(e);
@@ -230,7 +230,7 @@ export default function EditPost(props: { post?: Post }) {
                         form.setValue("category", value);
                       }}
                       selects={categorySelection}
-                      default={post?.metadata?.category}
+                      default={post?.postMetadata?.category}
                       {...field}
                     />
                   </FormControl>
@@ -251,7 +251,7 @@ export default function EditPost(props: { post?: Post }) {
                         form.setValue("issue_id", value);
                       }}
                       selects={issueOnNewPost}
-                      default={post?.metadata?.issue_id}
+                      default={post?.postMetadata?.issue_id}
                       {...field}
                     />
                   </FormControl>

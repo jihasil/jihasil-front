@@ -1,20 +1,20 @@
 import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
 
-import { PostInput, getPost } from "@/app/utils/post";
+import { PostInput, PostResponseDTO, getPost } from "@/app/utils/post";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
 
-  // uuid 딸린 게시물 하나
+  // uuid 딸린 게시물 하나의 metadata
   if (
     req.nextUrl.searchParams.size === 1 &&
-    req.nextUrl.searchParams.has("postUuid")
+    req.nextUrl.searchParams.has("post_id")
   ) {
-    const postUuid = req.nextUrl.searchParams.get("postUuid") as string;
-    const post = await getPost(postUuid);
+    const postId = req.nextUrl.searchParams.get("post_id") as string;
+    const post = await getPost(postId);
     if (!post) {
       return new Response(null, {
         status: 404,
@@ -26,6 +26,7 @@ export const GET = async (req: NextRequest) => {
     }
   }
 
+  // 전체 metadata
   const lastPostKeyJson = req.nextUrl.searchParams.get("lastPostKey");
   const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson) : null;
 
@@ -33,20 +34,20 @@ export const GET = async (req: NextRequest) => {
   const pageSize = Number(req.nextUrl.searchParams.get("pageSize") ?? 10);
 
   const param = {
-    TableName: "post",
+    TableName: "post_metadata",
     Limit: pageSize,
     ...(issueId !== null
       ? {
-          IndexName: "issue_id_index",
+          IndexName: "index_issue_id",
           KeyConditionExpression: "issue_id = :issue_id",
           ExpressionAttributeValues: {
             ":issue_id": issueId,
           },
         }
       : {
-          KeyConditionExpression: "partition_key = :partition_key",
+          KeyConditionExpression: "board = :board",
           ExpressionAttributeValues: {
-            ":partition_key": "all_posts",
+            ":board": "main",
           },
         }),
     ScanIndexForward: false,
@@ -62,8 +63,8 @@ export const GET = async (req: NextRequest) => {
     const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
     console.log(Items);
 
-    const data = {
-      posts: Items, // 포스트 목록
+    const data: PostResponseDTO = {
+      postMetadataList: Items, // 포스트 목록
       isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
       LastEvaluatedKey,
     };
@@ -83,27 +84,26 @@ export const POST = async (req: NextRequest) => {
   const postInput: PostInput = await req.json();
   postInput.metadata["is_deleted"] = false;
 
-  if (postInput.metadata.post_uuid === undefined) {
+  if (postInput.metadata.post_id === undefined) {
     // 새로 생성
     const created_at = new Date().toISOString();
-    const issue_id = postInput.metadata.issue_id;
-    postInput.metadata["partition_key"] = "all_posts";
-    postInput.metadata["created_at#issue_id"] = `${created_at}#${issue_id}`;
-    postInput.metadata.post_uuid = nanoid(10);
+    postInput.metadata.board = "main";
+    postInput.metadata.created_at = created_at;
+    postInput.metadata.post_id = nanoid(10);
   }
 
   delete postInput.metadata.thumbnail_file;
   const metadataPutParam = {
-    TableName: "post",
+    TableName: "post_metadata",
     Item: postInput.metadata,
   };
 
   const metadataPutQuery = new PutCommand(metadataPutParam);
 
   const contentPutParam = {
-    TableName: "post-content",
+    TableName: "post_content",
     Item: {
-      post_uuid: postInput.metadata.post_uuid,
+      post_id: postInput.metadata.post_id,
       html: postInput.html,
     },
   };
@@ -118,7 +118,7 @@ export const POST = async (req: NextRequest) => {
     await dynamoClient.send(contentPutQuery);
 
     return new Response(
-      JSON.stringify({ postUuid: postInput.metadata.post_uuid }),
+      JSON.stringify({ postId: postInput.metadata.post_id }),
       {
         status: 200,
       },
