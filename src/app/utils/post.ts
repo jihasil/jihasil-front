@@ -3,13 +3,10 @@ import { IssueUnion } from "@/const/issue";
 import { dynamoClient } from "@/lib/dynamo-db";
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 
-export type Metadata = {
-  thumbnail?: string | undefined; // legacy
-  "created_at#issue_id"?: string; // legacy
-  imageUrl?: string; // legacy
-  uuid?: string; // legacy
-  post_uuid?: string;
-  partition_key?: string;
+export type PostMetadata = {
+  post_id?: string;
+  created_at?: string;
+  board?: string;
   thumbnail_url?: string;
   thumbnail_file?: FileList;
   title: string;
@@ -23,42 +20,40 @@ export type Metadata = {
 
 export type PostInput = {
   html: string;
-  metadata: Metadata;
+  metadata: PostMetadata;
 };
 
 export type Post = {
-  "created_at#issue_id": string; // legacy
-  imageUrl?: string; // legacy
-  metadata: Metadata;
+  postMetadata: PostMetadata;
   html: string;
 };
 
 export type LastPostKey = {
-  "created_at#issue_id": string;
-  partition_key: string;
+  created_at: string;
+  board: string;
 };
 
 export type PostResponseDTO = {
-  posts: Metadata[];
+  postMetadataList: PostMetadata[];
   isLast: boolean;
   LastEvaluatedKey: LastPostKey;
 };
 
-export const getPost = async (postUuid: string) => {
+export const getPost = async (postId: string) => {
   const getContentParam = {
-    TableName: "post-content",
-    KeyConditionExpression: "post_uuid = :post_uuid",
+    TableName: "post_content",
+    KeyConditionExpression: "post_id = :post_id",
     ExpressionAttributeValues: {
-      ":post_uuid": postUuid,
+      ":post_id": postId,
     },
   };
 
   const getMetadataParam = {
-    TableName: "post",
-    IndexName: "post_uuid_index",
-    KeyConditionExpression: "post_uuid = :post_uuid",
+    TableName: "post_metadata",
+    IndexName: "index_post_id",
+    KeyConditionExpression: "post_id = :post_id",
     ExpressionAttributeValues: {
-      ":post_uuid": postUuid,
+      ":post_id": postId,
     },
   };
 
@@ -66,25 +61,28 @@ export const getPost = async (postUuid: string) => {
   const getMetadataQuery = new QueryCommand(getMetadataParam);
 
   try {
-    // @ts-expect-error it works
-    const content = await dynamoClient.send(getContentQuery);
+    console.log(getContentQuery);
+    console.log(getMetadataQuery);
 
     // @ts-expect-error it works
-    const metadata = await dynamoClient.send(getMetadataQuery);
+    const postContent = await dynamoClient.send(getContentQuery);
 
-    console.log(postUuid);
-    console.log(content);
-    console.log(metadata);
+    // @ts-expect-error it works
+    const postMetadata = await dynamoClient.send(getMetadataQuery);
+
+    console.log(postId);
+    console.log(postContent);
+    console.log(postMetadata);
 
     // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
-    if (content.Items.length !== 1 || metadata.Items.length !== 1) {
+    if (postContent.Items.length !== 1 || postMetadata.Items.length !== 1) {
       return null;
     } else {
       const post: Post = {
         // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
-        ...content.Items[0],
+        ...postContent.Items[0],
         // @ts-expect-error 기본값 설정해서 undefined 될 일 없음
-        metadata: { ...metadata.Items[0] },
+        postMetadata: { ...postMetadata.Items[0] },
       };
       return post;
     }

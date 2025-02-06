@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { LastPostKey, Metadata, PostResponseDTO } from "@/app/utils/post";
+import { LastPostKey, PostMetadata, PostResponseDTO } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
 import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import ShowNonApproved from "@/components/ui/show-non-approved";
@@ -14,20 +14,20 @@ import { useSessionStorage } from "@/hooks/use-session-storage";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 function Images(props: {
-  metadata: Metadata[];
+  postMetadataList: PostMetadata[];
   showNonApproved: CheckedState;
 }) {
   const smSize = window.matchMedia("(min-width: 640px)");
   const thumbnailSize = smSize.matches ? 700 : 500;
   console.log(thumbnailSize);
 
-  return props.metadata
+  return props.postMetadataList
     .filter((item) => props.showNonApproved || (item.is_approved ?? true))
     .map((item, index) => (
       <div key={index} className="w-full h-fit">
-        <Link href={`/post/view/${item.post_uuid ?? item.uuid}`}>
+        <Link href={`/post/view/${item.post_id ?? item.post_id}`}>
           <PostThumbnail
-            metadata={item}
+            postMetadata={item}
             imageSize={thumbnailSize}
             isClickable={true}
           />
@@ -70,7 +70,7 @@ export default function Home() {
   };
 
   const [lastPostKey, setLastPostKey] = useState<LastPostKey | null>(null);
-  const [metadata, setMetadata] = useState<Metadata[]>([]);
+  const [postMetadata, setPostMetadata] = useState<PostMetadata[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [issueFilter, setIssueFilter] = useSessionStorage<string>(
@@ -84,7 +84,7 @@ export default function Home() {
   );
 
   const initiate = () => {
-    setMetadata([]);
+    setPostMetadata([]);
     setLastPostKey(null);
     setHasMore(true);
     setIsLoading(false);
@@ -126,10 +126,11 @@ export default function Home() {
 
     try {
       if (response.ok) {
-        const { posts, isLast, LastEvaluatedKey }: PostResponseDTO =
+        const { postMetadataList, isLast, LastEvaluatedKey }: PostResponseDTO =
           await response.json();
         setHasMore(!isLast);
-        setMetadata((prevState) => [...prevState, ...posts]);
+        setPostMetadata((prevState) => [...prevState, ...postMetadataList]);
+        console.log(postMetadataList);
         console.info(LastEvaluatedKey);
         setLastPostKey(LastEvaluatedKey);
       } else {
@@ -166,7 +167,7 @@ export default function Home() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [metadata, hasMore, isLoading, handleScroll]);
+  }, [postMetadata, hasMore, isLoading, handleScroll]);
 
   return (
     <div className="flex flex-1 flex-col my-gap w-full items-center">
@@ -192,7 +193,10 @@ export default function Home() {
           {!isInitiated.current ? (
             <SkeletonImages />
           ) : (
-            <Images metadata={metadata} showNonApproved={showNonApproved} />
+            <Images
+              postMetadataList={postMetadata}
+              showNonApproved={showNonApproved}
+            />
           )}
         </div>
       </div>

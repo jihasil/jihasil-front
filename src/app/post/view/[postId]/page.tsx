@@ -11,18 +11,18 @@ import { defaultImageUrl } from "@/const/image";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ postUuid: string }>;
+  params: Promise<{ postId: string }>;
 }): Promise<Metadata> {
-  const postUuid = (await params).postUuid;
-  const post = await getPost(postUuid);
+  const postId = (await params).postId;
+  const post = await getPost(postId);
 
   return {
-    title: post?.metadata.title,
+    title: post?.postMetadata.title,
     openGraph: {
-      title: post?.metadata.title,
-      description: post?.metadata.subtitle,
-      url: `https://www.jihasil.com/post/view/${post?.metadata.post_uuid}`,
-      images: [new URL(post?.metadata.thumbnail_url ?? defaultImageUrl)],
+      title: post?.postMetadata.title,
+      description: post?.postMetadata.subtitle,
+      url: `/${post?.postMetadata.post_id}`,
+      images: [new URL(post?.postMetadata.thumbnail_url ?? defaultImageUrl)],
     },
   };
 }
@@ -30,27 +30,27 @@ export async function generateMetadata({
 export default async function PageViewer({
   params,
 }: {
-  params: Promise<{ postUuid: string }>;
+  params: Promise<{ postId: string }>;
 }) {
-  const postUuid = (await params).postUuid;
+  const postId = (await params).postId;
   const session = await auth();
 
-  const post = await getPost(postUuid);
+  const post = await getPost(postId);
   if (!post) {
     notFound();
   }
 
-  console.log(postUuid);
+  console.log(postId);
   console.log(post);
 
   return (
     <div className="grid my-col my-gap w-full">
       <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky md:top-[84px] lg:top-[92px]">
-        <PostThumbnail metadata={post.metadata} />
+        <PostThumbnail postMetadata={post.postMetadata} />
         {session?.user ? (
           <Link
             href={{
-              pathname: `/post/edit/${postUuid}`,
+              pathname: `/post/edit/${postId}`,
             }}
           >
             <Button className="w-full">수정</Button>
@@ -59,7 +59,7 @@ export default async function PageViewer({
       </div>
       <div className="lg:col-span-9 md:col-span-6 col-span-4 z-0">
         <div
-          id="post-content"
+          id="post_content"
           dangerouslySetInnerHTML={{
             __html: post.html,
           }}

@@ -6,12 +6,12 @@ import { Post, getPost } from "@/app/utils/post";
 export default async function EditPostPage({
   params,
 }: {
-  params: Promise<{ postUuid: string | undefined }>;
+  params: Promise<{ postId: string | undefined }>;
 }) {
-  const postUuid = (await params).postUuid;
+  const postId = (await params).postId;
   let post: Post | null = null;
-  if (postUuid) {
-    post = await getPost(postUuid);
+  if (postId) {
+    post = await getPost(postId);
   }
 
   if (!post) {
