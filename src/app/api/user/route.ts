@@ -8,11 +8,13 @@ type UserSignUpRequest = {
   id: string;
   name: string;
   password: string;
+  role?: string;
 };
 
 export const POST = async (req: NextRequest) => {
   const body: UserSignUpRequest = await req.json();
   body.password = await saltAndHashPassword(body.password);
+  body.role = "ROLE_USER";
 
   const param = {
     TableName: "user",

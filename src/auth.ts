@@ -3,6 +3,14 @@ import Credentials from "next-auth/providers/credentials";
 
 import { getUser, validatePassword } from "@/app/utils/user";
 
+declare module "next-auth" {
+  interface User {
+    id?: string;
+    email?: string | null;
+    role: string;
+  }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -14,6 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         const user = await getUser(credentials.id as string);
+        console.log(user);
 
         if (user !== null) {
           const isValid = await validatePassword(
@@ -35,4 +44,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   trustHost: true,
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) token.role = user.role;
+      return token;
+    },
+    session({ session, token }) {
+      session.user.role = token.role;
+      return session;
+    },
+  },
 });

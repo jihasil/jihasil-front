@@ -29,16 +29,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 회원가입 페이지 제한
-  if (request.nextUrl.pathname.startsWith("/user/signUp")) {
-    const session = await auth();
-
-    if (session?.user) {
-      // 이미 로그인 돼있을 시 유저 페이지로 리다이렉트
-      return NextResponse.redirect(new URL(`/user/myPage`, request.url));
-    }
-  }
-
   // 로그인 페이지 제한
   if (request.nextUrl.pathname.startsWith("/user/signIn")) {
     const session = await auth();
