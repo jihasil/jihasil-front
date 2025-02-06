@@ -14,9 +14,7 @@ const PostThumbnail = (props: {
   const textColor = issueTextColor[props.postMetadata.issue_id ?? "none"];
   divClassName += textColor;
 
-  let thumbnailUrl =
-    props?.postMetadata.thumbnail_url ??
-    "https://d5ws8pqr5saw9.cloudfront.net/jihasil-stage/post-media/main.png"; // default image
+  let thumbnailUrl = props?.postMetadata.thumbnail_url;
 
   if (props.imageSize) {
     thumbnailUrl += `?width=${props.imageSize}`;
@@ -25,7 +23,7 @@ const PostThumbnail = (props: {
   return (
     <div className={divClassName}>
       <ImageLoader
-        src={thumbnailUrl}
+        src={thumbnailUrl ?? "main.png"}
         alt={"thumbnail"}
         className={cn(
           "w-full h-auto",
