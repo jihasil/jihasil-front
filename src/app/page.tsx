@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { SessionProvider } from "next-auth/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React from "react";
 
-import { LastPostKey, PostMetadata, PostResponseDTO } from "@/app/utils/post";
+import { LastPostKey, PostMetadata } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
 import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import ShowNonApproved from "@/components/ui/show-non-approved";
 import { Skeleton } from "@/components/ui/skeleton";
 import { issueDisplay } from "@/const/issue";
+import { useInfiniteObjectList } from "@/hooks/use-infinite-object-list";
 import { useSessionStorage } from "@/hooks/use-session-storage";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
@@ -69,105 +70,31 @@ export default function Home() {
     return pageSize;
   };
 
-  const [lastPostKey, setLastPostKey] = useState<LastPostKey | null>(null);
-  const [postMetadata, setPostMetadata] = useState<PostMetadata[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [issueFilter, setIssueFilter] = useSessionStorage<string>(
     "issueFilter",
     "all",
   );
-  const isInitiated = useRef(false);
+
   const [showNonApproved, setShowNonApproved] = useSessionStorage<CheckedState>(
     "showNonApproved",
     false,
   );
-
-  const initiate = () => {
-    setPostMetadata([]);
-    setLastPostKey(null);
-    setHasMore(true);
-    setIsLoading(false);
-  };
 
   const changeIssue = (issueFilter: string) => {
     initiate();
     setIssueFilter(issueFilter);
   };
 
-  const fetchMore = useCallback(async () => {
-    if (!hasMore || isLoading) return;
-    setIsLoading(true);
-    console.debug("Fetching more");
-    console.debug(hasMore);
-
-    let url = "/api/post/";
-    const searchParams = new URLSearchParams();
-
-    const pageSize = getPageSize();
-
-    if (lastPostKey) {
-      const lastPostKeyJson = JSON.stringify(lastPostKey);
-      searchParams.append("lastPostKey", lastPostKeyJson);
-    }
-
+  const modifySearchParams = (searchParams: URLSearchParams) => {
     if (issueFilter !== "all") {
       searchParams.append("issueId", issueFilter);
     }
+  };
 
-    searchParams.append("pageSize", pageSize.toString());
-
-    url += `?${searchParams.toString()}`;
-    console.log(url.toString());
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-    });
-
-    try {
-      if (response.ok) {
-        const { postMetadataList, isLast, LastEvaluatedKey }: PostResponseDTO =
-          await response.json();
-        setHasMore(!isLast);
-        setPostMetadata((prevState) => [...prevState, ...postMetadataList]);
-        console.log(postMetadataList);
-        console.info(LastEvaluatedKey);
-        setLastPostKey(LastEvaluatedKey);
-      } else {
-        setHasMore(false);
-      }
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [hasMore, isLoading, issueFilter, lastPostKey]);
-
-  const handleScroll = useCallback(async () => {
-    const scrollTop = window.scrollY; // Pixels scrolled from the top
-    const windowHeight = window.innerHeight; // Visible area height
-    const documentHeight = document.documentElement.scrollHeight; // Total page height
-
-    // Check if scrolled beyond 70%
-    if (scrollTop / (documentHeight - windowHeight) >= 0.7) {
-      await fetchMore();
-    }
-  }, [fetchMore]);
-
-  useEffect(() => {
-    isInitiated.current = false;
-    fetchMore().finally(() => {
-      isInitiated.current = true;
-    });
-  }, [issueFilter, fetchMore]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [postMetadata, hasMore, isLoading, handleScroll]);
+  const { objectList, isInitiated, initiate } = useInfiniteObjectList<
+    PostMetadata,
+    LastPostKey
+  >("/api/post", "postMetadataList", modifySearchParams, getPageSize);
 
   return (
     <div className="flex flex-1 flex-col my-gap w-full items-center">
@@ -194,7 +121,7 @@ export default function Home() {
             <SkeletonImages />
           ) : (
             <Images
-              postMetadataList={postMetadata}
+              postMetadataList={objectList}
               showNonApproved={showNonApproved}
             />
           )}
