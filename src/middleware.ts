@@ -11,8 +11,24 @@ export async function middleware(request: NextRequest) {
   ) {
     const session = await auth();
     if (!session?.user && !request.nextUrl.pathname.startsWith("/api/user")) {
-      return new NextResponse("권한이 없습니다.", {
+      return new NextResponse("로그인 후 다시 시도해주세요.", {
         status: 401,
+      });
+    }
+  }
+
+  if (
+    request.method === "GET" &&
+    request.nextUrl.pathname.startsWith("/api/user")
+  ) {
+    const session = await auth();
+    if (!session?.user) {
+      return new NextResponse("로그인 후 다시 시도해주세요.", {
+        status: 401,
+      });
+    } else if (session?.user?.role !== "ROLE_SUPERUSER") {
+      return new NextResponse("권한이 없습니다.", {
+        status: 403,
       });
     }
   }

@@ -1,14 +1,43 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { saltAndHashPassword } from "@/app/utils/user";
 import { dynamoClient } from "@/lib/dynamo-db";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 type UserSignUpRequest = {
   id: string;
   name: string;
   password: string;
   role?: string;
+};
+
+export const GET = async () => {
+  const param = {
+    TableName: "user",
+    PageSize: 30,
+  };
+
+  const query = new ScanCommand(param);
+
+  try {
+    // @ts-expect-error dynamo db
+    const { Items, LastEvaluatedKey } = await dynamoClient.send(query);
+
+    return new NextResponse(
+      JSON.stringify({
+        users: Items,
+        LastEvaluatedKey,
+      }),
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.log(error);
+    return new NextResponse(JSON.stringify("오류가 발생했습니다."), {
+      status: 500,
+    });
+  }
 };
 
 export const POST = async (req: NextRequest) => {
