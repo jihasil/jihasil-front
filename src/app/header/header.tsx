@@ -41,58 +41,56 @@ const TransparentHeader = async () => {
   ];
 
   return (
-    <header className="bg-background sticky top-0 z-[2147483646] lg:py-6 md:py-5 py-4">
-      <div className="grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4 lg:gap-6 md:gap-5 gap-4">
-        <div className="w-full h-full lg:col-span-2 md:col-span-2 col-span-1">
-          <button className="h-full">
-            <Link href="/">
-              <Image
-                width={1000}
-                height={1000}
-                priority={true}
-                className="w-full h-auto"
-                src="/jihasil_logo.svg"
-                alt="Logo"
-              />
-            </Link>
-          </button>
-        </div>
-        <div className="col-span-2 -col-end-1 hidden w-full h-full justify-end md:flex items-center ">
-          {buttonList}
-        </div>
+    <header className="col-span-full h-fit backdrop-blur-md grid grid-cols-subgrid items-center sticky top-0 z-[2147483646] my-p">
+      <div className="w-full h-full lg:col-span-2 md:col-span-2 col-span-1">
+        <button className="h-full">
+          <Link href="/">
+            <Image
+              width={1000}
+              height={1000}
+              priority={true}
+              className="w-full h-auto"
+              src="/jihasil_logo.svg"
+              alt="Logo"
+            />
+          </Link>
+        </button>
+      </div>
+      <div className="col-span-2 -col-end-1 hidden w-full h-fit justify-end md:flex items-center ">
+        {buttonList}
+      </div>
 
-        <div className="col-span-1 -col-end-1 flex w-full justify-end md:hidden">
-          <Sheet>
-            <SheetTrigger>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </SheetTrigger>
-            <SheetContent className="z-[2147483647] w-1/2">
-              <SheetHeader>
-                <SheetTitle className="w-fit">MENU</SheetTitle>
-              </SheetHeader>
-              <div className="flex flex-col my-6">
-                {buttonList.map((button) => (
-                  <SheetClose key={button.key} asChild>
-                    {button}
-                  </SheetClose>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+      <div className="col-span-1 -col-end-1 flex w-full justify-end md:hidden">
+        <Sheet>
+          <SheetTrigger>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </SheetTrigger>
+          <SheetContent className="z-[2147483647] w-1/2">
+            <SheetHeader>
+              <SheetTitle className="w-fit">MENU</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col my-6">
+              {buttonList.map((button) => (
+                <SheetClose key={button.key} asChild>
+                  {button}
+                </SheetClose>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );

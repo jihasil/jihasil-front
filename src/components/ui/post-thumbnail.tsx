@@ -34,7 +34,7 @@ const PostThumbnail = (props: {
         <p className="font-bold text-xl text-opacity-100">
           {props?.postMetadata?.title}
         </p>
-        <p className="text-sm text-opacity-70">
+        <p className="text-sm text-opacity-70 whitespace-nowrap text-ellipsis overflow-hidden">
           {props?.postMetadata?.subtitle}
         </p>
       </div>

@@ -15,6 +15,11 @@ export const GET = async () => {
   const param = {
     TableName: "user",
     PageSize: 30,
+    ProjectionExpression: "id, #username, #role",
+    ExpressionAttributeNames: {
+      "#username": "name",
+      "#role": "role",
+    },
   };
 
   const query = new ScanCommand(param);

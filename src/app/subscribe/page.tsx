@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center col-span-full">
       <h3>곧 시작합니다!</h3>
     </div>
   );

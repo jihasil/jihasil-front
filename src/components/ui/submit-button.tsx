@@ -1,15 +1,20 @@
 import { cn } from "@/lib/utils";
-import { className } from "postcss-selector-parser";
 import { Button } from "@/components/ui/button";
 
 export default function SubmitButton(props: {
   isUploading: boolean;
   text?: string;
+  className?: string;
 }) {
   const { isUploading, text } = props;
 
   return (
-    <Button disabled={isUploading} type="submit">
+    <Button
+      disabled={isUploading}
+      type="submit"
+      className={cn(props.className)}
+    >
+      {text ?? "제출하기"}
       {isUploading ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -21,13 +26,11 @@ export default function SubmitButton(props: {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn("animate-spin", className)}
+          className={cn("animate-spin", props.className)}
         >
           <path d="M21 12a9 9 0 1 1-6.219-8.56" />
         </svg>
-      ) : (
-        (text ?? "제출하기")
-      )}
+      ) : null}
     </Button>
   );
 }

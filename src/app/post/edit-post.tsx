@@ -185,11 +185,14 @@ export default function EditPost(props: { post?: Post }) {
   }, [form, post]);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="grid grid-cols-subgrid col-span-full">
       <PreventRoute isUploading={isUploading} />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="w-full justify-items-stretch grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4 gap-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid grid-cols-subgrid col-span-full my-gap"
+        >
+          <div className="grid grid-cols-subgrid col-span-full my-gap">
             <FormField
               control={form.control}
               name="title"
@@ -279,19 +282,19 @@ export default function EditPost(props: { post?: Post }) {
           </div>
 
           <div
-            className="rounded-lg border h-full w-full dark"
+            className="col-span-full rounded-lg border h-full w-full dark"
             data-registry="plate"
           >
             <PlateEditor ref={plateEditorRef} data={post?.html} />
             <Toaster />
           </div>
 
-          <div className="w-fit flex flex-col gap-5">
+          <div className="col-span-full grid grid-cols-subgrid w-fit my-gap">
             <FormField
               control={form.control}
               name="thumbnail_file"
               render={() => (
-                <FormItem>
+                <FormItem className="col-span-4 col-start-1">
                   <FormLabel>썸네일</FormLabel>
                   <FormControl>
                     <Input type="file" {...fileRef} />
@@ -305,14 +308,14 @@ export default function EditPost(props: { post?: Post }) {
               control={form.control}
               name="is_approved"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="col-span-4 col-start-1 flex space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
+                  <div className="leading-none">
                     <FormLabel>
                       발행하기 (해제하면 전체 사용자에게 보이지 않습니다.)
                     </FormLabel>
@@ -322,7 +325,11 @@ export default function EditPost(props: { post?: Post }) {
               )}
             />
           </div>
-          <SubmitButton isUploading={isUploading} text={"제출하기"} />
+          <SubmitButton
+            isUploading={isUploading}
+            text={"제출하기"}
+            className="col-span-1 col-start-1"
+          />
         </form>
       </Form>
       <Toaster />

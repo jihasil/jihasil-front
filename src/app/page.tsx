@@ -97,8 +97,8 @@ export default function Home() {
   >("/api/post", "postMetadataList", modifySearchParams, getPageSize);
 
   return (
-    <div className="flex flex-1 flex-col my-gap w-full items-center">
-      <div className="w-full grid my-gap lg:grid-cols-12 md:grid-cols-8 grid-cols-6">
+    <div className="col-span-full grid grid-cols-subgrid my-gap">
+      <div className="col-span-full grid grid-cols-subgrid my-grid my-gap">
         <div className="col-span-2">
           <Navigation
             selects={issueDisplay}
@@ -115,7 +115,7 @@ export default function Home() {
           </SessionProvider>
         </div>
       </div>
-      <div className="overflow-y-auto w-full overflow-x-hidden">
+      <div className="overflow-y-auto col-span-full overflow-x-hidden">
         <div className="grid my-gap w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
           {!isInitiated.current ? (
             <SkeletonImages />

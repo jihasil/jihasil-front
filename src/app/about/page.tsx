@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="flex flex-col my-gap">
+    <div className="col-span-full flex flex-col my-gap">
       <div>
         <p className="text-2xl font-bold">지하실(JIHASIL)이란?</p>
         <p>

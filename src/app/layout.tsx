@@ -38,13 +38,15 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="bg-background lg:mx-6 md:mx-5 mx-4"
+        className="w-full flex justify-center"
         suppressHydrationWarning={true}
       >
         <SpeedInsights />
-        <div className="w-full min-h-[100vh] flex flex-col xl:max-w-7xl mx-auto">
+        <div className="w-full my-grid lg:gap-x-6 md:gap-x-5 gap-x-4 xl:max-w-7xl">
           <Header />
-          <div className="flex-1">{children}</div>
+          <div className="my-mx col-span-full grid grid-cols-subgrid ">
+            {children}
+          </div>
           <Footer />
         </div>
       </body>

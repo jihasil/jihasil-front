@@ -61,18 +61,18 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex w-fit flex-col my-gap">
+    <div className="md:col-span-4 col-span-2 lg:col-start-5 md:col-start-3 col-start-2 w-full grid grid-cols-subgrid">
       <PreventRoute isUploading={isUploading} />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="lg:space-y-6 md:space-y-5 space-y-4"
+          className="col-span-full grid grid-cols-subgrid my-gap"
         >
           <FormField
             control={form.control}
             name="id"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-full">
                 <FormLabel>ID</FormLabel>
                 <FormControl>
                   <Input placeholder="ID를 입력해주세요" {...field} />
@@ -86,7 +86,7 @@ export default function SignIn() {
             control={form.control}
             name="password"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-full">
                 <FormLabel>비밀번호</FormLabel>
                 <FormControl>
                   <Input
@@ -103,12 +103,6 @@ export default function SignIn() {
           <SubmitButton isUploading={isUploading} text={"로그인"} />
         </form>
       </Form>
-      <div className="flex flex-col my-gap">
-        혹은
-        <Button type="submit" className="w-fit">
-          <Link href="/user/signUp">회원가입</Link>
-        </Button>
-      </div>
       <Toaster />
     </div>
   );
