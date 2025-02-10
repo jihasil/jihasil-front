@@ -5,8 +5,8 @@ import { notFound } from "next/navigation";
 import { getPost } from "@/app/utils/post";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import { defaultImageUrl } from "@/const/image";
+import { PostThumbnail } from "@/widgets/post-thumbnail";
 
 export async function generateMetadata({
   params,

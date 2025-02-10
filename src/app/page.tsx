@@ -6,12 +6,12 @@ import React from "react";
 
 import { LastPostKey, PostMetadata } from "@/app/utils/post";
 import { Navigation } from "@/components/ui/navigation";
-import { PostThumbnail } from "@/components/ui/post-thumbnail";
 import ShowNonApproved from "@/components/ui/show-non-approved";
 import { Skeleton } from "@/components/ui/skeleton";
 import { issueDisplay } from "@/const/issue";
 import { useInfiniteObjectList } from "@/hooks/use-infinite-object-list";
 import { useSessionStorage } from "@/hooks/use-session-storage";
+import { PostThumbnail } from "@/widgets/post-thumbnail";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 function Images(props: {

@@ -93,3 +93,29 @@ export const POST = async (req: NextRequest) => {
     }
   }
 };
+
+export const PUT = async (req: NextRequest) => {
+  const body: UserSignUpRequest = await req.json();
+
+  const param = {
+    TableName: "user",
+    Item: body,
+  };
+
+  const query = new PutCommand(param);
+
+  console.log(query);
+
+  try {
+    // @ts-expect-error it works
+    await dynamoClient.send(query);
+    return new Response(JSON.stringify(`${body.id} 정보가 수정됨`), {
+      status: 200,
+    });
+  } catch (error: any) {
+    console.log(error);
+    return new Response(JSON.stringify(`Unknown Error: ${error.name}`), {
+      status: 500,
+    });
+  }
+};
