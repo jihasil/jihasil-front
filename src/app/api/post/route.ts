@@ -27,7 +27,7 @@ export const GET = async (req: NextRequest) => {
   }
 
   // 전체 metadata
-  const lastPostKeyJson = req.nextUrl.searchParams.get("lastPostKey");
+  const lastPostKeyJson = req.nextUrl.searchParams.get("lastKey");
   const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson) : null;
 
   const issueId = req.nextUrl.searchParams.get("issueId") ?? null;

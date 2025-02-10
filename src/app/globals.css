@@ -29,6 +29,10 @@ a {
     @apply gap-4 md:gap-5 lg:gap-6;
 }
 
+.my-gap-x {
+    @apply gap-x-4 md:gap-x-5 lg:gap-x-6;
+}
+
 .my-grid {
     @apply grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4;
 }
@@ -41,8 +45,16 @@ a {
     @apply mx-4 md:mx-5 lg:mx-6;
 }
 
+.my-my {
+    @apply my-4 md:my-5 lg:my-6;
+}
+
 .my-p {
     @apply lg:p-6 md:p-5 p-4;
+}
+
+.subgrid {
+    @apply grid col-span-full grid-cols-subgrid;
 }
 
 @layer base {

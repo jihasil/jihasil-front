@@ -42,11 +42,11 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <SpeedInsights />
-        <div className="w-full my-grid lg:gap-x-6 md:gap-x-5 gap-x-4 xl:max-w-7xl">
+        <div className="w-full my-grid min-h-screen grid-rows-[auto_1fr_auto] my-gap-x xl:max-w-7xl">
           <Header />
-          <div className="my-mx col-span-full grid grid-cols-subgrid ">
+          <main className="my-mx col-span-full grid grid-cols-subgrid h-fit">
             {children}
-          </div>
+          </main>
           <Footer />
         </div>
       </body>

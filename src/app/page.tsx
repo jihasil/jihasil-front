@@ -115,7 +115,7 @@ export default function Home() {
           </SessionProvider>
         </div>
       </div>
-      <div className="overflow-y-auto col-span-full overflow-x-hidden">
+      <div className="overflow-y-auto col-span-full">
         <div className="grid my-gap w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
           {!isInitiated.current ? (
             <SkeletonImages />

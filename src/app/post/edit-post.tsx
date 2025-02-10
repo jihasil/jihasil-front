@@ -185,14 +185,11 @@ export default function EditPost(props: { post?: Post }) {
   }, [form, post]);
 
   return (
-    <div className="grid grid-cols-subgrid col-span-full">
+    <div className="subgrid">
       <PreventRoute isUploading={isUploading} />
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-subgrid col-span-full my-gap"
-        >
-          <div className="grid grid-cols-subgrid col-span-full my-gap">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="subgrid my-gap">
+          <div className="subgrid my-gap">
             <FormField
               control={form.control}
               name="title"

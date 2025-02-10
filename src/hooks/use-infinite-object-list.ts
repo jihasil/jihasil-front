@@ -7,14 +7,14 @@ export const useInfiniteObjectList = <T, R>(
   getPageSize: () => number = () => 30,
 ) => {
   const [objectList, setObjectList] = useState<T[]>([]);
-  const [lastPostKey, setLastPostKey] = useState<R | null>(null);
+  const [lastKey, setLastKey] = useState<R | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const isInitiated = useRef(false);
 
   const initiate = () => {
     setObjectList([]);
-    setLastPostKey(null);
+    setLastKey(null);
     setHasMore(true);
     setIsLoading(false);
   };
@@ -33,9 +33,9 @@ export const useInfiniteObjectList = <T, R>(
       modifySearchParams(searchParams);
     }
 
-    if (lastPostKey) {
-      const lastPostKeyJson = JSON.stringify(lastPostKey);
-      searchParams.append("lastPostKey", lastPostKeyJson);
+    if (lastKey) {
+      const lastKeyJson = JSON.stringify(lastKey);
+      searchParams.append("lastKey", lastKeyJson);
     }
 
     searchParams.append("pageSize", pageSize.toString());
@@ -54,7 +54,7 @@ export const useInfiniteObjectList = <T, R>(
         setObjectList((prevState) => [...prevState, ...data[objectListKey]]);
         console.log(data[objectListKey]);
         console.info(LastEvaluatedKey);
-        setLastPostKey(LastEvaluatedKey);
+        setLastKey(LastEvaluatedKey);
       } else {
         setHasMore(false);
       }
@@ -63,7 +63,7 @@ export const useInfiniteObjectList = <T, R>(
     } finally {
       setIsLoading(false);
     }
-  }, [hasMore, isLoading, lastPostKey]);
+  }, [hasMore, isLoading, lastKey]);
 
   const handleScroll = useCallback(async () => {
     const scrollTop = window.scrollY; // Pixels scrolled from the top

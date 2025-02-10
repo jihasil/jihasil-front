@@ -11,16 +11,26 @@ type UserSignUpRequest = {
   role?: string;
 };
 
-export const GET = async () => {
+export const GET = async (nextRequest: NextRequest) => {
+  const pageSize = Number(
+    nextRequest.nextUrl.searchParams.get("pageSize") ?? 10,
+  );
+
+  const lastKeyJson = nextRequest.nextUrl.searchParams.get("lastKey");
+  const lastKey = lastKeyJson ? JSON.parse(lastKeyJson) : null;
+
   const param = {
     TableName: "user",
-    PageSize: 30,
+    Limit: pageSize,
     ProjectionExpression: "id, #username, #role",
     ExpressionAttributeNames: {
       "#username": "name",
       "#role": "role",
     },
+    ...(lastKey !== null && { ExclusiveStartKey: lastKey }),
   };
+
+  console.log(param);
 
   const query = new ScanCommand(param);
 

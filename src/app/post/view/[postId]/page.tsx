@@ -44,7 +44,7 @@ export default async function PageViewer({
   console.log(post);
 
   return (
-    <div className="grid grid-cols-subgrid col-span-full my-gap">
+    <div className="subgrid my-gap">
       <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky lg:top-[85px] md:top-[81px]">
         <PostThumbnail postMetadata={post.postMetadata} />
         {session?.user ? (
