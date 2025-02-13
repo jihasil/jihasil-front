@@ -17,7 +17,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
 import { roleSelection } from "@/shared/const/roles";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
-import { User } from "@/shared/types/user-types";
+import {
+  User,
+  UserEditRequestDTO,
+  UserResponseDTO,
+} from "@/shared/types/user-types";
 
 function UserSkeleton() {
   return [...Array(15)].map((e, index) => (
@@ -33,10 +37,10 @@ function UserSkeleton() {
 }
 
 function UserElement(props: {
-  users: User[];
-  changeUserData: (user: User) => Promise<void>;
-  changeUserPassword: (user: User) => Promise<void>;
-  deleteUser: (user: User) => Promise<void>;
+  users: UserResponseDTO[];
+  changeUserData: (user: UserEditRequestDTO) => Promise<boolean>;
+  changeUserPassword: (user: UserEditRequestDTO) => Promise<void>;
+  deleteUser: (index: number, user: UserEditRequestDTO) => Promise<boolean>;
 }) {
   return props.users.map((user, index) => {
     return (
@@ -71,7 +75,7 @@ function UserElement(props: {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  props.deleteUser(user);
+                  props.deleteUser(index, user);
                 }}
               >
                 삭제
@@ -86,33 +90,50 @@ function UserElement(props: {
 }
 
 export default function ManageUserPage() {
-  const { isInitiated, objectList } = useInfiniteObjectList<User, string>(
-    "/api/user",
-    "users",
-    undefined,
-    () => {
-      return 15;
-    },
-  );
+  const { isInitiated, objectList, setObjectList } = useInfiniteObjectList<
+    UserResponseDTO,
+    string
+  >("/api/user", "users", undefined, () => {
+    return 15;
+  });
 
-  const changeUserData = async (user: User) => {
+  const changeUserData = async (user: UserEditRequestDTO) => {
     const response = await fetch("/api/user", {
-      method: "PUT",
+      method: "PATCH",
       body: JSON.stringify(user),
     });
     if (response.ok) {
       toast.info(`${user.id}의 정보를 수정했습니다.`);
+      return true;
     } else {
       toast.error(`${user.id}의 정보를 수정하는데 실패했습니다.`);
+      return false;
     }
   };
 
-  const changeUserPassword = async (user: User) => {
+  const changeUserPassword = async (user: UserEditRequestDTO) => {
     toast.info(`${user.id}의 비밀번호를 수정했습니다.`);
   };
 
-  const deleteUser = async (user: User) => {
-    toast.info(`${user.id}를 삭제했습니다.`);
+  const deleteUser = async (index: number, user: UserEditRequestDTO) => {
+    const response = await fetch("/api/user", {
+      method: "DELETE",
+      body: JSON.stringify({ id: user.id }),
+    });
+    const body = await response.json();
+
+    if (response.ok) {
+      toast.info(body.message);
+      setObjectList([
+        ...objectList.slice(0, index),
+        ...objectList.slice(index + 1),
+      ]);
+
+      return true;
+    } else {
+      toast.error(body.message);
+      return false;
+    }
   };
 
   return (

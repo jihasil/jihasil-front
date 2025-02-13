@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { saltAndHashPassword } from "@/entities/user";
 import { dynamoClient } from "@/shared/lib/dynamo-db";
-import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-
-type UserSignUpRequest = {
-  id: string;
-  name: string;
-  password: string;
-  role?: string;
-};
+import {
+  UserEditRequestDTO,
+  UserKey,
+  UserResponseDTO,
+  UserSignUpRequestDTO,
+} from "@/shared/types/user-types";
+import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
+import {
+  DeleteCommand,
+  PutCommand,
+  ScanCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (nextRequest: NextRequest) => {
   const pageSize = Number(
@@ -57,7 +62,7 @@ export const GET = async (nextRequest: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
-  const body: UserSignUpRequest = await req.json();
+  const body: UserSignUpRequestDTO = await req.json();
   body.password = await saltAndHashPassword(body.password);
   body.role = "ROLE_USER";
 
@@ -94,22 +99,29 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-export const PUT = async (req: NextRequest) => {
-  const body: UserSignUpRequest = await req.json();
+export const PATCH = async (req: NextRequest) => {
+  const userEditRequest: UserEditRequestDTO = await req.json();
+  const userKey: UserKey = {
+    id: userEditRequest.id,
+  };
+
+  const exp = GenerateUpdateExpression(userKey, userEditRequest);
 
   const param = {
     TableName: "user",
-    Item: body,
+    Key: userKey,
+    ...exp,
   };
 
-  const query = new PutCommand(param);
+  console.log(param);
+  const query = new UpdateCommand(param);
 
   console.log(query);
 
   try {
     // @ts-expect-error it works
     await dynamoClient.send(query);
-    return new Response(JSON.stringify(`${body.id} 정보가 수정됨`), {
+    return new Response(JSON.stringify(`${userEditRequest.id} 정보가 수정됨`), {
       status: 200,
     });
   } catch (error: any) {
@@ -119,3 +131,79 @@ export const PUT = async (req: NextRequest) => {
     });
   }
 };
+
+export const DELETE = async (req: NextRequest) => {
+  const userKey: UserKey = await req.json();
+
+  const param = {
+    TableName: "user",
+    Key: userKey,
+    ConditionExpression: "#role <> :role",
+    ExpressionAttributeNames: {
+      "#role": "role",
+    },
+    ExpressionAttributeValues: {
+      ":role": "ROLE_SUPERUSER",
+    },
+  };
+
+  const query = new DeleteCommand(param);
+
+  try {
+    // @ts-expect-error it works
+    await dynamoClient.send(query);
+    return new Response(
+      JSON.stringify({ message: `${userKey.id} 사용자를 삭제했습니다.` }),
+      {
+        status: 200,
+      },
+    );
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof ConditionalCheckFailedException) {
+      return new Response(
+        JSON.stringify({ message: "슈퍼유저는 삭제할 수 없습니다." }),
+        {
+          status: 400,
+        },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        message: `${userKey.id} 사용자를 삭제하는 데 실패했습니다.`,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+function GenerateUpdateExpression(itemKey: object, updatingItem: object) {
+  const updatedEntries = Object.entries(updatingItem).filter(
+    ([key]) => !Object.keys(itemKey).includes(key),
+  );
+
+  const exp: {
+    UpdateExpression: string;
+    ExpressionAttributeNames: Record<string, string>;
+    ExpressionAttributeValues: Record<string, string | number | boolean>;
+  } = {
+    UpdateExpression: "SET",
+    ExpressionAttributeNames: {},
+    ExpressionAttributeValues: {},
+  };
+
+  console.log(exp.Key);
+
+  for (const [key, value] of updatedEntries) {
+    exp.UpdateExpression += ` #${key} = :${key},`;
+    exp.ExpressionAttributeNames[`#${key}`] = key;
+    exp.ExpressionAttributeValues[`:${key}`] = value;
+  }
+
+  // remove trailing comma
+  exp.UpdateExpression = exp.UpdateExpression.slice(0, -1);
+  return exp;
+}

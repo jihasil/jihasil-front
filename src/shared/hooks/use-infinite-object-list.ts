@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export const useInfiniteObjectList = <T, R>(
+export const useInfiniteObjectList = <ObjectType, KeyType>(
   url: string,
   objectListKey: string,
   modifySearchParams?: (searchParams: URLSearchParams) => void | undefined,
   getPageSize: () => number = () => 30,
 ) => {
-  const [objectList, setObjectList] = useState<T[]>([]);
-  const [lastKey, setLastKey] = useState<R | null>(null);
+  const [objectList, setObjectList] = useState<ObjectType[]>([]);
+  const [lastKey, setLastKey] = useState<KeyType | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const isInitiated = useRef(false);
@@ -92,6 +92,7 @@ export const useInfiniteObjectList = <T, R>(
   }, [objectList, hasMore, isLoading, handleScroll]);
 
   return {
+    setObjectList,
     objectList,
     isInitiated,
     initiate,
