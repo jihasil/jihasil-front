@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { saltAndHashPassword } from "@/app/utils/user";
-import { dynamoClient } from "@/lib/dynamo-db";
+import { saltAndHashPassword } from "@/entities/user";
+import { dynamoClient } from "@/shared/lib/dynamo-db";
 import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 type UserSignUpRequest = {

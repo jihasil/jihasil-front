@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { bucket, cfUrl, postMediaPrefix, s3Client } from "@/lib/s3";
+import { bucket, cfUrl, postMediaPrefix, s3Client } from "@/shared/lib/s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 

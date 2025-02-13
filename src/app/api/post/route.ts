@@ -1,8 +1,9 @@
 import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
 
-import { PostInput, PostResponseDTO, getPost } from "@/app/utils/post";
-import { dynamoClient } from "@/lib/dynamo-db";
+import { getPost } from "@/entities/post";
+import { dynamoClient } from "@/shared/lib/dynamo-db";
+import { PostInput, PostResponseDTO } from "@/shared/types/post-types";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {

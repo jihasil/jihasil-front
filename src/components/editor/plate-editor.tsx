@@ -283,8 +283,6 @@ export const PlateEditor = React.forwardRef(
             <EditorContainer>
               <Editor />
             </EditorContainer>
-
-            <SettingsDialog />
           </Plate>
         </DndProvider>
       </div>

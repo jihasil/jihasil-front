@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
 
-import Footer from "@/app/footer/footer";
-import Header from "@/app/header/header";
+import Footer from "@/widgets/footer";
+import Header from "@/widgets/header";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
@@ -42,9 +42,9 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <SpeedInsights />
-        <div className="w-full my-grid min-h-screen grid-rows-[auto_1fr_auto] my-gap-x xl:max-w-7xl">
+        <div className="my-mx w-full my-grid min-h-screen grid-rows-[auto_1fr_auto] my-gap-x xl:max-w-7xl">
           <Header />
-          <main className="my-mx col-span-full grid grid-cols-subgrid h-fit">
+          <main className="col-span-full grid grid-cols-subgrid h-fit">
             {children}
           </main>
           <Footer />

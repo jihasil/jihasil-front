@@ -53,6 +53,14 @@ a {
     @apply lg:p-6 md:p-5 p-4;
 }
 
+.my-px {
+    @apply lg:px-6 md:px-5 px-4;
+}
+
+.my-py {
+    @apply lg:py-6 md:py-5 py-4;
+}
+
 .subgrid {
     @apply grid col-span-full grid-cols-subgrid;
 }

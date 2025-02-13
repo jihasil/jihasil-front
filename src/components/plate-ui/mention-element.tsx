@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
-import type { TMentionElement } from '@udecode/plate-mention';
+import type { TMentionElement } from "@udecode/plate-mention";
 
-import { cn, withRef } from '@udecode/cn';
-import { IS_APPLE, getHandler } from '@udecode/plate';
-import { useFocused, useReadOnly, useSelected } from '@udecode/plate/react';
+import { cn, withRef } from "@udecode/cn";
+import { IS_APPLE, getHandler } from "@udecode/plate";
+import { useFocused, useReadOnly, useSelected } from "@udecode/plate/react";
 
-import { useMounted } from '@/hooks/use-mounted';
+import { useMounted } from "@/shared/hooks/use-mounted";
 
-import { PlateElement } from './plate-element';
+import { PlateElement } from "./plate-element";
 
 export const MentionElement = withRef<
   typeof PlateElement,
@@ -30,12 +30,12 @@ export const MentionElement = withRef<
       ref={ref}
       className={cn(
         className,
-        'inline-block rounded-md bg-muted px-1.5 py-0.5 align-baseline text-sm font-medium',
-        !readOnly && 'cursor-pointer',
-        selected && focused && 'ring-2 ring-ring',
-        element.children[0].bold === true && 'font-bold',
-        element.children[0].italic === true && 'italic',
-        element.children[0].underline === true && 'underline'
+        "inline-block rounded-md bg-muted px-1.5 py-0.5 align-baseline text-sm font-medium",
+        !readOnly && "cursor-pointer",
+        selected && focused && "ring-2 ring-ring",
+        element.children[0].bold === true && "font-bold",
+        element.children[0].italic === true && "italic",
+        element.children[0].underline === true && "underline",
       )}
       onClick={getHandler(onClick, element)}
       data-slate-value={element.value}
