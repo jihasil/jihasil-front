@@ -13,6 +13,8 @@ export type User = {
   id: string;
   name: string;
   password: string;
+  role?: string;
+  refreshToken?: string;
 };
 
 export const getUser = async (id: string): Promise<User | null> => {

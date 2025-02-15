@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { v4 } from "uuid";
 
 import { getUser } from "@/app/utils/user";
-import { JWT, decode, encode } from "@auth/core/jwt";
+import { decode, encode } from "@auth/core/jwt";
+
+export type RotateTokenResponseDTO = {
+  accessToken: string;
+  refreshToken: string;
+};
 
 export const POST = async (req: NextRequest) => {
   const { refreshToken } = (await req.json()) as { refreshToken: string };
@@ -31,7 +35,6 @@ export const POST = async (req: NextRequest) => {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const now = Date.now() / 1000;
   const newAccessToken = await encode({
     maxAge: 300,
     secret: secret,
@@ -50,7 +53,18 @@ export const POST = async (req: NextRequest) => {
     token: {
       role: user.role,
       sub: user.id,
-      naem: user.name,
+      name: user.name,
     },
+  });
+
+  // TODO: user patch -> refreshtoken 추가
+
+  const returnJson: RotateTokenResponseDTO = {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  };
+
+  return new NextResponse(JSON.stringify(returnJson), {
+    status: 200,
   });
 };
