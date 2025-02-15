@@ -3,6 +3,7 @@ export type User = {
   name: string;
   password: string;
   role: string;
+  refreshToken?: string;
 };
 
 export type UserKey = {
