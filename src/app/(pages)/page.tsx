@@ -7,7 +7,7 @@ import React from "react";
 import { Navigation } from "@/components/ui/navigation";
 import ShowNonApproved from "@/components/ui/show-non-approved";
 import { Skeleton } from "@/components/ui/skeleton";
-import { issueDisplay } from "@/shared/const/issue";
+import { IssueUnion, issueSelection } from "@/shared/enum/issue";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
 import { useSessionStorage } from "@/shared/hooks/use-session-storage";
 import { LastPostKey, PostMetadata } from "@/shared/types/post-types";
@@ -70,7 +70,7 @@ export default function Home() {
     return pageSize;
   };
 
-  const [issueFilter, setIssueFilter] = useSessionStorage<string>(
+  const [issueFilter, setIssueFilter] = useSessionStorage<IssueUnion>(
     "issueFilter",
     "all",
   );
@@ -80,7 +80,7 @@ export default function Home() {
     false,
   );
 
-  const changeIssue = (issueFilter: string) => {
+  const changeIssue = (issueFilter: IssueUnion) => {
     initiate();
     setIssueFilter(issueFilter);
   };
@@ -101,7 +101,7 @@ export default function Home() {
       <div className="col-span-full grid grid-cols-subgrid my-grid my-gap">
         <div className="md:col-span-2 col-span-1">
           <Navigation
-            selects={issueDisplay}
+            selects={issueSelection}
             onValueChange={changeIssue}
             default={issueFilter}
           />

@@ -1,5 +1,5 @@
-import { CategoryUnion } from "@/shared/const/category";
-import { IssueUnion } from "@/shared/const/issue";
+import { CategoryUnion } from "@/shared/enum/category";
+import { IssueUnion } from "@/shared/enum/issue";
 
 export type PostMetadata = {
   post_id?: string;

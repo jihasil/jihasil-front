@@ -20,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/ui/navigation";
 import SubmitButton from "@/components/ui/submit-button";
-import { CategoryUnion, categorySelection } from "@/shared/const/category";
-import { IssueUnion, issueOnNewPost } from "@/shared/const/issue";
+import { CategoryUnion, categorySelection } from "@/shared/enum/category";
+import { IssueUnion, issueSelection } from "@/shared/enum/issue";
 import { Post, PostInput } from "@/shared/types/post-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 export default function EditPost(props: { post?: Post }) {
   const router = useRouter();
   const { post } = props;
+  const issueSelectionExcludeAll = issueSelection.slice(1);
 
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
@@ -129,7 +130,7 @@ export default function EditPost(props: { post?: Post }) {
         (categorySelection[0].value as CategoryUnion),
       author: post?.postMetadata?.author ?? "",
       issue_id:
-        post?.postMetadata?.issue_id ?? (issueOnNewPost[0].value as IssueUnion),
+        post?.postMetadata?.issue_id ?? (issueSelection[1].value as IssueUnion),
       is_approved: post?.postMetadata?.is_approved ?? true,
     },
   });
@@ -250,7 +251,7 @@ export default function EditPost(props: { post?: Post }) {
                       onValueChange={(value: IssueUnion) => {
                         form.setValue("issue_id", value);
                       }}
-                      selects={issueOnNewPost}
+                      selects={issueSelectionExcludeAll}
                       default={post?.postMetadata?.issue_id}
                       {...field}
                     />

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUser } from "@/app/utils/user";
+import { getUser } from "@/entities/user";
 import { decode, encode } from "@auth/core/jwt";
 
 export type RotateTokenResponseDTO = {

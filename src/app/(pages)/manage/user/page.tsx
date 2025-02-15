@@ -15,7 +15,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
-import { roleSelection } from "@/shared/const/roles";
+import { roleSelection } from "@/shared/enum/roles";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
 import {
   User,

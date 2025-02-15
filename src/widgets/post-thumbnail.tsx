@@ -1,7 +1,7 @@
 import { ImageLoader } from "@/components/ui/image-loader";
 import { Separator } from "@/components/ui/separator";
-import { CategoryValue } from "@/shared/const/category";
-import { issueBackgroundColor, issueTextColor } from "@/shared/const/issue";
+import { CategoryValue } from "@/shared/enum/category";
+import { issueBackgroundColor, issueTextColor } from "@/shared/enum/issue";
 import { PostMetadata } from "@/shared/types/post-types";
 import { cn } from "@udecode/cn";
 
