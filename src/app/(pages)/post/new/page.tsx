@@ -1,4 +1,4 @@
-import EditPost from "@/features/edit-post";
+import EditPost from "@/widgets/edit-post";
 
 export default function NewPostPage() {
   return <EditPost />;

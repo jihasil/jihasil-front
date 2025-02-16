@@ -19,7 +19,7 @@ const TransparentHeader = async () => {
 
   let userOnlyButton = buttonStyle;
   let signInButton = buttonStyle;
-  if (!session?.user) {
+  if (!session?.error && !session?.user) {
     userOnlyButton += " hidden";
   } else {
     signInButton += "hidden";

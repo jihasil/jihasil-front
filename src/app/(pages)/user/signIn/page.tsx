@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import SignIn from "@/features/sign-in";
+import SignIn from "@/widgets/sign-in";
 
 export default function SignInPage() {
   return (

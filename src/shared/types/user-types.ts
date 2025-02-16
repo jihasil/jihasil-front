@@ -18,7 +18,10 @@ export type UserResponseDTO = {
 
 export type UserEditRequestDTO = {
   id: string;
-  [key: string]: string | number | boolean;
+  role?: string;
+  name?: string;
+  password?: string;
+  refreshToken?: string;
 };
 
 export type UserSignUpRequestDTO = {

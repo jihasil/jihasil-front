@@ -1,13 +1,12 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { RotateTokenResponseDTO } from "@/app/api/user/refresh/route";
-import { getUser, validatePassword } from "@/entities/user";
+import { getRefreshToken, getUser, validatePassword } from "@/entities/user";
+import { User } from "@/shared/types/user-types";
 
 declare module "next-auth" {
   interface User {
     role: string;
-    refreshToken: string;
   }
 }
 
@@ -41,52 +40,64 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: {
     strategy: "jwt",
-    maxAge: 300,
   },
   trustHost: true,
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
+        const tokenAndExpiry = await getRefreshToken(user as User);
+        if (!tokenAndExpiry) {
+          throw new TypeError("Failed to get refresh token");
+        }
+        const { refreshToken, expiresAt } = tokenAndExpiry;
+
+        console.log("New Refresh token", refreshToken);
         return {
           ...token,
           role: user.role,
-          refreshToken: user.refreshToken,
+          refreshToken,
+          expiresAt,
         };
-      } else if (Date.now() < token.exp * 1000) {
-        console.log(token);
-        return token;
-      } else {
-        if (!token.refreshToken) throw new TypeError("missing refreshToken");
+      } else if (Date.now() >= token.expiresAt * 1000) {
+        console.log("Previous Refresh token", token.refreshToken);
 
         try {
-          const response = await fetch("/api/user/refresh", {
-            method: "POST",
-            body: JSON.stringify({ refreshToken: token.refreshToken }),
-          });
+          if (!token.refreshToken) throw new TypeError("missing refreshToken");
 
-          const tokensOrError = await response.json();
-          if (!response.ok) throw tokensOrError;
+          const tokenAndExpiry = await getRefreshToken(
+            token.refreshToken as string,
+          );
 
-          const newTokens = tokensOrError as RotateTokenResponseDTO;
+          if (!tokenAndExpiry)
+            throw new TypeError("Failed to get refresh token");
+          const { refreshToken, expiresAt } = tokenAndExpiry;
 
           return {
-            token: newTokens.accessToken,
-            refreshToken: newTokens.refreshToken,
+            ...token,
+            refreshToken,
+            expiresAt,
           };
         } catch (error) {
           console.error(error);
+          console.log("에러를 던지면..");
           token.error = "RefreshTokenError";
-          return token;
+          return null;
         }
+      } else {
+        console.log("reusing token!");
+        console.log(token);
+        return token;
       }
     },
 
     async session({ session, token }) {
-      if (session.user) {
+      if (session.error) {
+        session.error = token.error;
+      } else {
         session.user.role = token.role;
+        session.user.id = token.sub;
       }
-      session.error = token.error;
       return session;
     },
   },
@@ -94,14 +105,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 declare module "next-auth" {
   interface Session {
+    id: string;
     error?: "RefreshTokenError";
   }
 }
 
 declare module "@auth/core/jwt" {
   interface JWT {
-    accessToken: string;
     refreshToken?: string;
+    expiresAt?: number;
     error?: "RefreshTokenError";
   }
 }

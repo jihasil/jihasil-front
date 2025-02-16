@@ -17,11 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
 import { roleSelection } from "@/shared/enum/roles";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
-import {
-  User,
-  UserEditRequestDTO,
-  UserResponseDTO,
-} from "@/shared/types/user-types";
+import { UserEditRequestDTO, UserResponseDTO } from "@/shared/types/user-types";
 
 function UserSkeleton() {
   return [...Array(15)].map((e, index) => (

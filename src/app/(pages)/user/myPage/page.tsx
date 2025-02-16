@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { invalidateUser } from "@/entities/user";
 import { auth, signOut } from "@/shared/lib/auth";
 
 export default async function PageViewer() {
@@ -12,6 +13,12 @@ export default async function PageViewer() {
         <form
           action={async () => {
             "use server";
+            console.log(`user logging out: ${session?.user?.id}`);
+
+            await invalidateUser({
+              id: session?.user?.id as string,
+            });
+
             await signOut({
               redirectTo: "/",
             });

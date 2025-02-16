@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { saltAndHashPassword } from "@/entities/user";
+import { changeUserInfo, saltAndHashPassword } from "@/entities/user";
 import { dynamoClient } from "@/shared/lib/dynamo-db";
 import {
   UserEditRequestDTO,
   UserKey,
-  UserResponseDTO,
   UserSignUpRequestDTO,
 } from "@/shared/types/user-types";
 import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
-import {
-  DeleteCommand,
-  PutCommand,
-  ScanCommand,
-  UpdateCommand,
-} from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (nextRequest: NextRequest) => {
   const pageSize = Number(
@@ -101,34 +95,38 @@ export const POST = async (req: NextRequest) => {
 
 export const PATCH = async (req: NextRequest) => {
   const userEditRequest: UserEditRequestDTO = await req.json();
-  const userKey: UserKey = {
-    id: userEditRequest.id,
-  };
-
-  const exp = GenerateUpdateExpression(userKey, userEditRequest);
-
-  const param = {
-    TableName: "user",
-    Key: userKey,
-    ...exp,
-  };
-
-  console.log(param);
-  const query = new UpdateCommand(param);
-
-  console.log(query);
 
   try {
-    // @ts-expect-error it works
-    await dynamoClient.send(query);
-    return new Response(JSON.stringify(`${userEditRequest.id} 정보가 수정됨`), {
-      status: 200,
-    });
+    const succeed = await changeUserInfo(userEditRequest);
+    if (succeed) {
+      return new Response(
+        JSON.stringify({
+          message: `사용자 ${userEditRequest.id}의 정보가 수정됐습니다.`,
+        }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: `사용자 ${userEditRequest.id}의 정보가 수정할 수 없습니다.`,
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
   } catch (error: any) {
     console.log(error);
-    return new Response(JSON.stringify(`Unknown Error: ${error.name}`), {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({
+        message: `사용자 ${userEditRequest.id}의 정보가 수정할 수 없습니다.`,
+      }),
+      {
+        status: 500,
+      },
+    );
   }
 };
 
@@ -179,31 +177,3 @@ export const DELETE = async (req: NextRequest) => {
     );
   }
 };
-
-function GenerateUpdateExpression(itemKey: object, updatingItem: object) {
-  const updatedEntries = Object.entries(updatingItem).filter(
-    ([key]) => !Object.keys(itemKey).includes(key),
-  );
-
-  const exp: {
-    UpdateExpression: string;
-    ExpressionAttributeNames: Record<string, string>;
-    ExpressionAttributeValues: Record<string, string | number | boolean>;
-  } = {
-    UpdateExpression: "SET",
-    ExpressionAttributeNames: {},
-    ExpressionAttributeValues: {},
-  };
-
-  console.log(exp.Key);
-
-  for (const [key, value] of updatedEntries) {
-    exp.UpdateExpression += ` #${key} = :${key},`;
-    exp.ExpressionAttributeNames[`#${key}`] = key;
-    exp.ExpressionAttributeValues[`:${key}`] = value;
-  }
-
-  // remove trailing comma
-  exp.UpdateExpression = exp.UpdateExpression.slice(0, -1);
-  return exp;
-}
