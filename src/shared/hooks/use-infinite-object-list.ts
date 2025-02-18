@@ -50,7 +50,7 @@ export const useInfiniteObjectList = <ObjectType, KeyType>(
     try {
       if (response.ok) {
         const { isLast, LastEvaluatedKey, ...data } = await response.json();
-        setHasMore(!isLast);
+        setHasMore(!isLast || data.length < pageSize);
         setObjectList((prevState) => [...prevState, ...data[objectListKey]]);
         console.log(data[objectListKey]);
         console.info(LastEvaluatedKey);

@@ -25,10 +25,14 @@ export const getUser = async (id: string): Promise<User | null> => {
   };
 
   const command = new QueryCommand(param);
-  console.log(command);
+  console.log(`getting user ${id}`);
 
   try {
     // @ts-expect-error asdf
+    dynamoClient.config.region().then((region) => {
+      console.log(region);
+    });
+
     const { Items } = await dynamoClient.send(command);
     console.log(Items);
 
@@ -38,6 +42,8 @@ export const getUser = async (id: string): Promise<User | null> => {
       return Items[0];
     }
   } catch (error) {
+    console.log(typeof error);
+    console.error(error);
     console.log(`${id} error occurred`);
     console.log(error);
     return null;

@@ -8,6 +8,7 @@ export const db = new DynamoDBClient({
   credentials: fromTemporaryCredentials({
     params: {
       RoleArn: AWS_ROLE_ARN,
+      DurationSeconds: 900, // 15 minutes
     },
   }),
 });

@@ -1,14 +1,35 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { cookies } from "next/headers";
 
 import { getRefreshToken, getUser, validatePassword } from "@/entities/user";
 import { User } from "@/shared/types/user-types";
+import { Mutex } from "async-mutex";
+import { decode } from "@auth/core/jwt";
 
 declare module "next-auth" {
   interface User {
     role: string;
   }
 }
+
+declare module "next-auth" {
+  interface Session {
+    id: string;
+    error?: "RefreshTokenError";
+  }
+}
+
+declare module "@auth/core/jwt" {
+  interface JWT {
+    refreshToken?: string;
+    expiresAt?: number;
+    error?: "RefreshTokenError";
+  }
+}
+
+const mutex = new Mutex();
+let nextRefreshAt: number = 0;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -47,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         const tokenAndExpiry = await getRefreshToken(user as User);
+
         if (!tokenAndExpiry) {
           throw new TypeError("Failed to get refresh token");
         }
@@ -60,18 +82,49 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           expiresAt,
         };
       } else if (Date.now() >= token.expiresAt * 1000) {
-        console.log("Previous Refresh token", token.refreshToken);
-
+        // console.log("refresh trying");
+        const release = await mutex.acquire();
+        console.log("refresh start");
+        console.log(token);
+        //
         try {
-          if (!token.refreshToken) throw new TypeError("missing refreshToken");
+          if (Date.now() / 1000 < nextRefreshAt) {
+            const cookieName = "authjs.session-token";
+            const cookieStore = await cookies();
+            const refreshedToken = cookieStore.get(cookieName);
+            const secret = process.env.AUTH_SECRET;
+
+            if (!secret) {
+              return null;
+            }
+            console.log("Refreshed token before. using cookie");
+            console.log(refreshedToken.value);
+
+            return decode({
+              secret,
+              salt: cookieName,
+              token: refreshedToken?.value,
+            });
+          }
+          console.log("Previous Refresh token", token.refreshToken);
+
+          if (!token.refreshToken) return null;
 
           const tokenAndExpiry = await getRefreshToken(
             token.refreshToken as string,
           );
 
-          if (!tokenAndExpiry)
-            throw new TypeError("Failed to get refresh token");
+          if (!tokenAndExpiry) return null;
+
           const { refreshToken, expiresAt } = tokenAndExpiry;
+
+          nextRefreshAt = expiresAt;
+
+          console.log({
+            ...token,
+            refreshToken,
+            expiresAt,
+          });
 
           return {
             ...token,
@@ -83,6 +136,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.log("에러를 던지면..");
           token.error = "RefreshTokenError";
           return null;
+        } finally {
+          release();
         }
       } else {
         console.log("reusing token!");
@@ -102,18 +157,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
-
-declare module "next-auth" {
-  interface Session {
-    id: string;
-    error?: "RefreshTokenError";
-  }
-}
-
-declare module "@auth/core/jwt" {
-  interface JWT {
-    refreshToken?: string;
-    expiresAt?: number;
-    error?: "RefreshTokenError";
-  }
-}
