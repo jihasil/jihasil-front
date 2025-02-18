@@ -6,11 +6,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/shared/lib/utils";
 
 export const Navigation = (props: {
   onValueChange: any;
   selects: { value: string; display: string }[];
   default?: string;
+  className?: string;
 }) => {
   const selectGroup = (
     <SelectGroup>
@@ -27,7 +29,7 @@ export const Navigation = (props: {
       defaultValue={props.default ?? props.selects[0].value}
       onValueChange={props.onValueChange}
     >
-      <SelectTrigger className="w-full">
+      <SelectTrigger className={cn("w-full", props.className)}>
         <SelectValue placeholder="선택하세요" />
       </SelectTrigger>
       <SelectContent>{selectGroup}</SelectContent>

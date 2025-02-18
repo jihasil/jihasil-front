@@ -8,11 +8,11 @@
     box-sizing: border-box;
 }
 
-p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
+/*p {*/
+/*    text-overflow: ellipsis;*/
+/*    overflow: hidden;*/
+/*    white-space: nowrap;*/
+/*}*/
 
 body {
     font-family: Pretendard, Arial, Helvetica, sans-serif;
@@ -29,12 +29,40 @@ a {
     @apply gap-4 md:gap-5 lg:gap-6;
 }
 
-.my-col {
-    @apply lg:grid-cols-12 md:grid-cols-8 grid-cols-4;
+.my-gap-x {
+    @apply gap-x-4 md:gap-x-5 lg:gap-x-6;
+}
+
+.my-grid {
+    @apply grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4;
 }
 
 .my-m {
     @apply m-4 md:m-5 lg:m-6;
+}
+
+.my-mx {
+    @apply mx-4 md:mx-5 lg:mx-6;
+}
+
+.my-my {
+    @apply my-4 md:my-5 lg:my-6;
+}
+
+.my-p {
+    @apply lg:p-6 md:p-5 p-4;
+}
+
+.my-px {
+    @apply lg:px-6 md:px-5 px-4;
+}
+
+.my-py {
+    @apply lg:py-6 md:py-5 py-4;
+}
+
+.subgrid {
+    @apply grid col-span-full grid-cols-subgrid;
 }
 
 @layer base {
