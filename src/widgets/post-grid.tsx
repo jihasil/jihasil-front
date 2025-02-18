@@ -65,6 +65,10 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
     getPageSize,
   );
 
+  const displayingPosts = objectList.filter(
+    (item) => showNonApproved || (item.is_approved ?? true),
+  );
+
   return (
     <div className="col-span-full grid grid-cols-subgrid my-gap">
       <div className="col-span-full grid grid-cols-subgrid my-grid my-gap">
@@ -83,12 +87,18 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
         ) : null}
       </div>
       <div className="overflow-y-auto col-span-full">
+        {isInitiated.current && displayingPosts.length === 0 ? (
+          <div className="w-full flex items-center justify-center">
+            <p>게시글이 없습니다.</p>
+          </div>
+        ) : null}
+
         <div className="grid my-gap w-full sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
           {!isInitiated.current ? (
             <SkeletonImages />
           ) : (
             <Images
-              postMetadataList={objectList}
+              postMetadataList={displayingPosts}
               showNonApproved={showNonApproved}
             />
           )}
@@ -106,19 +116,17 @@ const Images = (props: {
   const thumbnailSize = smSize.matches ? 700 : 500;
   console.log(thumbnailSize);
 
-  return props.postMetadataList
-    .filter((item) => props.showNonApproved || (item.is_approved ?? true))
-    .map((item, index) => (
-      <div key={index} className="w-full h-fit">
-        <Link href={`/post/view/${item.post_id ?? item.post_id}`}>
-          <PostThumbnail
-            postMetadata={item}
-            imageSize={thumbnailSize}
-            isClickable={true}
-          />
-        </Link>
-      </div>
-    ));
+  return props.postMetadataList.map((item, index) => (
+    <div key={index} className="w-full h-fit">
+      <Link href={`/post/view/${item.post_id}`}>
+        <PostThumbnail
+          postMetadata={item}
+          imageSize={thumbnailSize}
+          isClickable={true}
+        />
+      </Link>
+    </div>
+  ));
 };
 
 const SkeletonImages = () => {
