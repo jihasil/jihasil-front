@@ -12,7 +12,7 @@ const keyLen = 32;
 const digest: string = "sha256";
 const iterations: number = 100000;
 
-const accessTokenAge = 10; // 5 minutes
+const accessTokenAge = 60 * 5; // 5 minutes
 const refreshTokenAge = 60 * 60 * 12; // 12 hours
 
 export const getUser = async (id: string): Promise<User | null> => {
@@ -29,10 +29,6 @@ export const getUser = async (id: string): Promise<User | null> => {
 
   try {
     // @ts-expect-error asdf
-    dynamoClient.config.region().then((region) => {
-      console.log(region);
-    });
-
     const { Items } = await dynamoClient.send(command);
     console.log(Items);
 
