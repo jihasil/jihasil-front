@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { changeUserInfo, saltAndHashPassword } from "@/entities/user";
+import { changeUserInfo } from "@/entities/user";
+import { saltAndHashPassword } from "@/shared/lib/crypto";
 import { dynamoClient } from "@/shared/lib/dynamo-db";
 import {
   UserEditRequestDTO,

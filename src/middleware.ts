@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { auth } from "@/shared/lib/auth";
+import { getSession } from "@/features/request-sign-in";
 
 export async function middleware(request: NextRequest) {
-  const session = await auth();
+  const session = await getSession();
 
   const redirectToLoginPage = (response?: () => NextResponse | undefined) => {
-    if (!session || !session.user || session.error) {
+    if (!session || !session.user) {
       const signInUrl = new URL("/user/signIn", request.url);
       signInUrl.searchParams.set("from", request.nextUrl.pathname);
       return NextResponse.redirect(signInUrl);

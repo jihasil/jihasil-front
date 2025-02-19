@@ -14,12 +14,6 @@ export const CategoryKey = {
 
 export type CategoryUnion = (typeof CategoryKey)[keyof typeof CategoryKey];
 
-const cachedCategorySelection: NavigationSelection[] = [];
-const cachedCategoryValue: Record<string, string> = {};
+export const categorySelection = createNavigationSelection(CategoryKey);
 
-export const categorySelection = createNavigationSelection(
-  cachedCategorySelection,
-  CategoryKey,
-);
-
-export const CategoryValue = invertObject(cachedCategoryValue, CategoryKey);
+export const CategoryValue = invertObject(CategoryKey);

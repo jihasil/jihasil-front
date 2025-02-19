@@ -1,70 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUser } from "@/entities/user";
-import { decode, encode } from "@auth/core/jwt";
-
-export type RotateTokenResponseDTO = {
-  accessToken: string;
-  refreshToken: string;
-};
+import {
+  generateTokenPair,
+  getUserFromRefreshToken,
+  setCookiesWithToken,
+} from "@/shared/lib/auth";
 
 export const POST = async (req: NextRequest) => {
-  const { refreshToken } = (await req.json()) as { refreshToken: string };
-  const secret = process.env.AUTH_SECRET;
+  try {
+    const refreshTokenHash = req.cookies.get("refreshToken")?.value;
 
-  if (!secret) {
-    console.error("Missing secret");
-    return new NextResponse("Internal Server Error. Sorry!", { status: 500 });
+    if (!refreshTokenHash) {
+      throw new Error("AuthenticationError");
+    }
+
+    const user = await getUserFromRefreshToken(refreshTokenHash);
+
+    if (!user) {
+      throw new Error("AuthenticationError");
+    }
+
+    const tokenPair = await generateTokenPair(user);
+    if (!tokenPair) {
+      throw new Error("AuthenticationError");
+    }
+
+    await setCookiesWithToken(tokenPair);
+
+    return new NextResponse(
+      JSON.stringify({ message: `토큰이 발급됐습니다.` }),
+      {
+        status: 200,
+      },
+    );
+  } catch (error: any) {
+    if (error?.message === "AuthenticationError") {
+      return new NextResponse(
+        JSON.stringify({ message: "유효하지 않은 토큰입니다." }),
+        {
+          status: 401,
+        },
+      );
+    }
+    return new NextResponse(
+      JSON.stringify({ message: "로그인에 실패하였습니다." }),
+      {
+        status: 500,
+      },
+    );
   }
-
-  // refresh token 이 DB에 있고, 일치하는지 확인
-  const decodedJwt = await decode({
-    salt: "RefreshToken",
-    secret: secret,
-    token: refreshToken,
-  });
-
-  const id = decodedJwt?.sub;
-
-  if (!id) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  const user = await getUser(id);
-  if (!user || !user.refreshToken) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  const newAccessToken = await encode({
-    maxAge: 300,
-    secret: secret,
-    salt: "authjs.session-token",
-    token: {
-      role: user.role,
-      name: user.name,
-      sub: user.id,
-    },
-  });
-
-  const newRefreshToken = await encode({
-    maxAge: 60 * 60 * 24 * 7,
-    secret: secret,
-    salt: "RefreshToken",
-    token: {
-      role: user.role,
-      sub: user.id,
-      name: user.name,
-    },
-  });
-
-  // TODO: user patch -> refreshtoken 추가
-
-  const returnJson: RotateTokenResponseDTO = {
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
-  };
-
-  return new NextResponse(JSON.stringify(returnJson), {
-    status: 200,
-  });
 };

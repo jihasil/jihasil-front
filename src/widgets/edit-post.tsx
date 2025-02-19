@@ -129,8 +129,7 @@ export default function EditPost(props: { post?: Post }) {
         post?.postMetadata?.category ??
         (categorySelection[0].value as CategoryUnion),
       author: post?.postMetadata?.author ?? "",
-      issue_id:
-        post?.postMetadata?.issue_id ?? (issueSelection[1].value as IssueUnion),
+      issue_id: post?.postMetadata?.issue_id ?? issueSelection[1].value,
       is_approved: post?.postMetadata?.is_approved ?? true,
     },
   });

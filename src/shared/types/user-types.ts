@@ -24,9 +24,22 @@ export type UserEditRequestDTO = {
   refreshToken?: string;
 };
 
+export type UserSignInRequestDTO = {
+  id: string;
+  password: string;
+  redirectTo?: string;
+};
+
 export type UserSignUpRequestDTO = {
   id: string;
   name: string;
   password: string;
   role?: string;
+};
+
+export type TokenPair = {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenAge: number;
+  refreshTokenAge: number;
 };

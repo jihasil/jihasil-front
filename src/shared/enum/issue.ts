@@ -10,12 +10,7 @@ export const IssueKey = {
 
 export type IssueUnion = (typeof IssueKey)[keyof typeof IssueKey];
 
-const cachedIssueSelection: NavigationSelection[] = [];
-
-export const issueSelection = createNavigationSelection(
-  cachedIssueSelection,
-  IssueKey,
-);
+export const issueSelection = createNavigationSelection(IssueKey);
 
 export const issueTextColor = {
   none: "text-issue-none",
