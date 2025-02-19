@@ -149,7 +149,7 @@ export const setCookiesWithToken = async (tokenPair: TokenPair) => {
 
   cookieStore.set("refreshToken", tokenPair.refreshToken, {
     ...defaultCookieOptions,
-    path: "/api/user/refresh",
+    path: "/api/refresh",
     maxAge: tokenPair.refreshTokenAge,
   });
 };

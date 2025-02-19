@@ -10,6 +10,7 @@ import type {
 import { z } from "zod";
 
 import type { OurFileRouter } from "@/app/api/uploadthing/route";
+import { fetchR } from "@/shared/lib/request";
 
 export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}
 
@@ -38,7 +39,7 @@ export function useUploadFile({
 
     try {
       // Get presigned URL and final URL from your backend
-      const { presignedUrl, fileUrl, fileKey } = await fetch("/api/upload", {
+      const { presignedUrl, fileUrl, fileKey } = await fetchR("/api/upload", {
         method: "POST",
         body: JSON.stringify({
           filename: file.name,

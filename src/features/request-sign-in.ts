@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { cache } from "react";
+import { NextRequest, NextResponse } from "next/server";
 
 import { decode } from "@auth/core/jwt";
 
@@ -13,30 +13,38 @@ declare module "@auth/core/jwt" {
   }
 }
 
-export const getSession = cache(async () => {
+export const getSession = async () => {
+  const secret = process.env.TOKEN_SECRET;
+  if (!secret) return null;
+
   const cookieStore = await cookies();
   const accessTokenHash = cookieStore.get("accessToken")?.value;
 
-  const secret = process.env.TOKEN_SECRET;
+  try {
+    if (accessTokenHash) {
+      const [salt, encryptedAccessToken] = accessTokenHash.split("|");
+      const accessToken = await decode({
+        salt,
+        secret,
+        token: encryptedAccessToken,
+      });
 
-  if (accessTokenHash && secret) {
-    const [salt, encryptedAccessToken] = accessTokenHash.split("|");
-    const accessToken = await decode({
-      salt,
-      secret,
-      token: encryptedAccessToken,
-    });
-
-    if (accessToken && accessToken.exp > Date.now() / 1000) {
-      return {
-        user: {
-          id: accessToken.sub,
-          name: accessToken.name,
-          role: accessToken.role,
-        },
-      };
+      if (accessToken) {
+        if (accessToken.exp > Date.now() / 1000) {
+          return {
+            user: {
+              id: accessToken.sub,
+              name: accessToken.name,
+              role: accessToken.role,
+            },
+          };
+        }
+      }
     }
-
+  } catch (error) {
+    console.error(error);
     return null;
   }
-});
+
+  return null;
+};

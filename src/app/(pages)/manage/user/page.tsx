@@ -90,7 +90,7 @@ export default function ManageUserPage() {
   const { isInitiated, objectList, setObjectList } = useInfiniteObjectList<
     UserResponseDTO,
     string
-  >("/api/user", "users", undefined, () => {
+  >("/api/user/all", "users", undefined, () => {
     return 15;
   });
 
@@ -113,7 +113,7 @@ export default function ManageUserPage() {
   };
 
   const deleteUser = async (index: number, user: UserEditRequestDTO) => {
-    const response = await fetch("/api/user", {
+    const response = await fetchR("/api/user", {
       method: "DELETE",
       body: JSON.stringify({ id: user.id }),
     });

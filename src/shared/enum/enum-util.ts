@@ -15,11 +15,19 @@ export const createNavigationSelection = cache(
 export const invertObject = cache(
   (obj: Record<string, string>): Record<string, string> => {
     const cached: Record<string, string> = {};
-    if (Object.entries(cached).length === 0) {
-      Object.entries(obj).forEach(([key, value]) => {
-        cached[value] = key;
-      });
-    }
+    Object.entries(obj).forEach(([key, value]) => {
+      cached[value] = key;
+    });
+    return cached;
+  },
+);
+
+export const getOrdinal = cache(
+  (obj: Record<string, string>): Record<string, number> => {
+    const cached: Record<string, number> = {};
+    Object.entries(obj).forEach(([key], index) => {
+      cached[key] = index;
+    });
     return cached;
   },
 );

@@ -5,13 +5,14 @@ export const fetchR = async (
   return new Promise<Response>((resolve) => {
     fetch(input, init).then(async (response) => {
       if (response.status === 401) {
-        const cookieRotated = await fetch("/api/user/refresh");
+        const cookieRotated = await fetch("/api/refresh?noRedirect=true");
         console.log("cookie?");
         console.log(cookieRotated);
-        resolve(await fetch(input, init));
-      } else {
-        resolve(response);
+        if (cookieRotated.ok) {
+          resolve(await fetch(input, init));
+        }
       }
+      resolve(response);
     });
   });
 };

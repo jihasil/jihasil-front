@@ -26,7 +26,7 @@ export default async function PageViewer() {
             });
 
             const cookieStore = await cookies();
-            cookieStore.delete("accessToken");
+            cookieStore.set("accessToken", "invalidated");
             cookieStore.delete("refreshToken");
 
             redirect("/");
