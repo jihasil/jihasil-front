@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
 
 import {
   authorizeUser,
   generateTokenPair,
   setCookiesWithToken,
 } from "@/shared/lib/auth";
-import { UserSignInRequestDTO } from "@/shared/types/user-types";
+import { UserSignInRequestDTO, signInSchema } from "@/shared/types/user-types";
 
 export const POST = async (nextRequest: NextRequest) => {
   const credentials: UserSignInRequestDTO = await nextRequest.json();
 
   try {
-    const user = await authorizeUser(credentials);
+    const validationResult = signInSchema.safeParse(credentials);
+    if (!validationResult.success) {
+      throw validationResult.error;
+    }
+
+    const validCredentials = validationResult.data;
+
+    const user = await authorizeUser(validCredentials);
 
     if (!user) {
       throw new Error("AuthenticationError");
@@ -40,6 +48,10 @@ export const POST = async (nextRequest: NextRequest) => {
           status: 401,
         },
       );
+    } else if (e instanceof ZodError) {
+      return new NextResponse(JSON.stringify({ message: e.message }), {
+        status: 400,
+      });
     }
     return new NextResponse(
       JSON.stringify({ message: "로그인에 실패하였습니다." }),

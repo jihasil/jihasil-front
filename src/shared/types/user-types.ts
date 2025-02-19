@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type User = {
   id: string;
   name: string;
@@ -24,10 +26,18 @@ export type UserEditRequestDTO = {
   refreshToken?: string;
 };
 
+export const signInSchema = z.object({
+  id: z
+    .string({ required_error: "A unique ID is required" })
+    .min(1, "A unique ID is required."),
+  password: z
+    .string({ required_error: "Password is required" })
+    .min(1, "Password is required."),
+});
+
 export type UserSignInRequestDTO = {
   id: string;
   password: string;
-  redirectTo?: string;
 };
 
 export type UserSignUpRequestDTO = {

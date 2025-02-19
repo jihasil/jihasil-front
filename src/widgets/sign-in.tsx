@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
+import { signInSchema } from "@/shared/types/user-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -24,15 +25,6 @@ export default function SignIn() {
   const searchParams = useSearchParams();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const router = useRouter();
-
-  const signInSchema = z.object({
-    id: z
-      .string({ required_error: "A unique ID is required" })
-      .min(1, "A unique ID is required."),
-    password: z
-      .string({ required_error: "Password is required" })
-      .min(1, "Password is required."),
-  });
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof signInSchema>>({

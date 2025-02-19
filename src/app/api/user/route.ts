@@ -111,7 +111,7 @@ export const PATCH = async (req: NextRequest) => {
     } else {
       return new Response(
         JSON.stringify({
-          message: `사용자 ${userEditRequest.id}의 정보가 수정할 수 없습니다.`,
+          message: `사용자 ${userEditRequest.id}의 정보를 수정할 수 없습니다.`,
         }),
         {
           status: 400,
@@ -122,7 +122,7 @@ export const PATCH = async (req: NextRequest) => {
     console.log(error);
     return new Response(
       JSON.stringify({
-        message: `사용자 ${userEditRequest.id}의 정보가 수정할 수 없습니다.`,
+        message: `사용자 ${userEditRequest.id}의 정보를 수정할 수 없습니다.`,
       }),
       {
         status: 500,

@@ -6,7 +6,7 @@ import {
   setCookiesWithToken,
 } from "@/shared/lib/auth";
 
-export const POST = async (req: NextRequest) => {
+export const GET = async (req: NextRequest) => {
   try {
     const refreshTokenHash = req.cookies.get("refreshToken")?.value;
 
