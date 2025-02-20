@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Session } from "next-auth";
 import React from "react";
 
 import { Navigation } from "@/components/ui/navigation";
@@ -10,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { IssueUnion, issueSelection } from "@/shared/enum/issue";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
 import { useSessionStorage } from "@/shared/hooks/use-session-storage";
+import { Session } from "@/shared/types/auth-types";
 import { LastPostKey, PostMetadata } from "@/shared/types/post-types";
 import { PostThumbnail } from "@/widgets/post-thumbnail";
 import { CheckedState } from "@radix-ui/react-checkbox";
@@ -78,7 +78,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
           default={issueFilter}
           className="md:col-span-2 col-span-1"
         />
-        {props.session ? (
+        {props.session?.user ? (
           <ShowNonApproved
             className="md:col-span-1 col-span-2"
             onCheckedChange={setShowNonApproved}

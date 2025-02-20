@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { PlateEditor } from "@/components/editor/plate-editor";
@@ -19,9 +19,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/ui/navigation";
+import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
 import { CategoryUnion, categorySelection } from "@/shared/enum/category";
 import { IssueUnion, issueSelection } from "@/shared/enum/issue";
+import { fetchR } from "@/shared/lib/request";
 import { Post, PostInput } from "@/shared/types/post-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +35,7 @@ export default function EditPost(props: { post?: Post }) {
 
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
-    const { presignedUrl, fileUrl } = await fetch("/api/upload", {
+    const { presignedUrl, fileUrl } = await fetchR("/api/upload", {
       method: "POST",
       body: JSON.stringify({
         filename: thumbnail.name,
@@ -55,7 +57,8 @@ export default function EditPost(props: { post?: Post }) {
       )) as string;
     }
 
-    const response = await fetch("/api/post", {
+    console.log("submit 시발");
+    const response = await fetchR("/api/post", {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -129,8 +132,7 @@ export default function EditPost(props: { post?: Post }) {
         post?.postMetadata?.category ??
         (categorySelection[0].value as CategoryUnion),
       author: post?.postMetadata?.author ?? "",
-      issue_id:
-        post?.postMetadata?.issue_id ?? (issueSelection[1].value as IssueUnion),
+      issue_id: post?.postMetadata?.issue_id ?? issueSelection[1].value,
       is_approved: post?.postMetadata?.is_approved ?? true,
     },
   });

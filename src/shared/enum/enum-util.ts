@@ -1,25 +1,33 @@
+import { cache } from "react";
+
 import { NavigationSelection } from "@/shared/types/navigation";
 
-export function createNavigationSelection(
-  cached: NavigationSelection[],
-  obj: Record<string, string>,
-): NavigationSelection[] {
-  if (cached.length === 0) {
+export const createNavigationSelection = cache(
+  (obj: Record<string, string>): NavigationSelection[] => {
+    let cached: NavigationSelection[] = [];
     Object.entries(obj).forEach(([display, value]) => {
       cached = [...cached, { value, display }];
     });
-  }
-  return cached;
-}
+    return cached;
+  },
+);
 
-export function invertObject(
-  cached: Record<string, string>,
-  obj: Record<string, string>,
-): Record<string, string> {
-  if (Object.entries(cached).length === 0) {
+export const invertObject = cache(
+  (obj: Record<string, string>): Record<string, string> => {
+    const cached: Record<string, string> = {};
     Object.entries(obj).forEach(([key, value]) => {
       cached[value] = key;
     });
-  }
-  return cached;
-}
+    return cached;
+  },
+);
+
+export const getOrdinal = cache(
+  (obj: Record<string, string>): Record<string, number> => {
+    const cached: Record<string, number> = {};
+    Object.entries(obj).forEach(([key], index) => {
+      cached[key] = index;
+    });
+    return cached;
+  },
+);

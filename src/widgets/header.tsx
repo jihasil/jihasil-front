@@ -9,17 +9,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { auth } from "@/shared/lib/auth";
+import { getSession } from "@/features/request-sign-in";
 
 const TransparentHeader = async () => {
-  const session = await auth();
+  const session = await getSession();
 
   const buttonStyle =
     "lg:px-6 md:px-5 px-4 hover:bg-white hover:text-background text-foreground transition-all duration-300 ease-in-out w-full h-full flex items-center justify-center md:py-0 py-4 ";
 
   let userOnlyButton = buttonStyle;
   let signInButton = buttonStyle;
-  if (!session?.error && !session?.user) {
+  if (!session?.user) {
     userOnlyButton += " hidden";
   } else {
     signInButton += "hidden";
@@ -35,7 +35,7 @@ const TransparentHeader = async () => {
     <Link key="about" href="/about" className={buttonStyle}>
       ABOUT
     </Link>,
-    <Link key="signIn" href="/user/signIn" className={signInButton}>
+    <Link key="signIn" href="/signIn" className={signInButton}>
       LOGIN
     </Link>,
   ];

@@ -1,42 +1,68 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { auth } from "@/shared/lib/auth";
+import { getSession, rotateRefreshToken } from "@/features/request-sign-in";
+import { RoleUnion, roleOrdinal } from "@/shared/enum/roles";
 
 export async function middleware(request: NextRequest) {
-  const session = await auth();
+  const session = await getSession();
 
-  const redirectToLoginPage = (response?: () => NextResponse | undefined) => {
-    if (!session || !session.user || session.error) {
-      const signInUrl = new URL("/user/signIn", request.url);
-      signInUrl.searchParams.set("from", request.nextUrl.pathname);
-      return NextResponse.redirect(signInUrl);
+  if (!session) {
+    const response = await rotateRefreshToken(request);
+    if (response) {
+      return response;
     }
-    if (response !== undefined) return response();
+  }
+
+  const redirectToLoginPageIfNoSession = async (
+    minimumRole: RoleUnion = "ROLE_USER",
+  ) => {
+    if (!session) {
+      const nextUrl = new URL("/signIn", request.url);
+      nextUrl.searchParams.set("from", request.nextUrl.pathname);
+
+      return NextResponse.redirect(nextUrl);
+    } else if (
+      roleOrdinal[session.user.role ?? "ROLE_USER"] < roleOrdinal[minimumRole]
+    ) {
+      return new NextResponse("권한이 없습니다.", {
+        status: 403,
+      });
+    }
   };
 
   // API
-  // 회원가입 제외한 모든 비인가 POST 요청 제한
+  // 로그인 혹은 회원가입 제외한 모든 비인가 POST 요청 제한
   if (
     request.method === "POST" &&
     request.nextUrl.pathname.startsWith("/api")
   ) {
-    if (!session?.user && !request.nextUrl.pathname.startsWith("/api/user")) {
+    if (
+      !session &&
+      !request.nextUrl.pathname.startsWith("/api/user") &&
+      !request.nextUrl.pathname.startsWith("/api/signIn")
+    ) {
       return new NextResponse("로그인 후 다시 시도해주세요.", {
         status: 401,
       });
     }
   }
 
+  // 사용자 수정 API
   if (
-    request.method === "GET" &&
-    request.nextUrl.pathname.startsWith("/api/user")
+    request.nextUrl.pathname.startsWith("/api/user") &&
+    request.method !== "POST"
   ) {
-    if (!session?.user) {
+    if (!session) {
       return new NextResponse("로그인 후 다시 시도해주세요.", {
         status: 401,
       });
-    } else if (session?.user?.role !== "ROLE_SUPERUSER") {
+    } else if (
+      // 슈퍼유저 아닌 사용자가 사용자 삭제 혹은 전체 사용자 리턴 금지
+      session.user.role !== "ROLE_SUPERUSER" &&
+      (request.nextUrl.pathname.startsWith("/api/user/all") ||
+        request.method === "DELETE")
+    ) {
       return new NextResponse("권한이 없습니다.", {
         status: 403,
       });
@@ -46,29 +72,22 @@ export async function middleware(request: NextRequest) {
   // 페이지
   // 관리자 페이지 제한
   if (request.nextUrl.pathname.startsWith("/manage")) {
-    return redirectToLoginPage(() => {
-      if (session?.user?.role !== "ROLE_SUPERUSER") {
-        return new NextResponse("권한이 없습니다.", {
-          status: 403,
-        });
-      }
-    });
+    return await redirectToLoginPageIfNoSession("ROLE_SUPERUSER");
   }
 
-  // 글쓰기 페이지 제한
-  if (request.nextUrl.pathname.startsWith("/post/edit")) {
-    return redirectToLoginPage();
+  // 사용자 페이지 제한
+  if (
+    request.nextUrl.pathname.startsWith("/post/edit") ||
+    request.nextUrl.pathname.startsWith("/user")
+  ) {
+    return await redirectToLoginPageIfNoSession();
   }
 
   // 로그인 페이지 제한
-  if (request.nextUrl.pathname.startsWith("/user")) {
-    if (request.nextUrl.pathname.startsWith("/user/signIn")) {
-      if (session?.user) {
-        // 이미 로그인 돼있을 시 유저 페이지로 리다이렉트
-        return NextResponse.redirect(new URL(`/user/myPage`, request.url));
-      }
-    } else {
-      return redirectToLoginPage();
+  if (request.nextUrl.pathname.startsWith("/signIn")) {
+    if (session) {
+      // 이미 로그인 돼있을 시 유저 페이지로 리다이렉트
+      return NextResponse.redirect(new URL(`/user/myPage`, request.url));
     }
   }
 }

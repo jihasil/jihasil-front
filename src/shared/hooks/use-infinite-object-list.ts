@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchR } from "../lib/request";
 
 export const useInfiniteObjectList = <ObjectType, KeyType>(
   url: string,
@@ -43,7 +44,7 @@ export const useInfiniteObjectList = <ObjectType, KeyType>(
     url += `?${searchParams.toString()}`;
     console.log(url.toString());
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchR(url.toString(), {
       method: "GET",
     });
 

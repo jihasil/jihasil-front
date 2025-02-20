@@ -1,159 +1,156 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import { CookieSerializeOptions } from "cookie";
+import {
+  TokenPair,
+  User,
+  UserSignInRequestDTO,
+} from "@/shared/types/user-types";
+import { decode, encode } from "@auth/core/jwt";
+import { changeUserInfo, getUser } from "@/entities/user";
 import { cookies } from "next/headers";
+import { getRandomSalt, validatePassword } from "@/shared/lib/crypto";
+import { ACCESS_TOKEN, INVALIDATED, REFRESH_TOKEN } from "@/shared/const/auth";
 
-import { getRefreshToken, getUser, validatePassword } from "@/entities/user";
-import { User } from "@/shared/types/user-types";
-import { Mutex } from "async-mutex";
-import { decode } from "@auth/core/jwt";
+export const defaultCookieOptions: CookieSerializeOptions = {
+  httpOnly: process.env.NODE_ENV === "production",
+  path: "/",
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+};
 
-declare module "next-auth" {
-  interface User {
-    role: string;
+const accessTokenAge = 60 * 5; // 5 minutes
+const refreshTokenAge = 60 * 60 * 12; // 12 hours
+
+export const authorizeUser = async (
+  credentials: UserSignInRequestDTO,
+): Promise<User | null> => {
+  const user = await getUser(credentials.id as string);
+
+  if (user !== null) {
+    const isValid = await validatePassword(
+      credentials.password as string,
+      user.password,
+    );
+    if (isValid) {
+      return user;
+    } else {
+      return null;
+    }
+  } else {
+    return null;
   }
-}
+};
 
-declare module "next-auth" {
-  interface Session {
-    id: string;
-    error?: "RefreshTokenError";
+export const generateTokenPair = async (
+  user: User,
+): Promise<TokenPair | null> => {
+  const secret = process.env.TOKEN_SECRET;
+
+  if (!secret) {
+    throw new Error("No secret");
   }
-}
 
-declare module "@auth/core/jwt" {
-  interface JWT {
-    refreshToken?: string;
-    expiresAt?: number;
-    error?: "RefreshTokenError";
-  }
-}
+  try {
+    const refreshTokenSalt = await getRandomSalt();
 
-const mutex = new Mutex();
-let nextRefreshAt: number = 0;
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
-      credentials: {
-        id: {},
-        password: {},
+    const newRefreshToken = await encode({
+      maxAge: refreshTokenAge,
+      secret,
+      salt: refreshTokenSalt,
+      token: {
+        sub: user.id,
       },
-      authorize: async (credentials) => {
-        const user = await getUser(credentials.id as string);
+    });
 
-        if (user !== null) {
-          const isValid = await validatePassword(
-            credentials.password as string,
-            user.password,
-          );
-          if (isValid) {
-            return user;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
+    const accessTokenSalt = await getRandomSalt();
+
+    const newAccessToken = await encode({
+      maxAge: accessTokenAge,
+      secret,
+      salt: accessTokenSalt,
+      token: {
+        sub: user.id,
+        name: user.name,
+        role: user.role,
       },
-    }),
-  ],
-  session: {
-    strategy: "jwt",
-  },
-  trustHost: true,
+    });
 
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        const tokenAndExpiry = await getRefreshToken(user as User);
+    const saltAndRefreshToken = `${refreshTokenSalt}|${newRefreshToken}`;
+    const saltAndAccessToken = `${accessTokenSalt}|${newAccessToken}`;
 
-        if (!tokenAndExpiry) {
-          throw new TypeError("Failed to get refresh token");
-        }
-        const { refreshToken, expiresAt } = tokenAndExpiry;
+    const succeed = await changeUserInfo({
+      id: user.id,
+      refreshToken: saltAndRefreshToken,
+    });
 
-        console.log("New Refresh token", refreshToken);
-        return {
-          ...token,
-          role: user.role,
-          refreshToken,
-          expiresAt,
-        };
-      } else if (Date.now() >= token.expiresAt * 1000) {
-        // console.log("refresh trying");
-        const release = await mutex.acquire();
-        console.log("refresh start");
-        console.log(token);
-        //
-        try {
-          if (Date.now() / 1000 < nextRefreshAt) {
-            const cookieName = "authjs.session-token";
-            const cookieStore = await cookies();
-            const refreshedToken = cookieStore.get(cookieName);
-            const secret = process.env.AUTH_SECRET;
+    if (succeed) {
+      return {
+        refreshToken: saltAndRefreshToken,
+        refreshTokenAge,
+        accessTokenAge,
+        accessToken: saltAndAccessToken,
+      };
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
 
-            if (!secret) {
-              return null;
-            }
-            console.log("Refreshed token before. using cookie");
-            console.log(refreshedToken.value);
+export const getUserFromRefreshToken = async (refreshToken: string) => {
+  const secret = process.env.TOKEN_SECRET;
 
-            return decode({
-              secret,
-              salt: cookieName,
-              token: refreshedToken?.value,
-            });
-          }
-          console.log("Previous Refresh token", token.refreshToken);
+  if (!secret) {
+    throw new Error("No secret");
+  }
 
-          if (!token.refreshToken) return null;
+  const [salt, token] = refreshToken.split("|");
 
-          const tokenAndExpiry = await getRefreshToken(
-            token.refreshToken as string,
-          );
+  // refresh token 이 DB에 있고, 일치하는지 확인
+  const decodedJwt = await decode({
+    salt: salt,
+    secret: secret,
+    token: token,
+  });
 
-          if (!tokenAndExpiry) return null;
+  const id = decodedJwt?.sub;
 
-          const { refreshToken, expiresAt } = tokenAndExpiry;
+  if (!id) {
+    throw new Error("No valid token");
+  }
 
-          nextRefreshAt = expiresAt;
+  if (Date.now() >= (decodedJwt.exp ?? 0) * 1000) {
+    throw new Error("Refresh token expired");
+  }
 
-          console.log({
-            ...token,
-            refreshToken,
-            expiresAt,
-          });
+  const user = await getUser(id);
+  if (!user) {
+    throw new Error("No valid token");
+  }
+  if (!user.refreshToken) {
+    throw new Error("No refresh token");
+  }
+  console.log(user.refreshToken);
+  console.log(refreshToken);
+  if (user.refreshToken !== refreshToken) {
+    throw new Error("No valid token");
+  }
 
-          return {
-            ...token,
-            refreshToken,
-            expiresAt,
-          };
-        } catch (error) {
-          console.error(error);
-          console.log("에러를 던지면..");
-          token.error = "RefreshTokenError";
-          return null;
-        } finally {
-          release();
-        }
-      } else {
-        console.log("reusing token!");
-        console.log(token);
-        return token;
-      }
-    },
+  return user;
+};
 
-    async session({ session, token }) {
-      if (session.error) {
-        session.error = token.error;
-      } else {
-        session.user.role = token.role;
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-  },
-});
+export const setCookiesWithToken = async (tokenPair: TokenPair) => {
+  const cookieStore = await cookies();
+
+  cookieStore.set(ACCESS_TOKEN, tokenPair.accessToken, {
+    ...defaultCookieOptions,
+    maxAge: tokenPair.accessTokenAge,
+  });
+
+  cookieStore.set(REFRESH_TOKEN, tokenPair.refreshToken, {
+    ...defaultCookieOptions,
+    path: "/api/refresh",
+    maxAge: tokenPair.refreshTokenAge,
+  });
+};

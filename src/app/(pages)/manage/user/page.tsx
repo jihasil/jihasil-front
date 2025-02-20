@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
 import { roleSelection } from "@/shared/enum/roles";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
+import { fetchR } from "@/shared/lib/request";
 import { UserEditRequestDTO, UserResponseDTO } from "@/shared/types/user-types";
 
 function UserSkeleton() {
@@ -89,12 +90,12 @@ export default function ManageUserPage() {
   const { isInitiated, objectList, setObjectList } = useInfiniteObjectList<
     UserResponseDTO,
     string
-  >("/api/user", "users", undefined, () => {
+  >("/api/user/all", "users", undefined, () => {
     return 15;
   });
 
   const changeUserData = async (user: UserEditRequestDTO) => {
-    const response = await fetch("/api/user", {
+    const response = await fetchR("/api/user", {
       method: "PATCH",
       body: JSON.stringify(user),
     });
@@ -112,7 +113,7 @@ export default function ManageUserPage() {
   };
 
   const deleteUser = async (index: number, user: UserEditRequestDTO) => {
-    const response = await fetch("/api/user", {
+    const response = await fetchR("/api/user", {
       method: "DELETE",
       body: JSON.stringify({ id: user.id }),
     });

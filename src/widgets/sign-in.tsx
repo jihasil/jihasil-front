@@ -1,9 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import {
@@ -15,23 +15,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
-import { requestSignIn } from "@/features/request-sign-in";
+import { signInSchema } from "@/shared/types/user-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function SignIn() {
   const searchParams = useSearchParams();
   const [isUploading, setIsUploading] = useState<boolean>(false);
-
-  const signInSchema = z.object({
-    id: z
-      .string({ required_error: "A unique ID is required" })
-      .min(1, "A unique ID is required."),
-    password: z
-      .string({ required_error: "Password is required" })
-      .min(1, "Password is required."),
-  });
+  const router = useRouter();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -50,13 +43,24 @@ export default function SignIn() {
 
     setIsUploading(true);
     const signInData = await signInSchema.parseAsync(values);
-    const next = searchParams.get("from") ?? "/";
+    const redirectTo = searchParams.get("from") ?? "/";
 
-    const result = await requestSignIn(signInData, next);
+    const result = await fetch("/api/signIn", {
+      method: "POST",
+      body: JSON.stringify({ ...signInData }),
+    });
 
-    if (!result) {
-      toast.error("아이디와 비밀번호를 확인해주세요.");
+    console.log(result);
+    const body = await result.json();
+
+    if (!result.ok) {
+      toast.error(body.message);
+    } else {
+      toast.success(body.message);
+      router.push(redirectTo);
+      router.refresh();
     }
+
     setIsUploading(false);
   }
 

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { getPost } from "@/entities/post";
-import { auth } from "@/shared/lib/auth";
+import { getSession } from "@/features/request-sign-in";
 import { PostThumbnail } from "@/widgets/post-thumbnail";
 
 export async function generateMetadata({
@@ -35,8 +35,8 @@ export default async function PageViewer({
 }: {
   params: Promise<{ postId: string }>;
 }) {
+  const session = await getSession();
   const postId = (await params).postId;
-  const session = await auth();
 
   const post = await getPost(postId);
   if (!post) {
@@ -50,7 +50,7 @@ export default async function PageViewer({
     <div className="subgrid my-gap">
       <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky top-[89px]">
         <PostThumbnail postMetadata={post.postMetadata} />
-        {session?.user ? (
+        {session ? (
           <Link
             href={{
               pathname: `/post/edit/${postId}`,
