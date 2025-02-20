@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { invalidateUser } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
+import { ACCESS_TOKEN, INVALIDATED, REFRESH_TOKEN } from "@/shared/const/auth";
 
 export default async function PageViewer() {
   const session = await getSession();
@@ -26,8 +27,8 @@ export default async function PageViewer() {
             });
 
             const cookieStore = await cookies();
-            cookieStore.set("accessToken", "invalidated");
-            cookieStore.delete("refreshToken");
+            cookieStore.set(ACCESS_TOKEN, INVALIDATED);
+            cookieStore.delete(REFRESH_TOKEN);
 
             redirect("/");
           }}

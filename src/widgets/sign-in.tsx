@@ -45,7 +45,7 @@ export default function SignIn() {
     const signInData = await signInSchema.parseAsync(values);
     const redirectTo = searchParams.get("from") ?? "/";
 
-    const result = await fetch("/api/user/signIn", {
+    const result = await fetch("/api/signIn", {
       method: "POST",
       body: JSON.stringify({ ...signInData }),
     });

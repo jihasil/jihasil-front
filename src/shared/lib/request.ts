@@ -12,12 +12,14 @@ export const fetchR = async (
             console.log("Token Rotated");
 
             fetch(input, init)
-              .then(async (response) => {
-                resolve(response);
+              .then(async (responseAfterRotation) => {
+                resolve(responseAfterRotation);
               })
-              .catch((reason: any) => {
-                reject(reason);
+              .catch((reasonAfterRotation: any) => {
+                reject(reasonAfterRotation);
               });
+          } else {
+            resolve(response);
           }
         } else {
           resolve(response);

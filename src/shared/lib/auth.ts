@@ -8,6 +8,7 @@ import { decode, encode } from "@auth/core/jwt";
 import { changeUserInfo, getUser } from "@/entities/user";
 import { cookies } from "next/headers";
 import { getRandomSalt, validatePassword } from "@/shared/lib/crypto";
+import { ACCESS_TOKEN, INVALIDATED, REFRESH_TOKEN } from "@/shared/const/auth";
 
 export const defaultCookieOptions: CookieSerializeOptions = {
   httpOnly: process.env.NODE_ENV === "production",
@@ -142,12 +143,12 @@ export const getUserFromRefreshToken = async (refreshToken: string) => {
 export const setCookiesWithToken = async (tokenPair: TokenPair) => {
   const cookieStore = await cookies();
 
-  cookieStore.set("accessToken", tokenPair.accessToken, {
+  cookieStore.set(ACCESS_TOKEN, tokenPair.accessToken, {
     ...defaultCookieOptions,
     maxAge: tokenPair.accessTokenAge,
   });
 
-  cookieStore.set("refreshToken", tokenPair.refreshToken, {
+  cookieStore.set(REFRESH_TOKEN, tokenPair.refreshToken, {
     ...defaultCookieOptions,
     path: "/api/refresh",
     maxAge: tokenPair.refreshTokenAge,

@@ -1,10 +1,12 @@
 import { z } from "zod";
 
+import { RoleUnion } from "@/shared/enum/roles";
+
 export type User = {
   id: string;
   name: string;
   password: string;
-  role: string;
+  role: RoleUnion;
   refreshToken?: string;
 };
 
@@ -15,12 +17,12 @@ export type UserKey = {
 export type UserResponseDTO = {
   id: string;
   name: string;
-  role: string;
+  role: RoleUnion;
 };
 
 export type UserEditRequestDTO = {
   id: string;
-  role?: string;
+  role?: RoleUnion;
   name?: string;
   password?: string;
   refreshToken?: string;
@@ -44,7 +46,7 @@ export type UserSignUpRequestDTO = {
   id: string;
   name: string;
   password: string;
-  role?: string;
+  role?: RoleUnion;
 };
 
 export type TokenPair = {

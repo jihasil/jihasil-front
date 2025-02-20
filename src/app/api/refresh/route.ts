@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
+import { ACCESS_TOKEN, INVALIDATED, REFRESH_TOKEN } from "@/shared/const/auth";
 import {
   generateTokenPair,
   getUserFromRefreshToken,
@@ -14,7 +15,7 @@ export const GET = async (req: NextRequest) => {
   try {
     console.log("refreshing token!");
 
-    const refreshTokenHash = req.cookies.get("refreshToken")?.value;
+    const refreshTokenHash = req.cookies.get(REFRESH_TOKEN)?.value;
 
     if (!refreshTokenHash) {
       throw new Error("AuthenticationError");
@@ -52,7 +53,7 @@ export const GET = async (req: NextRequest) => {
 
   if (!rotateSuccess) {
     const cookieStore = await cookies();
-    cookieStore.set("accessToken", "invalidated");
+    cookieStore.set(ACCESS_TOKEN, INVALIDATED);
   }
 
   redirect(redirectTo);

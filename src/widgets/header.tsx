@@ -35,7 +35,7 @@ const TransparentHeader = async () => {
     <Link key="about" href="/about" className={buttonStyle}>
       ABOUT
     </Link>,
-    <Link key="signIn" href="/user/signIn" className={signInButton}>
+    <Link key="signIn" href="/signIn" className={signInButton}>
       LOGIN
     </Link>,
   ];

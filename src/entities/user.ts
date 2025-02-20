@@ -1,5 +1,6 @@
 "use server";
 
+import { INVALIDATED } from "@/shared/const/auth";
 import { dynamoClient, generateUpdateExpression } from "@/shared/lib/dynamo-db";
 import { User, UserEditRequestDTO, UserKey } from "@/shared/types/user-types";
 import { QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
@@ -42,7 +43,7 @@ export const changeUserInfo = async (userEditRequest: UserEditRequestDTO) => {
 
   // jwt token 에 포함되는 정보가 수정될 경우 refresh token 을 무효화 함.
   if (userEditRequest.role || userEditRequest.password) {
-    userEditRequest.refreshToken = "invalidated";
+    userEditRequest.refreshToken = INVALIDATED;
   }
 
   const exp = generateUpdateExpression(userKey, userEditRequest);
@@ -71,6 +72,6 @@ export const changeUserInfo = async (userEditRequest: UserEditRequestDTO) => {
 export const invalidateUser = async (userKey: UserKey) => {
   return await changeUserInfo({
     id: userKey.id,
-    refreshToken: "invalidated",
+    refreshToken: INVALIDATED,
   });
 };
