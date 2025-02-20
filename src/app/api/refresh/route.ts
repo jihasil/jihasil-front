@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { permanentRedirect, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -37,9 +37,7 @@ export const GET = async (req: NextRequest) => {
     console.error(error);
   }
 
-  const noRedirect = Boolean(
-    req.nextUrl.searchParams.get("noRedirect") ?? "false",
-  );
+  const noRedirect = req.nextUrl.searchParams.get("noRedirect") === "true";
 
   if (noRedirect) {
     if (rotateSuccess) {
