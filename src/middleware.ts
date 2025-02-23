@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { hasEnoughRole } from "@/entities/user";
 import { getSession, rotateRefreshToken } from "@/features/request-sign-in";
-import { RoleUnion, roleOrdinal } from "@/shared/enum/roles";
+import { RoleUnion } from "@/shared/enum/roles";
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
@@ -22,9 +23,7 @@ export async function middleware(request: NextRequest) {
       nextUrl.searchParams.set("from", request.nextUrl.pathname);
 
       return NextResponse.redirect(nextUrl);
-    } else if (
-      roleOrdinal[session.user.role ?? "ROLE_USER"] < roleOrdinal[minimumRole]
-    ) {
+    } else if (!hasEnoughRole(minimumRole, session.user.role)) {
       return new NextResponse("권한이 없습니다.", {
         status: 403,
       });

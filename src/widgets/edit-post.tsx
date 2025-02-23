@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -21,14 +21,16 @@ import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/ui/navigation";
 import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
+import { hasEnoughRole } from "@/entities/user";
 import { CategoryUnion, categorySelection } from "@/shared/enum/category";
 import { IssueUnion, issueSelection } from "@/shared/enum/issue";
 import { fetchR } from "@/shared/lib/request";
-import { Post, PostInput } from "@/shared/types/post-types";
+import { Session } from "@/shared/types/auth-types";
+import { Post, metadataSchema } from "@/shared/types/post-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function EditPost(props: { post?: Post }) {
+export default function EditPost(props: { post?: Post; session: Session }) {
   const router = useRouter();
   const { post } = props;
   const issueSelectionExcludeAll = issueSelection.slice(1);
@@ -50,14 +52,65 @@ export default function EditPost(props: { post?: Post }) {
     return fileUrl;
   };
 
-  const submit = async (values: PostInput) => {
-    if (values.metadata.thumbnail_file?.length === 1) {
-      values.metadata.thumbnail_url = (await uploadThumbnail(
-        values.metadata.thumbnail_file[0] as File,
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+
+  const schema = metadataSchema(post?.postMetadata.thumbnail_url);
+
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      title: post?.postMetadata?.title ?? "",
+      subtitle: post?.postMetadata?.subtitle ?? "",
+      category:
+        post?.postMetadata?.category ??
+        (categorySelection[0].value as CategoryUnion),
+      author: post?.postMetadata?.author ?? props.session.user.name,
+      issue_id: post?.postMetadata?.issue_id ?? issueSelection[1].value,
+      is_approved: post?.postMetadata?.is_approved ?? true,
+      html: post?.html,
+      thumbnail_url: post?.postMetadata?.thumbnail_url,
+      post_id: post?.postMetadata?.post_id,
+      board: post?.postMetadata?.board,
+      created_at: post?.postMetadata?.created_at,
+      user_id: props.session.user.id,
+      is_deleted: false,
+    },
+  });
+
+  // 2. Define a submit handler.
+  async function onSubmit(values: z.infer<typeof schema>) {
+    if (isUploading) {
+      return;
+    }
+
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    // const html = await plateEditorRef.current.exportToHtml();
+
+    // if (html.length > 0) {
+    setIsUploading(true);
+
+    try {
+      const postId = await submit(values);
+
+      router.push(`/post/view/${postId}`);
+    } catch (e) {
+      toast("업로드에 실패했습니다.");
+      console.error(e);
+    } finally {
+      setIsUploading(false);
+    }
+    // }
+  }
+
+  const submit = async (values: z.infer<typeof schema>) => {
+    if (values.thumbnail_file?.length === 1) {
+      values.thumbnail_url = (await uploadThumbnail(
+        values.thumbnail_file[0] as File,
       )) as string;
     }
 
-    console.log("submit 시발");
     const response = await fetchR("/api/post", {
       method: "POST",
       body: JSON.stringify(values),
@@ -70,111 +123,6 @@ export default function EditPost(props: { post?: Post }) {
     const { postId } = await response.json();
     return postId;
   };
-
-  const plateEditorRef = useRef<{ exportToHtml: () => Promise<string> }>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-
-  const ACCEPTED_IMAGE_TYPES = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-  ];
-
-  const metadataSchema = z.object({
-    thumbnail_file: z
-      .any()
-      .refine((file: FileList) => {
-        // 기본값 있으면 (있는 글 수정이면 파일 없어도 됨)
-        if (post?.postMetadata?.thumbnail_url) return true;
-        else {
-          // 없으면 파일 있어야 함
-          return file.length === 1;
-        }
-      }, "썸네일 파일을 입력해주세요.")
-      .refine((file: FileList) => {
-        return (
-          post?.postMetadata?.thumbnail_url ||
-          ACCEPTED_IMAGE_TYPES.includes(file[0]?.type)
-        );
-      }, "jpg, png, webp 이미지를 입력해주세요."),
-    title: z.string().min(1, "제목을 입력해주세요."),
-    subtitle: z.string().min(1, "부제목을 입력해주세요."),
-    category: z.union(
-      [
-        z.literal("magazine"),
-        z.literal("column"),
-        z.literal("podcast"),
-        z.literal("curation"),
-        z.literal("social"),
-      ],
-      {
-        required_error: "카테고리를 선택하세요.",
-      },
-    ),
-    author: z
-      .string({ required_error: "글쓴이를 입력해주세요" })
-      .min(1, "글쓴이를 입력하세요."),
-    issue_id: z.union(
-      [z.literal("issue_001"), z.literal("issue_002"), z.literal("none")],
-      { required_error: "이슈를 선택하세요." },
-    ),
-    is_approved: z.boolean(),
-  });
-
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof metadataSchema>>({
-    resolver: zodResolver(metadataSchema),
-    defaultValues: {
-      title: post?.postMetadata?.title ?? "",
-      subtitle: post?.postMetadata?.subtitle ?? "",
-      category:
-        post?.postMetadata?.category ??
-        (categorySelection[0].value as CategoryUnion),
-      author: post?.postMetadata?.author ?? "",
-      issue_id: post?.postMetadata?.issue_id ?? issueSelection[1].value,
-      is_approved: post?.postMetadata?.is_approved ?? true,
-    },
-  });
-
-  // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof metadataSchema>) {
-    if (isUploading) {
-      return;
-    }
-
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    if (plateEditorRef.current) {
-      const html = await plateEditorRef.current.exportToHtml();
-
-      if (html.length > 0) {
-        setIsUploading(true);
-
-        try {
-          const postId = await submit({
-            html,
-            metadata: {
-              ...values,
-              post_id: post?.postMetadata?.post_id,
-              thumbnail_url: post?.postMetadata?.thumbnail_url,
-              board: post?.postMetadata?.board,
-              created_at: post?.postMetadata?.created_at,
-            },
-          });
-
-          router.push(`/post/view/${postId}`);
-        } catch (e) {
-          toast("업로드에 실패했습니다.");
-          console.error(e);
-        } finally {
-          setIsUploading(false);
-        }
-      } else {
-        toast("글 내용을 입력해주세요.");
-      }
-    }
-  }
 
   const fileRef = form.register("thumbnail_file");
 
@@ -272,6 +220,9 @@ export default function EditPost(props: { post?: Post }) {
                   <FormControl>
                     <Input
                       placeholder="도현, 준, 나우, 나무, ...etc"
+                      readOnly={
+                        !hasEnoughRole("ROLE_ADMIN", props.session.user.role)
+                      }
                       {...field}
                     />
                   </FormControl>
@@ -281,13 +232,28 @@ export default function EditPost(props: { post?: Post }) {
             />
           </div>
 
-          <div
-            className="col-span-full rounded-lg border h-full w-full dark"
-            data-registry="plate"
-          >
-            <PlateEditor ref={plateEditorRef} data={post?.html} />
-            <Toaster />
-          </div>
+          <FormField
+            control={form.control}
+            name="html"
+            render={() => (
+              <FormItem
+                className="col-span-full h-full w-full dark"
+                data-registry="plate"
+              >
+                <FormLabel>본문</FormLabel>
+                <FormControl>
+                  <div className="rounded-lg border ">
+                    <PlateEditor
+                      html={post?.html}
+                      onChange={(value: string) => {
+                        form.setValue("html", value);
+                      }}
+                    />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
           <div className="subgrid my-gap">
             <FormField

@@ -1,5 +1,4 @@
 import { createNavigationSelection } from "@/shared/enum/enum-util";
-import { NavigationSelection } from "@/shared/types/navigation";
 
 export const IssueKey = {
   "모든 이슈": "all",

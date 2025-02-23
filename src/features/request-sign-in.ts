@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { ACCESS_TOKEN, INVALIDATED } from "@/shared/const/auth";
 import { RoleUnion } from "@/shared/enum/roles";
+import { Session } from "@/shared/types/auth-types";
 import { decode } from "@auth/core/jwt";
 
 declare module "@auth/core/jwt" {
@@ -15,7 +16,7 @@ declare module "@auth/core/jwt" {
   }
 }
 
-export const getSession = async () => {
+export const getSession = async (): Promise<Session | null> => {
   const cookieStore = await cookies();
   const accessTokenHash = cookieStore.get(ACCESS_TOKEN)?.value;
 

@@ -1,9 +1,11 @@
+import { RoleUnion } from "@/shared/enum/roles";
+
 type User = {
   id: string;
   name: string;
-  role?: string;
+  role?: RoleUnion;
 };
 
 export type Session = {
-  user: User | null;
+  user: User;
 };

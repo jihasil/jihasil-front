@@ -25,8 +25,8 @@ export const invertObject = cache(
 export const getOrdinal = cache(
   (obj: Record<string, string>): Record<string, number> => {
     const cached: Record<string, number> = {};
-    Object.entries(obj).forEach(([key], index) => {
-      cached[key] = index;
+    Object.entries(obj).forEach(([key, value], index) => {
+      cached[value] = index;
     });
     return cached;
   },
