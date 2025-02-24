@@ -24,8 +24,8 @@ export default async function PageViewer() {
         안녕하세요, {session?.user.name} 님
       </p>
       <p className="col-span-full">권한: {RoleValue[session.user.role]}</p>
-      <div className="col-span-1 flex flex-col flex-grow my-gap">
-        <Button className="flex-grow" asChild>
+      <div className="col-span-1 flex flex-col grow my-gap">
+        <Button className="grow" asChild>
           <Link
             href={`/user/edit/?userId=${session.user.id}&from=${encodeURIComponent("/user/myPage")}`}
           >

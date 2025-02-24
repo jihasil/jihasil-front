@@ -98,7 +98,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     }
   }
 
-  async function onError(values) {
+  async function onError(values: any) {
     // toast.error(values);
     console.log(values);
   }
@@ -264,7 +264,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
               control={form.control}
               name="is_approved"
               render={({ field }) => (
-                <FormItem className="col-span-4 col-start-1 flex space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="col-span-4 col-start-1 flex gap-x-3 rounded-md border p-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
