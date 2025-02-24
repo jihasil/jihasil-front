@@ -91,6 +91,7 @@ import {
 import { BaseIndentPlugin } from "@udecode/plate-indent";
 import { BaseIndentListPlugin } from "@udecode/plate-indent-list";
 import { BaseAlignPlugin } from "@udecode/plate-alignment";
+import { Prism } from "../plate-ui/code-block-combobox";
 
 export const plateStaticPlugins = [
   BaseColumnPlugin,
@@ -112,11 +113,11 @@ export const plateStaticPlugins = [
   BaseDatePlugin,
   BaseEquationPlugin,
   BaseInlineEquationPlugin,
-  // BaseCodeBlockPlugin.configure({
-  //   options: {
-  //     prism: Prism,
-  //   },
-  // }),
+  BaseCodeBlockPlugin.configure({
+    options: {
+      prism: Prism,
+    },
+  }),
   BaseIndentPlugin.extend({
     inject: {
       targetPlugins: [

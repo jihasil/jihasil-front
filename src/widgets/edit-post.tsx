@@ -98,6 +98,11 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     }
   }
 
+  async function onError(values) {
+    // toast.error(values);
+    console.log(values);
+  }
+
   const submit = async (values: z.infer<typeof schema>) => {
     if (values.thumbnail_file?.length === 1) {
       values.thumbnail_url = (await uploadThumbnail(
@@ -124,7 +129,10 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     <div className="subgrid">
       <PreventRoute isUploading={isUploading} />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="subgrid my-gap">
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+          className="subgrid my-gap"
+        >
           <div className="subgrid my-gap">
             <FormField
               control={form.control}

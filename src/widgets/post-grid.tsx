@@ -76,7 +76,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
           selects={issueSelection}
           onValueChange={changeIssue}
           default={issueFilter}
-          className="md:col-span-2 col-span-1"
+          className="col-span-2"
         />
         {props.session?.user ? (
           <ShowNonApproved
