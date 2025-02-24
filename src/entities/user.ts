@@ -1,6 +1,5 @@
-"use server";
-
 import { INVALIDATED } from "@/shared/const/auth";
+import { RoleUnion, roleOrdinal } from "@/shared/enum/roles";
 import { dynamoClient, generateUpdateExpression } from "@/shared/lib/dynamo-db";
 import { User, UserEditRequestDTO, UserKey } from "@/shared/types/user-types";
 import { QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
@@ -74,4 +73,11 @@ export const invalidateUser = async (userKey: UserKey) => {
     id: userKey.id,
     refreshToken: INVALIDATED,
   });
+};
+
+export const hasEnoughRole = (
+  minimumRole: RoleUnion,
+  role: RoleUnion = "ROLE_USER",
+) => {
+  return roleOrdinal[minimumRole] <= roleOrdinal[role];
 };

@@ -1,9 +1,12 @@
 import { nanoid } from "nanoid";
-import { NextRequest } from "next/server";
+import { forbidden, unauthorized } from "next/navigation";
+import { NextRequest, NextResponse } from "next/server";
 
 import { getPost } from "@/entities/post";
+import { hasEnoughRole } from "@/entities/user";
+import { getSession } from "@/features/request-sign-in";
 import { dynamoClient } from "@/shared/lib/dynamo-db";
-import { PostInput, PostResponseDTO } from "@/shared/types/post-types";
+import { PostResponseDTO, metadataSchema } from "@/shared/types/post-types";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
@@ -82,21 +85,51 @@ export const GET = async (req: NextRequest) => {
 };
 
 export const POST = async (req: NextRequest) => {
-  const postInput: PostInput = await req.json();
-  postInput.metadata["is_deleted"] = false;
+  const postInput = await req.json();
 
-  if (postInput.metadata.post_id === undefined) {
-    // 새로 생성
-    const created_at = new Date().toISOString();
-    postInput.metadata.board = "main";
-    postInput.metadata.created_at = created_at;
-    postInput.metadata.post_id = nanoid(10);
+  const validatedPostResult = metadataSchema(postInput.thumbnail_url).safeParse(
+    postInput,
+  );
+
+  if (validatedPostResult.error) {
+    return new NextResponse(
+      JSON.stringify({ message: validatedPostResult.error.message }),
+      {
+        status: 400,
+      },
+    );
   }
 
-  delete postInput.metadata.thumbnail_file;
+  const validatedPost = validatedPostResult.data;
+  const { html, ...postMetadata } = validatedPost;
+
+  const session = await getSession();
+  if (!session) {
+    forbidden();
+  }
+
+  // 글쓴이 이름은 관리자 이상만 변경 가능
+  if (
+    !hasEnoughRole("ROLE_ADMIN", session.user.role) &&
+    postMetadata.author !== session.user.name
+  ) {
+    unauthorized();
+  }
+
+  postMetadata["is_deleted"] = false;
+
+  if (postMetadata.post_id === undefined) {
+    // 새로 생성
+    const created_at = new Date().toISOString();
+    postMetadata.board = "main";
+    postMetadata.created_at = created_at;
+    postMetadata.post_id = nanoid(10);
+  }
+
+  delete postMetadata.thumbnail_file;
   const metadataPutParam = {
     TableName: "post_metadata",
-    Item: postInput.metadata,
+    Item: postMetadata,
   };
 
   const metadataPutQuery = new PutCommand(metadataPutParam);
@@ -104,8 +137,8 @@ export const POST = async (req: NextRequest) => {
   const contentPutParam = {
     TableName: "post_content",
     Item: {
-      post_id: postInput.metadata.post_id,
-      html: postInput.html,
+      post_id: postMetadata.post_id,
+      html: html,
     },
   };
 
@@ -118,12 +151,9 @@ export const POST = async (req: NextRequest) => {
     // @ts-expect-error it works
     await dynamoClient.send(contentPutQuery);
 
-    return new Response(
-      JSON.stringify({ postId: postInput.metadata.post_id }),
-      {
-        status: 200,
-      },
-    );
+    return new Response(JSON.stringify({ postId: postMetadata.post_id }), {
+      status: 200,
+    });
   } catch (error: any) {
     console.log(error);
 
