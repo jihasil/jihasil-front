@@ -3,13 +3,8 @@
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
-import type {
-  ClientUploadedFileData,
-  UploadFilesOptions,
-} from "uploadthing/types";
 import { z } from "zod";
 
-import type { OurFileRouter } from "@/app/api/uploadthing/route";
 import { fetchR } from "@/shared/lib/request";
 
 export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}
