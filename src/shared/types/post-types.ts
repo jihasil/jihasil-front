@@ -84,6 +84,6 @@ export const metadataSchema = (thumbnail_url: string | undefined) =>
     thumbnail_url: z.string(),
     board: z.string(),
     created_at: z.string(),
-    user_id: z.string().min(10),
+    user_id: z.string(),
     is_deleted: z.boolean(),
   });

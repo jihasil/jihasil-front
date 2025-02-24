@@ -93,7 +93,7 @@ import { SlashInputElement } from "@/components/plate-ui/slash-input-element";
 import { TocElement } from "@/components/plate-ui/toc-element";
 import { ToggleElement } from "@/components/plate-ui/toggle-element";
 
-export const useCreateEditor = (value: string) => {
+export const useCreateEditor = (value: string | undefined) => {
   return usePlateEditor({
     override: {
       components: withPlaceholders(components),

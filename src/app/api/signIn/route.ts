@@ -10,7 +10,6 @@ import { UserSignInRequestDTO, signInSchema } from "@/shared/types/user-types";
 
 export const POST = async (nextRequest: NextRequest) => {
   const credentials: UserSignInRequestDTO = await nextRequest.json();
-  console.log(credentials);
 
   try {
     const validationResult = signInSchema.safeParse(credentials);

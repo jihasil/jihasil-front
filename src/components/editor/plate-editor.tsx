@@ -13,7 +13,7 @@ export const PlateEditor = (props: {
   html: string | undefined;
   onChange: (html: string) => void;
 }) => {
-  const editor = useCreateEditor(props.html ?? "");
+  const editor = useCreateEditor(props.html);
   const editorStatic = createSlateEditor({
     plugins: plateStaticPlugins,
   });
@@ -26,19 +26,23 @@ export const PlateEditor = (props: {
           console.log(value);
           editorStatic.children = value;
 
-          const serializedHtml = await serializeHtml(editorStatic, {
-            components: plateStaticComponents,
-            props: {
-              style: {
-                padding: "0 calc(50% - 350px)",
-                paddingBottom: "",
+          if (editor.api.isEmpty()) {
+            props.onChange("");
+          } else {
+            const serializedHtml = await serializeHtml(editorStatic, {
+              components: plateStaticComponents,
+              props: {
+                style: {
+                  padding: "0 calc(50% - 350px)",
+                  paddingBottom: "",
+                },
               },
-            },
-          });
+            });
 
-          console.log(serializedHtml);
+            console.log(serializedHtml);
 
-          props.onChange(serializedHtml);
+            props.onChange(serializedHtml);
+          }
         }}
       >
         <EditorContainer>

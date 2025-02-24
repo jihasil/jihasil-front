@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { getPost } from "@/entities/post";
+import { hasEnoughRole } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
 import { PostThumbnail } from "@/widgets/post-thumbnail";
 
@@ -50,14 +51,18 @@ export default async function PageViewer({
     <div className="subgrid my-gap">
       <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky top-[89px]">
         <PostThumbnail postMetadata={post.postMetadata} />
-        {session ? (
-          <Link
-            href={{
-              pathname: `/post/edit/${postId}`,
-            }}
-          >
-            <Button className="w-full">수정</Button>
-          </Link>
+        {session &&
+        (hasEnoughRole("ROLE_SUPERUSER", session.user.role) ||
+          session.user.id === post.postMetadata.user_id) ? (
+          <>
+            <Link
+              href={{
+                pathname: `/post/edit/${postId}`,
+              }}
+            >
+              <Button className="w-full">수정</Button>
+            </Link>
+          </>
         ) : null}
       </div>
       <div className="lg:col-span-9 md:col-span-6 col-span-4 z-0">

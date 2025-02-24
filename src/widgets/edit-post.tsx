@@ -84,11 +84,6 @@ export default function EditPost(props: { post?: Post; session: Session }) {
       return;
     }
 
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    // const html = await plateEditorRef.current.exportToHtml();
-
-    // if (html.length > 0) {
     setIsUploading(true);
 
     try {
@@ -101,7 +96,6 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     } finally {
       setIsUploading(false);
     }
-    // }
   }
 
   const submit = async (values: z.infer<typeof schema>) => {
@@ -125,15 +119,6 @@ export default function EditPost(props: { post?: Post; session: Session }) {
   };
 
   const fileRef = form.register("thumbnail_file");
-
-  useEffect(() => {
-    if (post) {
-      Object.entries(post).forEach(([key, value]) => {
-        // @ts-expect-error form setValue 는 key 가 없으면 오류를 발생하지 않고 그냥 동작 안 함
-        form.setValue(key, value);
-      });
-    }
-  }, [form, post]);
 
   return (
     <div className="subgrid">
@@ -236,10 +221,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
             control={form.control}
             name="html"
             render={() => (
-              <FormItem
-                className="col-span-full h-full w-full dark"
-                data-registry="plate"
-              >
+              <FormItem className="col-span-full dark" data-registry="plate">
                 <FormLabel>본문</FormLabel>
                 <FormControl>
                   <div className="rounded-lg border ">
