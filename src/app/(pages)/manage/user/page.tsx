@@ -15,7 +15,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
-import { roleSelection } from "@/shared/enum/roles";
+import { RoleUnion, roleSelection } from "@/shared/enum/roles";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
 import { fetchR } from "@/shared/lib/request";
 import { UserEditRequestDTO, UserResponseDTO } from "@/shared/types/user-types";
@@ -50,7 +50,7 @@ function UserElement(props: {
             className="col-span-1"
             selects={roleSelection}
             default={user.role}
-            onValueChange={(value: string) => {
+            onValueChange={(value: RoleUnion) => {
               user.role = value;
               props.changeUserData(user);
             }}
