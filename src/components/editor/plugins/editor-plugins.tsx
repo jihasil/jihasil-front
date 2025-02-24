@@ -87,7 +87,7 @@ export const editorPlugins = [
   cursorOverlayPlugin,
   ...blockMenuPlugins,
   ...dndPlugins,
-  EmojiPlugin.configure({ options: { data: emojiMartData as any } }),
+  // EmojiPlugin.configure({ options: { data: emojiMartData as any } }),
   exitBreakPlugin,
   resetBlockTypePlugin,
   ...deletePlugins,
@@ -95,9 +95,9 @@ export const editorPlugins = [
   TrailingBlockPlugin,
 
   // Deserialization
-  DocxPlugin,
+  // DocxPlugin,
   MarkdownPlugin.configure({ options: { indentList: true } }),
-  JuicePlugin,
+  // JuicePlugin,
 
   // UI
   FixedToolbarPlugin,

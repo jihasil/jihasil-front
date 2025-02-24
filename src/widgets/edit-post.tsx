@@ -98,6 +98,11 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     }
   }
 
+  async function onError(values: any) {
+    // toast.error(values);
+    console.log(values);
+  }
+
   const submit = async (values: z.infer<typeof schema>) => {
     if (values.thumbnail_file?.length === 1) {
       values.thumbnail_url = (await uploadThumbnail(
@@ -124,7 +129,10 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     <div className="subgrid">
       <PreventRoute isUploading={isUploading} />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="subgrid my-gap">
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+          className="subgrid my-gap"
+        >
           <div className="subgrid my-gap">
             <FormField
               control={form.control}
@@ -256,7 +264,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
               control={form.control}
               name="is_approved"
               render={({ field }) => (
-                <FormItem className="col-span-4 col-start-1 flex space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="col-span-4 col-start-1 flex gap-x-3 rounded-md border p-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}

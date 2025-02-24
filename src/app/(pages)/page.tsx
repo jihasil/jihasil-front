@@ -1,5 +1,3 @@
-import React from "react";
-
 import { getSession } from "@/features/request-sign-in";
 import { PostGrid } from "@/widgets/post-grid";
 

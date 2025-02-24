@@ -1,68 +1,124 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-* {
+@config '../../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility my-gap {
+  @apply gap-4 md:gap-5 lg:gap-6;
+}
+
+@utility my-gap-x {
+  @apply gap-x-4 md:gap-x-5 lg:gap-x-6;
+}
+
+@utility my-grid {
+  @apply grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4;
+}
+
+@utility my-m {
+  @apply m-4 md:m-5 lg:m-6;
+}
+
+@utility my-mx {
+  @apply mx-4 md:mx-5 lg:mx-6;
+}
+
+@utility my-my {
+  @apply my-4 md:my-5 lg:my-6;
+}
+
+@utility my-p {
+  @apply lg:p-6 md:p-5 p-4;
+}
+
+@utility my-px {
+  @apply lg:px-6 md:px-5 px-4;
+}
+
+@utility my-py {
+  @apply lg:py-6 md:py-5 py-4;
+}
+
+@utility subgrid {
+  @apply grid col-span-full grid-cols-subgrid;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer utilities {
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
+  }
 
-/*p {*/
-/*    text-overflow: ellipsis;*/
-/*    overflow: hidden;*/
-/*    white-space: nowrap;*/
-/*}*/
+  /*p {*/
+  /*    text-overflow: ellipsis;*/
+  /*    overflow: hidden;*/
+  /*    white-space: nowrap;*/
+  /*}*/
 
-body {
+  body {
     font-family: Pretendard, Arial, Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
+  }
 
-a {
+  a {
     color: inherit;
     text-decoration: none;
-}
-
-.my-gap {
-    @apply gap-4 md:gap-5 lg:gap-6;
-}
-
-.my-gap-x {
-    @apply gap-x-4 md:gap-x-5 lg:gap-x-6;
-}
-
-.my-grid {
-    @apply grid lg:grid-cols-12 md:grid-cols-8 grid-cols-4;
-}
-
-.my-m {
-    @apply m-4 md:m-5 lg:m-6;
-}
-
-.my-mx {
-    @apply mx-4 md:mx-5 lg:mx-6;
-}
-
-.my-my {
-    @apply my-4 md:my-5 lg:my-6;
-}
-
-.my-p {
-    @apply lg:p-6 md:p-5 p-4;
-}
-
-.my-px {
-    @apply lg:px-6 md:px-5 px-4;
-}
-
-.my-py {
-    @apply lg:py-6 md:py-5 py-4;
-}
-
-.subgrid {
-    @apply grid col-span-full grid-cols-subgrid;
+  }
 }
 
 @layer base {
@@ -182,5 +238,16 @@ a {
 
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/*---break---*/
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
     }
 }

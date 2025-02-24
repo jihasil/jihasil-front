@@ -2,7 +2,6 @@
 
 import React from "react";
 
-import { useEditorReadOnly } from "@udecode/plate/react";
 import {
   BoldPlugin,
   CodePlugin,
@@ -21,6 +20,7 @@ import {
   ImagePlugin,
   VideoPlugin,
 } from "@udecode/plate-media/react";
+import { useEditorReadOnly } from "@udecode/plate/react";
 import {
   ArrowUpToLineIcon,
   BaselineIcon,
@@ -136,6 +136,7 @@ export function FixedToolbarButtons() {
 
           <ToolbarGroup>
             <AlignDropdownMenu />
+
             <NumberedIndentListToolbarButton />
             <BulletedIndentListToolbarButton />
             <IndentTodoToolbarButton />
@@ -144,10 +145,15 @@ export function FixedToolbarButtons() {
 
           <ToolbarGroup>
             <LinkToolbarButton />
+            <TableDropdownMenu />
+            <EmojiDropdownMenu />
           </ToolbarGroup>
 
           <ToolbarGroup>
             <MediaToolbarButton nodeType={ImagePlugin.key} />
+            <MediaToolbarButton nodeType={VideoPlugin.key} />
+            <MediaToolbarButton nodeType={AudioPlugin.key} />
+            <MediaToolbarButton nodeType={FilePlugin.key} />
           </ToolbarGroup>
 
           <ToolbarGroup>
@@ -155,10 +161,21 @@ export function FixedToolbarButtons() {
             <OutdentToolbarButton />
             <IndentToolbarButton />
           </ToolbarGroup>
+
+          <ToolbarGroup>
+            <MoreDropdownMenu />
+          </ToolbarGroup>
         </>
       )}
 
       <div className="grow" />
+
+      <ToolbarGroup>
+        <MarkToolbarButton nodeType={HighlightPlugin.key} tooltip="Highlight">
+          <HighlighterIcon />
+        </MarkToolbarButton>
+        <CommentToolbarButton />
+      </ToolbarGroup>
 
       <ToolbarGroup>
         <ModeDropdownMenu />

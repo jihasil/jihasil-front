@@ -92,6 +92,12 @@ import { withPlaceholders } from "@/components/plate-ui/placeholder";
 import { SlashInputElement } from "@/components/plate-ui/slash-input-element";
 import { TocElement } from "@/components/plate-ui/toc-element";
 import { ToggleElement } from "@/components/plate-ui/toggle-element";
+import {
+  TableCellElement,
+  TableCellHeaderElement,
+} from "../plate-ui/table-cell-element";
+import { TableElement } from "../plate-ui/table-element";
+import { TableRowElement } from "@/components/plate-ui/table-row-element";
 
 export const useCreateEditor = (value: string | undefined) => {
   return usePlateEditor({
@@ -110,19 +116,19 @@ export const useCreateEditor = (value: string | undefined) => {
 
 export const components = {
   // [AIPlugin.key]: AILeaf,
-  // [AudioPlugin.key]: MediaAudioElement,
+  [AudioPlugin.key]: MediaAudioElement,
   [BlockquotePlugin.key]: BlockquoteElement,
   [BoldPlugin.key]: withProps(PlateLeaf, { as: "strong" }),
-  // [CodeBlockPlugin.key]: CodeBlockElement,
+  [CodeBlockPlugin.key]: CodeBlockElement,
   [CodeLinePlugin.key]: CodeLineElement,
-  // [CodePlugin.key]: CodeLeaf,
-  // [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
+  [CodePlugin.key]: CodeLeaf,
+  [CodeSyntaxPlugin.key]: CodeSyntaxLeaf,
   [ColumnItemPlugin.key]: ColumnElement,
   [ColumnPlugin.key]: ColumnGroupElement,
   [CommentsPlugin.key]: CommentLeaf,
   [DatePlugin.key]: DateElement,
-  // [EmojiInputPlugin.key]: EmojiInputElement,
-  // [EquationPlugin.key]: EquationElement,
+  [EmojiInputPlugin.key]: EmojiInputElement,
+  [EquationPlugin.key]: EquationElement,
   [ExcalidrawPlugin.key]: ExcalidrawElement,
   [FilePlugin.key]: MediaFileElement,
   [HEADING_KEYS.h1]: withProps(HeadingElement, { variant: "h1" }),
@@ -147,12 +153,12 @@ export const components = {
   [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: "s" }),
   [SubscriptPlugin.key]: withProps(PlateLeaf, { as: "sub" }),
   [SuperscriptPlugin.key]: withProps(PlateLeaf, { as: "sup" }),
-  // [TableCellHeaderPlugin.key]: TableCellHeaderElement,
-  // [TableCellPlugin.key]: TableCellElement,
-  // [TablePlugin.key]: TableElement,
-  // [TableRowPlugin.key]: TableRowElement,
+  [TableCellHeaderPlugin.key]: TableCellHeaderElement,
+  [TableCellPlugin.key]: TableCellElement,
+  [TablePlugin.key]: TableElement,
+  [TableRowPlugin.key]: TableRowElement,
   [TocPlugin.key]: TocElement,
   [TogglePlugin.key]: ToggleElement,
   [UnderlinePlugin.key]: withProps(PlateLeaf, { as: "u" }),
-  // [VideoPlugin.key]: MediaVideoElement,
+  [VideoPlugin.key]: MediaVideoElement,
 };

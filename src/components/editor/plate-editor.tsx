@@ -23,7 +23,7 @@ export const PlateEditor = (props: {
       <Plate
         editor={editor}
         onChange={async ({ value }) => {
-          console.log(value);
+          // console.log(value);
           editorStatic.children = value;
 
           if (editor.api.isEmpty()) {
@@ -39,7 +39,7 @@ export const PlateEditor = (props: {
               },
             });
 
-            console.log(serializedHtml);
+            // console.log(serializedHtml);
 
             props.onChange(serializedHtml);
           }

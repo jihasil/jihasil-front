@@ -1,4 +1,8 @@
-import { createNavigationSelection, getOrdinal } from "@/shared/enum/enum-util";
+import {
+  createNavigationSelection,
+  getOrdinal,
+  invertObject,
+} from "@/shared/enum/enum-util";
 
 export const RoleKey = {
   사용자: "ROLE_USER",
@@ -11,3 +15,5 @@ export type RoleUnion = (typeof RoleKey)[keyof typeof RoleKey];
 export const roleSelection = createNavigationSelection(RoleKey);
 
 export const roleOrdinal = getOrdinal(RoleKey);
+
+export const RoleValue = invertObject(RoleKey);

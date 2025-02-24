@@ -41,7 +41,7 @@ const TransparentHeader = async () => {
   ];
 
   return (
-    <header className="col-span-full h-fit bg-background grid grid-cols-subgrid items-center sticky top-0 z-[2147483646] my-py">
+    <header className="col-span-full h-fit bg-background grid grid-cols-subgrid items-center sticky top-0 z-2147483646 my-py">
       <div className="w-full h-full lg:col-span-2 md:col-span-2 col-span-1">
         <button className="h-full">
           <Link href="/">
@@ -78,7 +78,7 @@ const TransparentHeader = async () => {
               />
             </svg>
           </SheetTrigger>
-          <SheetContent className="z-[2147483647] w-1/2">
+          <SheetContent className="z-2147483647 w-1/2">
             <SheetHeader>
               <SheetTitle className="w-fit">MENU</SheetTitle>
             </SheetHeader>
