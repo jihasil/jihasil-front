@@ -156,7 +156,6 @@ export default function ManageUserPage() {
           />
         )}
       </div>
-      <Toaster />
     </div>
   );
 }

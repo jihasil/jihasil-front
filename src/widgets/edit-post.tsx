@@ -288,7 +288,6 @@ export default function EditPost(props: { post?: Post; session: Session }) {
           </div>
         </form>
       </Form>
-      <Toaster />
     </div>
   );
 }

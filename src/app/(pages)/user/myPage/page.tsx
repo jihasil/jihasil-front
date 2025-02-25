@@ -5,6 +5,7 @@ import { forbidden, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { hasEnoughRole, invalidateUser } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
+import { signOut } from "@/features/sign-out";
 import { ACCESS_TOKEN, INVALIDATED, REFRESH_TOKEN } from "@/shared/const/auth";
 import { RoleValue } from "@/shared/enum/roles";
 
@@ -38,23 +39,15 @@ export default async function PageViewer() {
           </Button>
         ) : null}
         <form
-          className="hidden"
           action={async () => {
             "use server";
-            console.log(`user logging out: ${session?.user.id}`);
-
-            await invalidateUser({
-              id: session?.user.id as string,
-            });
-
-            const cookieStore = await cookies();
-            cookieStore.set(ACCESS_TOKEN, INVALIDATED);
-            cookieStore.delete(REFRESH_TOKEN);
-
-            redirect("/");
+            await signOut(session);
           }}
-        />
-        <Button type="submit">로그아웃</Button>
+        >
+          <Button className="w-full" type="submit">
+            로그아웃
+          </Button>
+        </form>
       </div>
     </div>
   );

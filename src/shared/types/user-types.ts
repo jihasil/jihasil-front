@@ -49,6 +49,11 @@ export type UserSignUpRequestDTO = {
   role?: RoleUnion;
 };
 
+export const changePasswordSchema = z.object({
+  oldPassword: z.string().min(1, "기존 비밀번호를 입력해주세요."),
+  newPassword: z.string().min(1, "새 비밀번호를 입력해주세요."),
+});
+
 export type TokenPair = {
   accessToken: string;
   refreshToken: string;

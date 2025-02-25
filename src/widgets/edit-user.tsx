@@ -17,48 +17,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
-import { signInSchema } from "@/shared/types/user-types";
+import { changePassword } from "@/features/change-password";
+import { signOut } from "@/features/sign-out";
+import { Session } from "@/shared/types/auth-types";
+import { changePasswordSchema } from "@/shared/types/user-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function SignIn() {
+export default function EditUser(props: { session: Session }) {
   const searchParams = useSearchParams();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const router = useRouter();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<z.infer<typeof changePasswordSchema>>({
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
-      id: "",
-      password: "",
+      oldPassword: "",
+      newPassword: "",
     },
   });
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof signInSchema>) {
+  async function onSubmit(values: z.infer<typeof changePasswordSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     if (isUploading) return;
 
     setIsUploading(true);
-    const signInData = await signInSchema.parseAsync(values);
     const redirectTo = searchParams.get("from") ?? "/";
 
-    const result = await fetch("/api/signIn", {
-      method: "POST",
-      body: JSON.stringify({ ...signInData }),
-    });
+    const result = await changePassword(values);
 
-    console.log(result);
-    const body = await result.json();
-
-    if (!result.ok) {
-      toast.error(body.message);
-    } else {
-      toast.success(body.message);
+    if (result) {
+      toast.success("비밀번호를 변경했습니다. 다시 로그인해주세요");
+      await signOut(props.session);
       router.push(redirectTo);
-      router.refresh();
+    } else {
+      toast.error("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
     }
 
     setIsUploading(false);
@@ -74,28 +70,14 @@ export default function SignIn() {
         >
           <FormField
             control={form.control}
-            name="id"
+            name="newPassword"
             render={({ field }) => (
               <FormItem className="col-span-full">
-                <FormLabel>ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="ID를 입력해주세요" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="col-span-full">
-                <FormLabel>비밀번호</FormLabel>
+                <FormLabel>새 비밀번호</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
-                    placeholder="비밀번호를 입력해주세요."
+                    placeholder="새 비밀번호를 입력해주세요"
                     {...field}
                   />
                 </FormControl>
@@ -104,7 +86,25 @@ export default function SignIn() {
             )}
           />
 
-          <SubmitButton isUploading={isUploading} text={"로그인"} />
+          <FormField
+            control={form.control}
+            name="oldPassword"
+            render={({ field }) => (
+              <FormItem className="col-span-full">
+                <FormLabel>기존 비밀번호</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="기존 비밀번호를 입력해주세요."
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <SubmitButton isUploading={isUploading} text={"변경하기"} />
         </form>
       </Form>
     </div>

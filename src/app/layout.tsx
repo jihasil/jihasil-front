@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import React from "react";
 
+import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/widgets/footer";
 import Header from "@/widgets/header";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -48,6 +49,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Toaster />
         </div>
       </body>
     </html>
