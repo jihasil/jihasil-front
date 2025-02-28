@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -163,6 +165,10 @@ export default function ManageUserPage() {
           />
         )}
       </div>
+      <div className="col-span-full my-m"></div>
+      <Button asChild>
+        <Link href="/signUp">사용자 추가</Link>
+      </Button>
     </div>
   );
 }

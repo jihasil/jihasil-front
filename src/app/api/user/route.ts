@@ -1,6 +1,7 @@
+import { forbidden, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
-import { changeUserInfo } from "@/entities/user";
+import { changeUserInfo, hasEnoughRole } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
 import { saltAndHashPassword } from "@/shared/lib/crypto";
 import { dynamoClient } from "@/shared/lib/dynamo-db";
@@ -8,18 +9,43 @@ import {
   UserEditRequestDTO,
   UserKey,
   UserSignUpRequestDTO,
+  signUpSchema,
 } from "@/shared/types/user-types";
 import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 export const POST = async (req: NextRequest) => {
+  const session = await getSession();
+  if (!session) {
+    unauthorized();
+  } else if (!hasEnoughRole("ROLE_SUPERUSER", session.user.role)) {
+    forbidden();
+  }
+
   const body: UserSignUpRequestDTO = await req.json();
-  body.password = await saltAndHashPassword(body.password);
-  body.role = "ROLE_USER";
+
+  const signUpValidation = signUpSchema.safeParse(body);
+  if (signUpValidation.error) {
+    return new NextResponse(
+      JSON.stringify({ message: signUpValidation.error }),
+      {
+        status: 400,
+      },
+    );
+  }
+
+  const { id, name, password, role } = signUpValidation.data;
+
+  const passwordHash = await saltAndHashPassword(password);
 
   const param = {
     TableName: "user",
-    Item: body,
+    Item: {
+      id,
+      name,
+      password: passwordHash,
+      role,
+    },
     ConditionExpression: "attribute_not_exists(id)",
     ReturnValuesOnConditionCheckFailure: "ALL_OLD",
   };
@@ -31,20 +57,29 @@ export const POST = async (req: NextRequest) => {
 
   try {
     await dynamoClient.send(query);
-    return new NextResponse(JSON.stringify(`환영합니다, ${body.name} 님!`), {
-      status: 200,
-    });
+    return new NextResponse(
+      JSON.stringify({ message: `${body.name} 사용자를 추가했습니다.` }),
+      {
+        status: 200,
+      },
+    );
   } catch (error: any) {
     console.log(error);
 
     if (error.name === "ConditionalCheckFailedException") {
-      return new NextResponse(JSON.stringify(`이미 있는 아이디입니다.`), {
-        status: 400,
-      });
+      return new NextResponse(
+        JSON.stringify({ message: "이미 있는 ID입니다." }),
+        {
+          status: 400,
+        },
+      );
     } else {
-      return new NextResponse(JSON.stringify(`Unknown Error: ${error.name}`), {
-        status: 500,
-      });
+      return new NextResponse(
+        JSON.stringify({ message: `사용자 추가에 실패했습니다.` }),
+        {
+          status: 500,
+        },
+      );
     }
   }
 };

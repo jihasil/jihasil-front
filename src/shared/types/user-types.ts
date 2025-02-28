@@ -46,8 +46,15 @@ export type UserSignUpRequestDTO = {
   id: string;
   name: string;
   password: string;
-  role?: RoleUnion;
+  role: RoleUnion;
 };
+
+export const signUpSchema = z.object({
+  id: z.string().min(1, "ID를 입력해주세요."),
+  name: z.string().min(1, "이름을 입력해주세요."),
+  password: z.string().min(1, "비밀번호를 입력해주세요."),
+  role: z.union([z.literal("ROLE_USER"), z.literal("ROLE_ADMIN")]),
+});
 
 export const changePasswordSchema = z.object({
   userId: z.string(),
