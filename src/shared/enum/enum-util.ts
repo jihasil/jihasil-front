@@ -3,31 +3,31 @@ import { cache } from "react";
 import { NavigationSelection } from "@/shared/types/navigation";
 
 export const createNavigationSelection = cache(
-  (obj: Record<string, string>): NavigationSelection[] => {
-    let cached: NavigationSelection[] = [];
-    Object.entries(obj).forEach(([display, value]) => {
-      cached = [...cached, { value, display }];
-    });
-    return cached;
-  },
+  <T extends string>(obj: Record<string, T>): NavigationSelection<T>[] =>
+    Object.entries(obj).reduce((acc, [display, value]) => {
+      acc.push({ value, display });
+      return acc;
+    }, [] as NavigationSelection<T>[]),
 );
 
 export const invertObject = cache(
-  (obj: Record<string, string>): Record<string, string> => {
-    const cached: Record<string, string> = {};
-    Object.entries(obj).forEach(([key, value]) => {
-      cached[value] = key;
-    });
-    return cached;
-  },
+  <T extends string>(obj: Record<string, T>): Record<T, string> =>
+    Object.entries(obj).reduce(
+      (acc, [key, value]) => {
+        acc[value] = key;
+        return acc;
+      },
+      {} as Record<T, string>,
+    ),
 );
 
 export const getOrdinal = cache(
-  (obj: Record<string, string>): Record<string, number> => {
-    const cached: Record<string, number> = {};
-    Object.entries(obj).forEach(([key, value], index) => {
-      cached[value] = index;
-    });
-    return cached;
-  },
+  <T extends string>(obj: Record<string, T>): Record<T, number> =>
+    Object.entries(obj).reduce(
+      (acc, [, value], currentIndex) => {
+        acc[value] = currentIndex;
+        return acc;
+      },
+      {} as Record<T, number>,
+    ),
 );

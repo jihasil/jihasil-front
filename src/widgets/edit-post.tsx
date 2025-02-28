@@ -62,9 +62,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
     defaultValues: {
       title: post?.postMetadata?.title ?? "",
       subtitle: post?.postMetadata?.subtitle ?? "",
-      category:
-        post?.postMetadata?.category ??
-        (categorySelection[0].value as CategoryUnion),
+      category: post?.postMetadata?.category ?? categorySelection[0].value,
       author: post?.postMetadata?.author ?? props.session.user.name,
       issue_id: post?.postMetadata?.issue_id ?? issueSelection[1].value,
       is_approved: post?.postMetadata?.is_approved ?? true,

@@ -1,4 +1,4 @@
-export type NavigationSelection = {
-  value: string;
+export type NavigationSelection<T> = {
+  value: T;
   display: string;
 };

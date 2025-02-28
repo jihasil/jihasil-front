@@ -7,7 +7,7 @@ import { hasEnoughRole, invalidateUser } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
 import { signOut } from "@/features/sign-out";
 import { ACCESS_TOKEN, INVALIDATED, REFRESH_TOKEN } from "@/shared/const/auth";
-import { RoleValue } from "@/shared/enum/roles";
+import { roleValue } from "@/shared/enum/roles";
 
 export default async function PageViewer() {
   const session = await getSession();
@@ -24,7 +24,7 @@ export default async function PageViewer() {
       <p className="col-span-full text-2xl font-bold">
         안녕하세요, {session?.user.name} 님
       </p>
-      <p className="col-span-full">권한: {RoleValue[session.user.role]}</p>
+      <p className="col-span-full">권한: {roleValue[session.user.role]}</p>
       <div className="col-span-1 flex flex-col grow my-gap">
         <Button className="grow" asChild>
           <Link href={"/user/edit"}>비밀번호 변경</Link>

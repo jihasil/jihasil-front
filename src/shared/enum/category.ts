@@ -2,7 +2,6 @@ import {
   createNavigationSelection,
   invertObject,
 } from "@/shared/enum/enum-util";
-import { NavigationSelection } from "@/shared/types/navigation";
 
 export const CategoryKey = {
   매거진: "magazine",
@@ -14,6 +13,7 @@ export const CategoryKey = {
 
 export type CategoryUnion = (typeof CategoryKey)[keyof typeof CategoryKey];
 
-export const categorySelection = createNavigationSelection(CategoryKey);
+export const categorySelection =
+  createNavigationSelection<CategoryUnion>(CategoryKey);
 
-export const CategoryValue = invertObject(CategoryKey);
+export const categoryValue = invertObject<CategoryUnion>(CategoryKey);

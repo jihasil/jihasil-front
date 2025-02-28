@@ -1,6 +1,6 @@
 import { ImageLoader } from "@/components/ui/image-loader";
 import { Separator } from "@/components/ui/separator";
-import { CategoryValue } from "@/shared/enum/category";
+import { categoryValue } from "@/shared/enum/category";
 import { issueBackgroundColor, issueTextColor } from "@/shared/enum/issue";
 import { PostMetadata } from "@/shared/types/post-types";
 import { cn } from "@udecode/cn";
@@ -41,7 +41,7 @@ const PostThumbnail = (props: {
       <div className="flex gap-1 items-center text-sm text-opacity-70">
         <p className="me-2">●</p>
         <p className="font-bold">
-          {CategoryValue[props?.postMetadata?.category as string]}
+          {categoryValue[props?.postMetadata?.category as string]}
         </p>
         <p>|</p>
         <p>{props?.postMetadata?.author}</p>

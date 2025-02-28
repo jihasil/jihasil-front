@@ -9,7 +9,7 @@ export const IssueKey = {
 
 export type IssueUnion = (typeof IssueKey)[keyof typeof IssueKey];
 
-export const issueSelection = createNavigationSelection(IssueKey);
+export const issueSelection = createNavigationSelection<IssueUnion>(IssueKey);
 
 export const issueTextColor = {
   none: "text-issue-none",

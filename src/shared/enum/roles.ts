@@ -12,8 +12,8 @@ export const RoleKey = {
 
 export type RoleUnion = (typeof RoleKey)[keyof typeof RoleKey];
 
-export const roleSelection = createNavigationSelection(RoleKey);
+export const roleSelection = createNavigationSelection<RoleUnion>(RoleKey);
 
-export const roleOrdinal = getOrdinal(RoleKey);
+export const roleOrdinal = getOrdinal<RoleUnion>(RoleKey);
 
-export const RoleValue = invertObject(RoleKey);
+export const roleValue = invertObject<RoleUnion>(RoleKey);
