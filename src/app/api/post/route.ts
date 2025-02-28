@@ -6,7 +6,12 @@ import { getPost } from "@/entities/post";
 import { hasEnoughRole } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
 import { dynamoClient } from "@/shared/lib/dynamo-db";
-import { PostResponseDTO, metadataSchema } from "@/shared/types/post-types";
+import {
+  PostKey,
+  PostMetadata,
+  PostResponseDTO,
+  metadataSchema,
+} from "@/shared/types/post-types";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
@@ -63,14 +68,13 @@ export const GET = async (req: NextRequest) => {
   const command = new QueryCommand(param);
 
   try {
-    // @ts-expect-error 타입을 일일히 지정할 수 없음
     const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
     console.log(Items);
 
     const data: PostResponseDTO = {
-      postMetadataList: Items, // 포스트 목록
+      postMetadataList: Items as PostMetadata[], // 포스트 목록
       isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
-      LastEvaluatedKey,
+      LastEvaluatedKey: LastEvaluatedKey as PostKey,
     };
 
     return new Response(JSON.stringify(data), {
@@ -105,15 +109,17 @@ export const POST = async (req: NextRequest) => {
 
   const session = await getSession();
   if (!session) {
-    forbidden();
+    unauthorized();
   }
 
   // 글쓴이 이름은 관리자 이상만 변경 가능
   if (
-    !hasEnoughRole("ROLE_ADMIN", session.user.role) &&
-    postMetadata.author !== session.user.name
+    (!hasEnoughRole("ROLE_ADMIN", session.user.role) &&
+      postMetadata.author !== session.user.name) ||
+    (!hasEnoughRole("ROLE_SUPERUSER", session.user.role) &&
+      postMetadata.user_id !== session.user.id)
   ) {
-    unauthorized();
+    forbidden();
   }
 
   postMetadata["is_deleted"] = false;
@@ -145,10 +151,7 @@ export const POST = async (req: NextRequest) => {
   const contentPutQuery = new PutCommand(contentPutParam);
 
   try {
-    // @ts-expect-error it works
     await dynamoClient.send(metadataPutQuery);
-
-    // @ts-expect-error it works
     await dynamoClient.send(contentPutQuery);
 
     return new Response(JSON.stringify({ postId: postMetadata.post_id }), {

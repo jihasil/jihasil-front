@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 
@@ -14,7 +15,6 @@ import {
 import { Navigation } from "@/components/ui/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Toaster } from "@/components/ui/sonner";
 import { RoleUnion, roleSelection } from "@/shared/enum/roles";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
 import { fetchR } from "@/shared/lib/request";
@@ -87,6 +87,8 @@ function UserElement(props: {
 }
 
 export default function ManageUserPage() {
+  const router = useRouter();
+
   const { isInitiated, objectList, setObjectList } = useInfiniteObjectList<
     UserResponseDTO,
     string
@@ -99,17 +101,22 @@ export default function ManageUserPage() {
       method: "PATCH",
       body: JSON.stringify(user),
     });
+
+    const body = await response.json();
+
     if (response.ok) {
-      toast.info(`${user.id}의 정보를 수정했습니다.`);
+      toast.info(body.message);
       return true;
     } else {
-      toast.error(`${user.id}의 정보를 수정하는데 실패했습니다.`);
+      toast.error(body.message);
       return false;
     }
   };
 
   const changeUserPassword = async (user: UserEditRequestDTO) => {
-    toast.info(`${user.id}의 비밀번호를 수정했습니다.`);
+    router.push(
+      `/user/edit/?userId=${user.id}&from=${encodeURIComponent("/manage/user")}`,
+    );
   };
 
   const deleteUser = async (index: number, user: UserEditRequestDTO) => {

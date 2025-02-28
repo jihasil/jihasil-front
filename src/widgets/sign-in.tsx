@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { Checkbox } from "@/components/plate-ui/checkbox";
 import {
   Form,
   FormControl,
@@ -15,8 +16,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/shared/lib/utils";
 import { signInSchema } from "@/shared/types/user-types";
 import PreventRoute from "@/widgets/prevent-route";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -105,6 +112,19 @@ export default function SignIn() {
           />
 
           <SubmitButton isUploading={isUploading} text={"로그인"} />
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className={cn("col-start-1 col-span-2 text-sm")}>
+                  <p>비밀번호를 잊어버렸어요.</p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>관리자에게 연락하세요.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </form>
       </Form>
     </div>

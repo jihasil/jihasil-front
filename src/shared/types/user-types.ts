@@ -50,6 +50,7 @@ export type UserSignUpRequestDTO = {
 };
 
 export const changePasswordSchema = z.object({
+  userId: z.string(),
   oldPassword: z.string().min(1, "기존 비밀번호를 입력해주세요."),
   newPassword: z.string().min(1, "새 비밀번호를 입력해주세요."),
 });

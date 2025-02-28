@@ -17,14 +17,13 @@ export const getUser = async (id: string): Promise<User | null> => {
   console.log(`getting user ${id}`);
 
   try {
-    // @ts-expect-error asdf
     const { Items } = await dynamoClient.send(command);
     console.log(Items);
 
     if (!Items || Items.length !== 1) {
       return null;
     } else {
-      return Items[0];
+      return Items[0] as User;
     }
   } catch (error) {
     console.log(typeof error);
@@ -59,7 +58,6 @@ export const changeUserInfo = async (userEditRequest: UserEditRequestDTO) => {
   console.log(query);
 
   try {
-    // @ts-expect-error it works
     await dynamoClient.send(query);
     return true;
   } catch (error: any) {

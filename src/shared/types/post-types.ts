@@ -24,7 +24,7 @@ export type Post = {
   postMetadata: PostMetadata;
 };
 
-export type LastPostKey = {
+export type PostKey = {
   created_at: string;
   board: string;
 };
@@ -32,7 +32,7 @@ export type LastPostKey = {
 export type PostResponseDTO = {
   postMetadataList: PostMetadata[];
   isLast: boolean;
-  LastEvaluatedKey: LastPostKey;
+  LastEvaluatedKey: PostKey;
 };
 
 const ACCEPTED_IMAGE_TYPES = [

@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
 import { changePassword } from "@/features/change-password";
 import { signOut } from "@/features/sign-out";
@@ -28,11 +27,15 @@ export default function EditUser(props: { session: Session }) {
   const searchParams = useSearchParams();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const router = useRouter();
+  const { session } = props;
+
+  const userId = searchParams.get("userId") ?? session.user.id;
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof changePasswordSchema>>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
+      userId,
       oldPassword: "",
       newPassword: "",
     },
@@ -50,11 +53,15 @@ export default function EditUser(props: { session: Session }) {
     const result = await changePassword(values);
 
     if (result) {
-      toast.success("비밀번호를 변경했습니다. 다시 로그인해주세요");
-      await signOut(props.session);
+      if (userId === session.user.id) {
+        toast.success("비밀번호를 변경했습니다. 다시 로그인해주세요");
+        await signOut(session);
+      } else {
+        toast.success(`${userId} 사용자의 비밀번호를 변경했습니다.`);
+      }
       router.push(redirectTo);
     } else {
-      toast.error("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
+      toast.error("비밀번호 변경에 실패했습니다.");
     }
 
     setIsUploading(false);

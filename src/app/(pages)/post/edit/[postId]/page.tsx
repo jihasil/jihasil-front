@@ -1,6 +1,7 @@
 import { forbidden, redirect, unauthorized } from "next/navigation";
 
 import { getPost } from "@/entities/post";
+import { hasEnoughRole } from "@/entities/user";
 import { getSession } from "@/features/request-sign-in";
 import { Session } from "@/shared/types/auth-types";
 import { Post } from "@/shared/types/post-types";
@@ -20,13 +21,20 @@ export default async function EditPostPage({
   const session: Session | null = await getSession();
 
   if (!session) {
-    forbidden();
+    unauthorized();
   }
 
   if (!post) {
     console.log("no post");
     redirect("/post/new");
   } else {
+    if (
+      !hasEnoughRole("ROLE_SUPERUSER", session.user.role) &&
+      session.user.id !== post.postMetadata.user_id
+    ) {
+      forbidden();
+    }
+
     return <EditPost post={post} session={session} />;
   }
 }

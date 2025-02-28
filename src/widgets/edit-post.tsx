@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -73,7 +73,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
       post_id: post?.postMetadata?.post_id,
       board: post?.postMetadata?.board,
       created_at: post?.postMetadata?.created_at,
-      user_id: props.session.user.id,
+      user_id: post?.postMetadata?.user_id ?? props.session.user.id,
       is_deleted: false,
     },
   });

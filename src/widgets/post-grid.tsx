@@ -10,7 +10,7 @@ import { IssueUnion, issueSelection } from "@/shared/enum/issue";
 import { useInfiniteObjectList } from "@/shared/hooks/use-infinite-object-list";
 import { useSessionStorage } from "@/shared/hooks/use-session-storage";
 import { Session } from "@/shared/types/auth-types";
-import { LastPostKey, PostMetadata } from "@/shared/types/post-types";
+import { PostKey, PostMetadata } from "@/shared/types/post-types";
 import { PostThumbnail } from "@/widgets/post-thumbnail";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
@@ -57,7 +57,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
 
   const { objectList, isInitiated, initiate } = useInfiniteObjectList<
     PostMetadata,
-    LastPostKey
+    PostKey
   >(
     "/api/post" + (props.id ? `?id=${props.id}` : ""),
     "postMetadataList",

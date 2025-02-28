@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { forbidden, redirect } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { hasEnoughRole, invalidateUser } from "@/entities/user";
@@ -13,7 +13,7 @@ export default async function PageViewer() {
   const session = await getSession();
 
   if (!session) {
-    forbidden();
+    unauthorized();
   }
 
   console.log("session");
@@ -27,11 +27,7 @@ export default async function PageViewer() {
       <p className="col-span-full">권한: {RoleValue[session.user.role]}</p>
       <div className="col-span-1 flex flex-col grow my-gap">
         <Button className="grow" asChild>
-          <Link
-            href={`/user/edit/?userId=${session.user.id}&from=${encodeURIComponent("/user/myPage")}`}
-          >
-            정보 수정
-          </Link>
+          <Link href={"/user/edit"}>비밀번호 변경</Link>
         </Button>
         {hasEnoughRole("ROLE_SUPERUSER", session.user.role) ? (
           <Button asChild>

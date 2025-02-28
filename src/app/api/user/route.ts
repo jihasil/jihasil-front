@@ -30,7 +30,6 @@ export const POST = async (req: NextRequest) => {
   console.log(query);
 
   try {
-    // @ts-expect-error it works
     await dynamoClient.send(query);
     return new NextResponse(JSON.stringify(`환영합니다, ${body.name} 님!`), {
       status: 200,
@@ -59,7 +58,7 @@ export const PATCH = async (req: NextRequest) => {
     session?.user.role !== "ROLE_SUPERUSER" &&
     session?.user.id !== userEditRequest.id
   ) {
-    return new NextResponse("권한이 없습니다.", {
+    return new NextResponse(JSON.stringify({ message: "권한이 없습니다." }), {
       status: 403,
     });
   }
@@ -116,7 +115,6 @@ export const DELETE = async (req: NextRequest) => {
   const query = new DeleteCommand(param);
 
   try {
-    // @ts-expect-error it works
     await dynamoClient.send(query);
     return new NextResponse(
       JSON.stringify({ message: `${userKey.id} 사용자를 삭제했습니다.` }),

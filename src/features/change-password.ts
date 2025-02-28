@@ -23,9 +23,13 @@ export const changePassword = async (
     return false;
   }
 
-  const { oldPassword, newPassword } = changePasswordDTOValidation.data;
+  const { userId, oldPassword, newPassword } = changePasswordDTOValidation.data;
+  if (session.user.role !== "ROLE_SUPERUSER" && session.user.id !== userId) {
+    return false;
+  }
+
   const userExists = await authorizeUser({
-    id: session.user.id,
+    id: userId,
     password: oldPassword,
   });
 
@@ -36,7 +40,7 @@ export const changePassword = async (
   const newPasswordHash = await saltAndHashPassword(newPassword);
 
   return changeUserInfo({
-    id: session.user.id,
+    id: userId,
     password: newPasswordHash,
   });
 };
