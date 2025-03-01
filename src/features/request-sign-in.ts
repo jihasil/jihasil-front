@@ -12,7 +12,7 @@ declare module "@auth/core/jwt" {
     exp: number;
     sub: string;
     name: string;
-    role?: RoleUnion;
+    role: RoleUnion;
   }
 }
 
