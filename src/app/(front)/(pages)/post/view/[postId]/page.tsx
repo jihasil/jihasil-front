@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { getPost } from "@/app/(back)/domain/post";
+import { postService } from "@/app/(back)/domain/post-service";
 import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { Button } from "@/app/(front)/components/ui/button";
 import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
@@ -14,7 +14,7 @@ export async function generateMetadata({
   params: Promise<{ postId: string }>;
 }): Promise<Metadata> {
   const postId = (await params).postId;
-  const post = await getPost(postId);
+  const post = await postService.getPostById(postId);
 
   return {
     title: post?.postMetadata.title,
@@ -39,7 +39,7 @@ export default async function PageViewer({
   const session = await getSession();
   const postId = (await params).postId;
 
-  const post = await getPost(postId);
+  const post = await postService.getPostById(postId);
   if (!post) {
     notFound();
   }

@@ -1,7 +1,7 @@
 import { forbidden, redirect, unauthorized } from "next/navigation";
 
 import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { getPost } from "@/app/(back)/domain/post";
+import { postService } from "@/app/(back)/domain/post-service";
 import { hasEnoughRole } from "@/app/(back)/domain/user";
 import EditPost from "@/app/(front)/widgets/edit-post";
 import { Session } from "@/app/global/types/auth-types";
@@ -15,7 +15,7 @@ export default async function EditPostPage({
   const postId = (await params).postId;
   let post: Post | null = null;
   if (postId) {
-    post = await getPost(postId);
+    post = await postService.getPostById(postId);
   }
 
   const session: Session | null = await getSession();

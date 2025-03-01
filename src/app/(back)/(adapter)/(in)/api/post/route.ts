@@ -3,7 +3,6 @@ import { forbidden, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { getPost } from "@/app/(back)/domain/post";
 import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { dynamoClient } from "@/app/(back)/shared/lib/dynamo-db";
 import {
@@ -16,24 +15,6 @@ import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
-
-  // uuid 딸린 게시물 하나의 metadata
-  if (
-    req.nextUrl.searchParams.size === 1 &&
-    req.nextUrl.searchParams.has("post_id")
-  ) {
-    const postId = req.nextUrl.searchParams.get("post_id") as string;
-    const post = await getPost(postId);
-    if (!post) {
-      return new Response(null, {
-        status: 404,
-      });
-    } else {
-      return new Response(JSON.stringify(post), {
-        status: 200,
-      });
-    }
-  }
 
   // 전체 metadata
   const lastPostKeyJson = req.nextUrl.searchParams.get("lastKey");
