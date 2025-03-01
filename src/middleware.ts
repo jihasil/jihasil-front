@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { hasEnoughRole } from "@/entities/user";
-import { getSession, rotateRefreshToken } from "@/features/request-sign-in";
-import { RoleUnion } from "@/shared/enum/roles";
+import {
+  getSession,
+  rotateRefreshToken,
+} from "@/app/(back)/application/model/request-sign-in";
+import { hasEnoughRole } from "@/app/(back)/domain/user";
+import { RoleUnion } from "@/app/global/enum/roles";
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
@@ -77,6 +80,7 @@ export async function middleware(request: NextRequest) {
   // 사용자 페이지 제한
   if (
     request.nextUrl.pathname.startsWith("/post/edit") ||
+    request.nextUrl.pathname.startsWith("/post/new") ||
     request.nextUrl.pathname.startsWith("/user")
   ) {
     return await redirectToLoginPageIfNoSession();
