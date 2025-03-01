@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/ui/navigation";
-import { Toaster } from "@/components/ui/sonner";
 import SubmitButton from "@/components/ui/submit-button";
 import { hasEnoughRole } from "@/entities/user";
 import { CategoryUnion, categorySelection } from "@/shared/enum/category";
@@ -33,7 +32,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 export default function EditPost(props: { post?: Post; session: Session }) {
   const router = useRouter();
   const { post } = props;
-  const issueSelectionExcludeAll = issueSelection.slice(1);
 
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
@@ -64,7 +62,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
       subtitle: post?.postMetadata?.subtitle ?? "",
       category: post?.postMetadata?.category ?? categorySelection[0].value,
       author: post?.postMetadata?.author ?? props.session.user.name,
-      issue_id: post?.postMetadata?.issue_id ?? issueSelection[1].value,
+      issue_id: post?.postMetadata?.issue_id ?? issueSelection[0].value,
       is_approved: post?.postMetadata?.is_approved ?? true,
       html: post?.html,
       thumbnail_url: post?.postMetadata?.thumbnail_url,
@@ -192,7 +190,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
                       onValueChange={(value: IssueUnion) => {
                         form.setValue("issue_id", value);
                       }}
-                      selects={issueSelectionExcludeAll}
+                      selects={issueSelection}
                       default={post?.postMetadata?.issue_id}
                       {...field}
                     />

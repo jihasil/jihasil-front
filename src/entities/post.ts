@@ -27,10 +27,7 @@ export const getPost = async (postId: string) => {
     console.log(getContentQuery);
     console.log(getMetadataQuery);
 
-    // @ts-expect-error it works
     const postContent = await dynamoClient.send(getContentQuery);
-
-    // @ts-expect-error it works
     const postMetadata = await dynamoClient.send(getMetadataQuery);
 
     console.log(postId);

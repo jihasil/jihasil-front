@@ -1,7 +1,6 @@
 import { createNavigationSelection } from "@/shared/enum/enum-util";
 
 export const IssueKey = {
-  "모든 이슈": "all",
   "이슈 없음": "none",
   "1. 프레임 속의 프레임": "issue_001",
   "2. 돌아오기 위한 여정": "issue_002",

@@ -10,10 +10,6 @@ const PostThumbnail = (props: {
   imageSize?: number;
   isClickable?: boolean;
 }) => {
-  let divClassName = "w-full flex flex-col my-gap ";
-  const textColor = issueTextColor[props.postMetadata.issue_id ?? "none"];
-  divClassName += textColor;
-
   let thumbnailUrl = props?.postMetadata.thumbnail_url;
 
   if (props.imageSize) {
@@ -21,7 +17,12 @@ const PostThumbnail = (props: {
   }
 
   return (
-    <div className={divClassName}>
+    <div
+      className={cn(
+        "w-full flex flex-col my-gap",
+        issueTextColor[props.postMetadata.issue_id],
+      )}
+    >
       <ImageLoader
         src={thumbnailUrl ?? "main.png"}
         alt={"thumbnail"}
@@ -41,7 +42,7 @@ const PostThumbnail = (props: {
       <div className="flex gap-1 items-center text-sm text-opacity-70">
         <p className="me-2">●</p>
         <p className="font-bold">
-          {categoryValue[props?.postMetadata?.category as string]}
+          {categoryValue[props?.postMetadata?.category]}
         </p>
         <p>|</p>
         <p>{props?.postMetadata?.author}</p>

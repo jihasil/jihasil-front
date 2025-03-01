@@ -6,12 +6,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CheckedState } from "@radix-ui/react-checkbox";
 import { cn } from "@/shared/lib/utils";
 
 export default function ShowNonApproved(props: {
   onCheckedChange: any;
-  checked: CheckedState;
+  checked: boolean;
   className?: string;
 }) {
   return (

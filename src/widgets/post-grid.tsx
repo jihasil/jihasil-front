@@ -34,17 +34,17 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
     return pageSize;
   };
 
-  const [issueFilter, setIssueFilter] = useSessionStorage<IssueUnion>(
+  const [issueFilter, setIssueFilter] = useSessionStorage<IssueUnion | "all">(
     "issueFilter",
     "all",
   );
 
-  const [showNonApproved, setShowNonApproved] = useSessionStorage<CheckedState>(
+  const [showNonApproved, setShowNonApproved] = useSessionStorage<boolean>(
     "showNonApproved",
     false,
   );
 
-  const changeIssue = (issueFilter: IssueUnion) => {
+  const changeIssue = (issueFilter: IssueUnion | "all") => {
     initiate();
     setIssueFilter(issueFilter);
   };
@@ -73,7 +73,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
     <div className="col-span-full grid grid-cols-subgrid my-gap">
       <div className="col-span-full grid grid-cols-subgrid my-grid my-gap">
         <Navigation
-          selects={issueSelection}
+          selects={[{ value: "all", display: "모든 이슈" }, ...issueSelection]}
           onValueChange={changeIssue}
           default={issueFilter}
           className="col-span-2"
