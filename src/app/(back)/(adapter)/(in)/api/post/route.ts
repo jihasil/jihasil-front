@@ -3,62 +3,36 @@ import { forbidden, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getSession } from "@/app/(back)/application/model/request-sign-in";
+import { postService } from "@/app/(back)/domain/post-service";
 import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { dynamoClient } from "@/app/(back)/shared/lib/dynamo-db";
-import {
-  PostKey,
-  PostMetadata,
-  PostResponseDTO,
-  metadataSchema,
-} from "@/app/global/types/post-types";
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { IssueUnion } from "@/app/global/enum/issue";
+import { metadataSchema } from "@/app/global/types/post-types";
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 export const GET = async (req: NextRequest) => {
   console.log(req.nextUrl.searchParams);
 
-  // 전체 metadata
   const lastPostKeyJson = req.nextUrl.searchParams.get("lastKey");
   const lastPostKey = lastPostKeyJson ? JSON.parse(lastPostKeyJson) : null;
 
-  const issueId = req.nextUrl.searchParams.get("issueId") ?? null;
+  const issueId = req.nextUrl.searchParams.get("issueId");
   const pageSize = Number(req.nextUrl.searchParams.get("pageSize") ?? 10);
 
-  const param = {
-    TableName: "post_metadata",
-    Limit: pageSize,
-    ...(issueId !== null
-      ? {
-          IndexName: "index_issue_id",
-          KeyConditionExpression: "issue_id = :issue_id",
-          ExpressionAttributeValues: {
-            ":issue_id": issueId,
-          },
-        }
-      : {
-          KeyConditionExpression: "board = :board",
-          ExpressionAttributeValues: {
-            ":board": "main",
-          },
-        }),
-    ScanIndexForward: false,
-    ...(lastPostKey !== null && { ExclusiveStartKey: lastPostKey }),
-  };
-
-  console.log(param);
-
-  const command = new QueryCommand(param);
-
   try {
-    const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
-    console.log(Items);
+    const postMetadataList = await postService.getPostMetadataListByFilter(
+      {
+        pageSize,
+        lastKey: lastPostKey,
+      },
+      {
+        ...(issueId && {
+          issue_id: issueId as IssueUnion,
+        }),
+      },
+    );
 
-    const data: PostResponseDTO = {
-      postMetadataList: Items as PostMetadata[], // 포스트 목록
-      isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
-      LastEvaluatedKey: LastEvaluatedKey as PostKey,
-    };
-
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(postMetadataList), {
       status: 200,
     });
   } catch (error) {
