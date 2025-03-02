@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { CategoryUnion } from "@/app/global/enum/category";
 import { IssueUnion } from "@/app/global/enum/issue";
+import { Filter, Key } from "@/app/global/types/page-types";
 
 export type PostMetadata = {
   post_id?: string;
@@ -24,15 +25,20 @@ export type Post = {
   postMetadata: PostMetadata;
 };
 
-export type PostKey = {
+export interface PostKey extends Key {
   created_at: string;
   board: string;
-};
+}
+
+export interface PostFilter extends Filter {
+  user_id?: string;
+  issue_id?: IssueUnion;
+}
 
 export type PostResponseDTO = {
   postMetadataList: PostMetadata[];
   isLast: boolean;
-  LastEvaluatedKey: PostKey;
+  lastPostKey: PostKey;
 };
 
 const ACCEPTED_IMAGE_TYPES = [
