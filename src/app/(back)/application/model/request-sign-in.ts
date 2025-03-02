@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { cache } from "react";
 
 import { ACCESS_TOKEN, INVALIDATED } from "@/app/(back)/shared/const/auth";
 import { RoleUnion } from "@/app/global/enum/roles";
@@ -16,7 +17,7 @@ declare module "@auth/core/jwt" {
   }
 }
 
-export const getSession = async (): Promise<Session | null> => {
+export const getSession = cache(async (): Promise<Session | null> => {
   const cookieStore = await cookies();
   const accessTokenHash = cookieStore.get(ACCESS_TOKEN)?.value;
 
@@ -50,7 +51,7 @@ export const getSession = async (): Promise<Session | null> => {
   }
 
   return null;
-};
+});
 
 export const rotateRefreshToken = async (request: NextRequest) => {
   const cookieStore = await cookies();

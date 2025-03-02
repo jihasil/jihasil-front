@@ -1,10 +1,6 @@
 import { dynamoClient } from "@/app/(back)/shared/lib/dynamo-db";
 import { Page, PageRequest } from "@/app/global/types/page-types";
-import {
-  CreatePostRequestDTO,
-  PostFilter,
-  PostKey,
-} from "@/app/global/types/post-types";
+import { PostFilter, PostKey } from "@/app/global/types/post-types";
 import {
   PutCommand,
   PutCommandInput,

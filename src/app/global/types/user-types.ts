@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { RoleUnion } from "@/app/global/enum/roles";
+import { Filter, Key } from "@/app/global/types/page-types";
 
 export type User = {
   id: string;
@@ -10,8 +11,18 @@ export type User = {
   refreshToken?: string;
 };
 
-export type UserKey = {
+export interface UserKey extends Key {
   id: string;
+}
+
+export interface UserFilter extends Filter {
+  id: string;
+}
+
+export type UserEntry = {
+  id: string;
+  name: string;
+  role: RoleUnion;
 };
 
 export type UserResponseDTO = {
@@ -26,6 +37,12 @@ export type UserEditRequestDTO = {
   name?: string;
   password?: string;
   refreshToken?: string;
+};
+
+export type ChangePasswordRequestDTO = {
+  id: string;
+  oldPassword: string;
+  newPassword: string;
 };
 
 export const signInSchema = z.object({
@@ -57,7 +74,7 @@ export const signUpSchema = z.object({
 });
 
 export const changePasswordSchema = z.object({
-  userId: z.string(),
+  id: z.string(),
   oldPassword: z.string().min(1, "기존 비밀번호를 입력해주세요."),
   newPassword: z.string().min(1, "새 비밀번호를 입력해주세요."),
 });

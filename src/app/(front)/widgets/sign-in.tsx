@@ -49,12 +49,11 @@ export default function SignIn() {
     if (isUploading) return;
 
     setIsUploading(true);
-    const signInData = await signInSchema.parseAsync(values);
     const redirectTo = searchParams.get("from") ?? "/";
 
     const result = await fetch("/api/signIn", {
       method: "POST",
-      body: JSON.stringify({ ...signInData }),
+      body: JSON.stringify(values),
     });
 
     console.log(result);

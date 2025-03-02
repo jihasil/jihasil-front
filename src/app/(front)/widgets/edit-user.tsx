@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { changePassword } from "@/app/(back)/application/model/change-password";
 import { signOut } from "@/app/(back)/application/model/sign-out";
 import {
   Form,
@@ -18,6 +17,7 @@ import {
 } from "@/app/(front)/components/ui/form";
 import { Input } from "@/app/(front)/components/ui/input";
 import SubmitButton from "@/app/(front)/components/ui/submit-button";
+import { fetchR } from "@/app/(front)/shared/lib/request";
 import PreventRoute from "@/app/(front)/widgets/prevent-route";
 import { Session } from "@/app/global/types/auth-types";
 import { changePasswordSchema } from "@/app/global/types/user-types";
@@ -35,7 +35,7 @@ export default function EditUser(props: { session: Session }) {
   const form = useForm<z.infer<typeof changePasswordSchema>>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {
-      userId,
+      id: userId,
       oldPassword: "",
       newPassword: "",
     },
@@ -50,18 +50,23 @@ export default function EditUser(props: { session: Session }) {
     setIsUploading(true);
     const redirectTo = searchParams.get("from") ?? "/";
 
-    const result = await changePassword(values);
+    const result = await fetchR("/api/user/password", {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
 
-    if (result) {
+    const body = await result.json();
+
+    if (result.ok) {
       if (userId === session.user.id) {
-        toast.success("비밀번호를 변경했습니다. 다시 로그인해주세요");
+        toast.success(body.message);
         await signOut(session);
       } else {
-        toast.success(`${userId} 사용자의 비밀번호를 변경했습니다.`);
+        toast.success(body.message);
       }
       router.push(redirectTo);
     } else {
-      toast.error("비밀번호 변경에 실패했습니다.");
+      toast.error(body.message);
     }
 
     setIsUploading(false);

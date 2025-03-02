@@ -22,6 +22,8 @@ import { fetchR } from "@/app/(front)/shared/lib/request";
 import { RoleUnion, roleSelection } from "@/app/global/enum/roles";
 import {
   UserEditRequestDTO,
+  UserEntry,
+  UserKey,
   UserResponseDTO,
 } from "@/app/global/types/user-types";
 
@@ -95,8 +97,8 @@ export default function ManageUserPage() {
   const router = useRouter();
 
   const { isInitiated, objectList, setObjectList } = useInfiniteObjectList<
-    UserResponseDTO,
-    string
+    UserEntry,
+    UserKey
   >("/api/user/all", "users", undefined, () => {
     return 15;
   });
