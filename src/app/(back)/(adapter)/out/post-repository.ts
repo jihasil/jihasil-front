@@ -1,16 +1,20 @@
 import { dynamoClient } from "@/app/(back)/shared/lib/dynamo-db";
-import { PageRequest } from "@/app/global/types/page-types";
+import { Page, PageRequest } from "@/app/global/types/page-types";
 import {
-  Post,
+  CreatePostRequestDTO,
   PostFilter,
   PostKey,
-  PostMetadata,
-  PostResponseDTO,
 } from "@/app/global/types/post-types";
-import { QueryCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  PutCommand,
+  PutCommandInput,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
+
+import { Post } from "../../domain/post";
 
 export class PostRepository {
-  getPostMetadataListByFilter = async (
+  getPostListByFilter = async (
     pageRequest: PageRequest<PostKey>,
     filter: PostFilter,
   ) => {
@@ -45,10 +49,15 @@ export class PostRepository {
       const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
       console.log(Items);
 
-      const data: PostResponseDTO = {
-        postMetadataList: Items as PostMetadata[], // 포스트 목록
+      // @ts-expect-error 오류 유발
+      const posts = Items.map((item) => {
+        return Post.fromJSON(item);
+      });
+
+      const data: Page<Post, PostKey> = {
+        data: posts, // 포스트 목록
         isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
-        lastPostKey: LastEvaluatedKey as PostKey,
+        lastKey: LastEvaluatedKey as PostKey,
       };
 
       return data;
@@ -59,14 +68,6 @@ export class PostRepository {
   };
 
   getPostById = async (postId: string) => {
-    const getContentParam = {
-      TableName: "post_content",
-      KeyConditionExpression: "post_id = :post_id",
-      ExpressionAttributeValues: {
-        ":post_id": postId,
-      },
-    };
-
     const getMetadataParam = {
       TableName: "post_metadata",
       IndexName: "index_post_id",
@@ -76,33 +77,41 @@ export class PostRepository {
       },
     };
 
-    const getContentQuery = new QueryCommand(getContentParam);
     const getMetadataQuery = new QueryCommand(getMetadataParam);
 
     try {
-      console.log(getContentQuery);
       console.log(getMetadataQuery);
 
-      const postContent = (await dynamoClient.send(getContentQuery))
+      const posts = (await dynamoClient.send(getMetadataQuery))
         ?.Items as Post[];
-      const postMetadata = (await dynamoClient.send(getMetadataQuery))
-        ?.Items as PostMetadata[];
 
       console.log(postId);
-      console.log(postContent);
-      console.log(postMetadata);
+      console.log(posts);
 
-      if (postContent.length !== 1 || postMetadata.length !== 1) {
+      if (posts.length !== 1) {
         return null;
       } else {
-        const post: Post = {
-          ...postContent[0],
-          postMetadata: { ...postMetadata[0] },
-        };
-        return post;
+        return Post.fromJSON(posts[0]);
       }
     } catch (error) {
       console.error(error);
+      return null;
+    }
+  };
+
+  createPost = async (post: Post) => {
+    const metadataPutParam: PutCommandInput = {
+      TableName: "post_metadata",
+      Item: post.toJSON(),
+    };
+
+    const metadataPutQuery = new PutCommand(metadataPutParam);
+
+    try {
+      await dynamoClient.send(metadataPutQuery);
+      return { postId: post.postId };
+    } catch (error: any) {
+      console.log(error);
       return null;
     }
   };

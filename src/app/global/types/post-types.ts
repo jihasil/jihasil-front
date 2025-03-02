@@ -4,25 +4,36 @@ import { CategoryUnion } from "@/app/global/enum/category";
 import { IssueUnion } from "@/app/global/enum/issue";
 import { Filter, Key } from "@/app/global/types/page-types";
 
-export type PostMetadata = {
-  post_id?: string;
-  created_at?: string;
+export type CreatePostRequestDTO = {
+  postId?: string;
+  createdAt?: string;
   board?: string;
-  thumbnail_url?: string;
-  thumbnail_file?: FileList;
+  thumbnailUrl?: string;
+  title: string;
+  subtitle: string;
+  category: CategoryUnion;
+  author: string;
+  issueId: IssueUnion;
+  isApproved: boolean;
+  isDeleted?: boolean;
+  userId?: string;
+  html?: string;
+};
+
+export type PostResponseDTO = {
+  post_id: string;
+  createdAt: string;
+  board: string;
+  thumbnailUrl: string;
   title: string;
   subtitle: string;
   category: CategoryUnion;
   author: string;
   issue_id: IssueUnion;
-  is_approved: boolean;
-  is_deleted?: boolean;
-  user_id?: string;
-};
-
-export type Post = {
+  isApproved: boolean;
+  isDeleted: boolean;
+  userId: string;
   html: string;
-  postMetadata: PostMetadata;
 };
 
 export interface PostKey extends Key {
@@ -35,10 +46,15 @@ export interface PostFilter extends Filter {
   issue_id?: IssueUnion;
 }
 
-export type PostResponseDTO = {
-  postMetadataList: PostMetadata[];
-  isLast: boolean;
-  lastPostKey: PostKey;
+export type PostEntry = {
+  postId: string;
+  thumbnailUrl: string;
+  title: string;
+  subtitle: string;
+  category: CategoryUnion;
+  author: string;
+  issueId: IssueUnion;
+  isApproved: boolean;
 };
 
 const ACCEPTED_IMAGE_TYPES = [
@@ -48,20 +64,20 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 
-export const metadataSchema = (thumbnail_url: string | undefined) =>
+export const metadataSchema = (thumbnailUrl: string | undefined) =>
   z.object({
-    thumbnail_file: z
+    thumbnailFile: z
       .any()
       .refine((file: FileList) => {
         // 기본값 있으면 (있는 글 수정이면 파일 없어도 됨)
-        if (thumbnail_url) return true;
+        if (thumbnailUrl) return true;
         else {
           // 없으면 파일 있어야 함
           return file.length === 1;
         }
       }, "썸네일 파일을 입력해주세요.")
       .refine((file: FileList) => {
-        return thumbnail_url || ACCEPTED_IMAGE_TYPES.includes(file[0]?.type);
+        return thumbnailUrl || ACCEPTED_IMAGE_TYPES.includes(file[0]?.type);
       }, "jpg, png, webp 이미지를 입력해주세요."),
     title: z.string().min(1, "제목을 입력해주세요."),
     subtitle: z.string().min(1, "부제목을 입력해주세요."),
@@ -80,16 +96,16 @@ export const metadataSchema = (thumbnail_url: string | undefined) =>
     author: z
       .string({ required_error: "글쓴이를 입력해주세요" })
       .min(1, "글쓴이를 입력하세요."),
-    issue_id: z.union(
+    issueId: z.union(
       [z.literal("issue_001"), z.literal("issue_002"), z.literal("none")],
       { required_error: "이슈를 선택하세요." },
     ),
-    is_approved: z.boolean(),
+    isApproved: z.boolean(),
     html: z.string().min(1, "내용을 입력하세요."),
-    user_id: z.string(),
-    post_id: z.string().optional(),
-    thumbnail_url: z.string().optional(),
+    userId: z.string(),
+    postId: z.string().optional(),
+    thumbnailUrl: z.string().optional(),
     board: z.string().optional(),
-    created_at: z.string().optional(),
-    is_deleted: z.boolean().optional(),
+    createdAt: z.string().optional(),
+    isDeleted: z.boolean().optional(),
   });

@@ -1,11 +1,11 @@
 import { forbidden, redirect, unauthorized } from "next/navigation";
 
+import { postService } from "@/app/(back)/application/model/post-service";
 import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { postService } from "@/app/(back)/domain/post-service";
+import { Post } from "@/app/(back)/domain/post";
 import { hasEnoughRole } from "@/app/(back)/domain/user";
 import EditPost from "@/app/(front)/widgets/edit-post";
 import { Session } from "@/app/global/types/auth-types";
-import { Post } from "@/app/global/types/post-types";
 
 export default async function EditPostPage({
   params,
@@ -30,11 +30,11 @@ export default async function EditPostPage({
   } else {
     if (
       !hasEnoughRole("ROLE_SUPERUSER", session.user.role) &&
-      session.user.id !== post.postMetadata.user_id
+      session.user.id !== post.userId
     ) {
       forbidden();
     }
 
-    return <EditPost post={post} session={session} />;
+    return <EditPost post={post.toPostResponseDTO()} session={session} />;
   }
 }

@@ -2,25 +2,27 @@ import { ImageLoader } from "@/app/(front)/components/ui/image-loader";
 import { Separator } from "@/app/(front)/components/ui/separator";
 import { categoryValue } from "@/app/global/enum/category";
 import { issueBackgroundColor, issueTextColor } from "@/app/global/enum/issue";
-import { PostMetadata } from "@/app/global/types/post-types";
+import { PostEntry } from "@/app/global/types/post-types";
 import { cn } from "@udecode/cn";
 
 const PostThumbnail = (props: {
-  postMetadata: PostMetadata;
+  postEntry: PostEntry;
   imageSize?: number;
   isClickable?: boolean;
 }) => {
-  let thumbnailUrl = props?.postMetadata.thumbnail_url;
+  const { postEntry, imageSize, isClickable } = props;
 
-  if (props.imageSize) {
-    thumbnailUrl += `?width=${props.imageSize}`;
+  let thumbnailUrl = postEntry.thumbnailUrl;
+
+  if (imageSize) {
+    thumbnailUrl += `?width=${imageSize}`;
   }
 
   return (
     <div
       className={cn(
         "w-full flex flex-col my-gap",
-        issueTextColor[props.postMetadata.issue_id],
+        issueTextColor[postEntry.issueId],
       )}
     >
       <ImageLoader
@@ -28,27 +30,23 @@ const PostThumbnail = (props: {
         alt={"thumbnail"}
         className={cn(
           "w-full h-auto",
-          `${props.isClickable ? "transform transition duration-500 hover:brightness-50" : null}`,
+          `${isClickable ? "transform transition duration-500 hover:brightness-50" : null}`,
         )}
       />
       <div>
-        <p className="font-bold text-xl text-opacity-100">
-          {props?.postMetadata?.title}
-        </p>
+        <p className="font-bold text-xl text-opacity-100">{postEntry.title}</p>
         <p className="text-sm text-opacity-70 whitespace-nowrap text-ellipsis overflow-hidden">
-          {props?.postMetadata?.subtitle}
+          {postEntry.subtitle}
         </p>
       </div>
       <div className="flex gap-1 items-center text-sm text-opacity-70">
         <p className="me-2">●</p>
-        <p className="font-bold">
-          {categoryValue[props?.postMetadata?.category]}
-        </p>
+        <p className="font-bold">{categoryValue[postEntry.category]}</p>
         <p>|</p>
-        <p>{props?.postMetadata?.author}</p>
+        <p>{postEntry?.author}</p>
       </div>
       <Separator
-        className={issueBackgroundColor[props.postMetadata.issue_id ?? "none"]}
+        className={issueBackgroundColor[postEntry.issueId ?? "none"]}
       />
     </div>
   );

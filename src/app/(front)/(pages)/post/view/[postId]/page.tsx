@@ -2,8 +2,9 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { postService } from "@/app/(back)/application/model/post-service";
 import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { postService } from "@/app/(back)/domain/post-service";
+import { Post } from "@/app/(back)/domain/post";
 import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { Button } from "@/app/(front)/components/ui/button";
 import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
@@ -16,17 +17,17 @@ export async function generateMetadata({
   const postId = (await params).postId;
   const post = await postService.getPostById(postId);
 
+  if (!post) {
+    notFound();
+  }
+
   return {
-    title: post?.postMetadata.title,
+    title: post.title,
     openGraph: {
-      title: post?.postMetadata.title,
-      description: post?.postMetadata.subtitle,
-      url: `/${post?.postMetadata.post_id}`,
-      images: [
-        post?.postMetadata.thumbnail_url
-          ? new URL(post?.postMetadata.thumbnail_url)
-          : "/main.png",
-      ],
+      title: post.title,
+      description: post.subtitle,
+      url: `/${post.postId}`,
+      images: [post.thumbnailUrl],
     },
   };
 }
@@ -44,16 +45,19 @@ export default async function PageViewer({
     notFound();
   }
 
+  const postEntity = Post.fromJSON(post);
+  const postEntry = postEntity.toPostEntry();
+
   console.log(postId);
   console.log(post);
 
   return (
     <div className="subgrid my-gap">
       <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky top-[89px]">
-        <PostThumbnail postMetadata={post.postMetadata} />
+        <PostThumbnail postEntry={postEntry} />
         {session &&
         (hasEnoughRole("ROLE_SUPERUSER", session.user.role) ||
-          session.user.id === post.postMetadata.user_id) ? (
+          session.user.id === post.userId) ? (
           <>
             <Link
               href={{

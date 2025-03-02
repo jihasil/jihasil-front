@@ -97,11 +97,7 @@ import {
 } from "../../components/plate-ui/table-cell-element";
 import { TableElement } from "../../components/plate-ui/table-element";
 
-export const useCreateEditor = (
-  p0: unknown,
-  deps: any[],
-  value: string | undefined,
-) => {
+export const useCreateEditor = (value: string | undefined) => {
   return usePlateEditor({
     override: {
       components: withPlaceholders(components),

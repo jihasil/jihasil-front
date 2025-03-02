@@ -11,7 +11,7 @@ import { useSessionStorage } from "@/app/(front)/shared/hooks/use-session-storag
 import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
 import { IssueUnion, issueSelection } from "@/app/global/enum/issue";
 import { Session } from "@/app/global/types/auth-types";
-import { PostKey, PostMetadata } from "@/app/global/types/post-types";
+import { PostEntry, PostKey } from "@/app/global/types/post-types";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 export const PostGrid = (props: { id?: string; session?: Session | null }) => {
@@ -56,7 +56,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
   };
 
   const { objectList, isInitiated, initiate } = useInfiniteObjectList<
-    PostMetadata,
+    PostEntry,
     PostKey
   >(
     "/api/post" + (props.id ? `?id=${props.id}` : ""),
@@ -65,8 +65,8 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
     getPageSize,
   );
 
-  const displayingPosts = objectList.filter(
-    (item) => showNonApproved || (item.is_approved ?? true),
+  const postEntryList = objectList.filter(
+    (item) => showNonApproved || (item.isApproved ?? true),
   );
 
   return (
@@ -87,7 +87,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
         ) : null}
       </div>
       <div className="overflow-y-auto col-span-full">
-        {isInitiated.current && displayingPosts.length === 0 ? (
+        {isInitiated.current && postEntryList.length === 0 ? (
           <div className="w-full flex items-center justify-center">
             <p>게시글이 없습니다.</p>
           </div>
@@ -98,7 +98,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
             <SkeletonImages />
           ) : (
             <Images
-              postMetadataList={displayingPosts}
+              postEntryList={postEntryList}
               showNonApproved={showNonApproved}
             />
           )}
@@ -109,18 +109,18 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
 };
 
 const Images = (props: {
-  postMetadataList: PostMetadata[];
+  postEntryList: PostEntry[];
   showNonApproved: CheckedState;
 }) => {
   const smSize = window.matchMedia("(min-width: 640px)");
   const thumbnailSize = smSize.matches ? 700 : 500;
   console.log(thumbnailSize);
 
-  return props.postMetadataList.map((item, index) => (
+  return props.postEntryList.map((item, index) => (
     <div key={index} className="w-full h-fit">
-      <Link href={`/post/view/${item.post_id}`}>
+      <Link href={`/post/view/${item.postId}`}>
         <PostThumbnail
-          postMetadata={item}
+          postEntry={item}
           imageSize={thumbnailSize}
           isClickable={true}
         />

@@ -26,10 +26,13 @@ import PreventRoute from "@/app/(front)/widgets/prevent-route";
 import { CategoryUnion, categorySelection } from "@/app/global/enum/category";
 import { IssueUnion, issueSelection } from "@/app/global/enum/issue";
 import { Session } from "@/app/global/types/auth-types";
-import { Post, metadataSchema } from "@/app/global/types/post-types";
+import { PostResponseDTO, metadataSchema } from "@/app/global/types/post-types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function EditPost(props: { post?: Post; session: Session }) {
+export default function EditPost(props: {
+  post?: PostResponseDTO;
+  session: Session;
+}) {
   const router = useRouter();
   const { post } = props;
 
@@ -52,25 +55,24 @@ export default function EditPost(props: { post?: Post; session: Session }) {
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
-  const schema = metadataSchema(post?.postMetadata.thumbnail_url);
+  const schema = metadataSchema(post?.thumbnailUrl);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      title: post?.postMetadata?.title ?? "",
-      subtitle: post?.postMetadata?.subtitle ?? "",
-      category: post?.postMetadata?.category ?? categorySelection[0].value,
-      author: post?.postMetadata?.author ?? props.session.user.name,
-      issue_id: post?.postMetadata?.issue_id ?? issueSelection[0].value,
-      is_approved: post?.postMetadata?.is_approved ?? true,
+      title: post?.title ?? "",
+      subtitle: post?.subtitle ?? "",
+      category: post?.category ?? categorySelection[0].value,
+      author: post?.author ?? props.session.user.name,
+      issueId: post?.issue_id ?? issueSelection[0].value,
+      isApproved: post?.isApproved ?? true,
       html: post?.html,
-      thumbnail_url: post?.postMetadata?.thumbnail_url,
-      post_id: post?.postMetadata?.post_id,
-      board: post?.postMetadata?.board,
-      created_at: post?.postMetadata?.created_at,
-      user_id: post?.postMetadata?.user_id ?? props.session.user.id,
-      is_deleted: false,
+      thumbnailUrl: post?.thumbnailUrl,
+      postId: post?.post_id,
+      board: post?.board,
+      createdAt: post?.createdAt,
+      userId: post?.userId ?? props.session.user.id,
     },
   });
 
@@ -84,8 +86,9 @@ export default function EditPost(props: { post?: Post; session: Session }) {
 
     try {
       const postId = await submit(values);
-
-      router.push(`/post/view/${postId}`);
+      if (postId) {
+        router.push(`/post/view/${postId}`);
+      }
     } catch (e) {
       toast("업로드에 실패했습니다.");
       console.error(e);
@@ -100,10 +103,11 @@ export default function EditPost(props: { post?: Post; session: Session }) {
   }
 
   const submit = async (values: z.infer<typeof schema>) => {
-    if (values.thumbnail_file?.length === 1) {
-      values.thumbnail_url = (await uploadThumbnail(
-        values.thumbnail_file[0] as File,
+    if (values.thumbnailFile?.length === 1) {
+      values.thumbnailUrl = (await uploadThumbnail(
+        values.thumbnailFile[0] as File,
       )) as string;
+      delete values.thumbnailFile;
     }
 
     const response = await fetchR("/api/post", {
@@ -111,15 +115,16 @@ export default function EditPost(props: { post?: Post; session: Session }) {
       body: JSON.stringify(values),
     });
 
+    const body = await response.json();
     if (!response.ok) {
-      throw new Error("Failed to upload");
+      toast.error(body.message);
+      return null;
     }
 
-    const { postId } = await response.json();
-    return postId;
+    return body.postId;
   };
 
-  const fileRef = form.register("thumbnail_file");
+  const fileRef = form.register("thumbnailFile");
 
   return (
     <div className="subgrid">
@@ -170,7 +175,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
                         form.setValue("category", value);
                       }}
                       selects={categorySelection}
-                      default={post?.postMetadata?.category}
+                      default={post?.category}
                       {...field}
                     />
                   </FormControl>
@@ -181,17 +186,17 @@ export default function EditPost(props: { post?: Post; session: Session }) {
 
             <FormField
               control={form.control}
-              name="issue_id"
+              name="issueId"
               render={({ field }) => (
                 <FormItem className="col-span-2">
                   <FormLabel>이슈</FormLabel>
                   <FormControl>
                     <Navigation
                       onValueChange={(value: IssueUnion) => {
-                        form.setValue("issue_id", value);
+                        form.setValue("issueId", value);
                       }}
                       selects={issueSelection}
-                      default={post?.postMetadata?.issue_id}
+                      default={post?.issue_id}
                       {...field}
                     />
                   </FormControl>
@@ -244,7 +249,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
           <div className="subgrid my-gap">
             <FormField
               control={form.control}
-              name="thumbnail_file"
+              name="thumbnailFile"
               render={() => (
                 <FormItem className="col-span-4 col-start-1">
                   <FormLabel>썸네일</FormLabel>
@@ -258,7 +263,7 @@ export default function EditPost(props: { post?: Post; session: Session }) {
 
             <FormField
               control={form.control}
-              name="is_approved"
+              name="isApproved"
               render={({ field }) => (
                 <FormItem className="col-span-4 col-start-1 flex gap-x-3 rounded-md border p-3">
                   <FormControl>

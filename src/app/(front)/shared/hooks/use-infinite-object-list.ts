@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+
+import { Key, Page } from "@/app/global/types/page-types";
 
 import { fetchR } from "../lib/request";
 
-export const useInfiniteObjectList = <ObjectType, KeyType>(
+export const useInfiniteObjectList = <ObjectType, KeyType extends Key>(
   url: string,
   objectListKey: string,
   modifySearchParams?: (searchParams: URLSearchParams) => void | undefined,
@@ -51,17 +54,25 @@ export const useInfiniteObjectList = <ObjectType, KeyType>(
 
     try {
       if (response.ok) {
-        const { isLast, LastEvaluatedKey, ...data } = await response.json();
-        setHasMore(!isLast || data.length < pageSize);
-        setObjectList((prevState) => [...prevState, ...data[objectListKey]]);
-        console.log(data[objectListKey]);
-        console.info(LastEvaluatedKey);
-        setLastKey(LastEvaluatedKey);
+        const { isLast, lastKey, data } = (await response.json()) as Page<
+          ObjectType,
+          KeyType
+        >;
+        setHasMore(!isLast && data.length < pageSize && !lastKey);
+        setObjectList((prevState) => [...prevState, ...data]);
+        console.log(data);
+        console.info(lastKey);
+
+        if (lastKey) {
+          setLastKey(lastKey);
+        }
       } else {
         setHasMore(false);
       }
     } catch (error: any) {
       console.error(error);
+      const body = await response.json();
+      toast.error(body.message);
     } finally {
       setIsLoading(false);
     }

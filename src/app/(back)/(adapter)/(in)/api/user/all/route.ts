@@ -27,7 +27,6 @@ export const GET = async (nextRequest: NextRequest) => {
   const query = new ScanCommand(param);
 
   try {
-    // @ts-expect-error dynamo db
     const { Items, LastEvaluatedKey } = await dynamoClient.send(query);
 
     return new NextResponse(

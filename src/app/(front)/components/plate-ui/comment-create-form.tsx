@@ -16,6 +16,7 @@ import {
   Plate,
   PlateLeaf,
   useEditorRef,
+  usePlateEditor,
   useStoreSelect,
 } from "@udecode/plate/react";
 import {
@@ -56,7 +57,7 @@ export const useCommentEditor = (
   options: Omit<CreatePlateEditorOptions, "plugins"> = {},
   deps: any[] = [],
 ) => {
-  return useCreateEditor(
+  return usePlateEditor(
     {
       id: "comment",
       override: {
@@ -79,7 +80,6 @@ export const useCommentEditor = (
       ...options,
     },
     deps,
-    undefined,
   );
 };
 
