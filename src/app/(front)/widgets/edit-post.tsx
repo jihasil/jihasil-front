@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { PlateEditor } from "@/app/(front)/components/editor/plate-editor";
 import { Checkbox } from "@/app/(front)/components/plate-ui/checkbox";
 import {
@@ -22,16 +21,17 @@ import { Input } from "@/app/(front)/components/ui/input";
 import { Navigation } from "@/app/(front)/components/ui/navigation";
 import SubmitButton from "@/app/(front)/components/ui/submit-button";
 import { fetchR } from "@/app/(front)/shared/lib/request";
+import { hasEnoughRole } from "@/app/(front)/shared/lib/utils";
 import PreventRoute from "@/app/(front)/widgets/prevent-route";
 import { CategoryUnion, categorySelection } from "@/app/global/enum/category";
 import { IssueUnion, issueSelection } from "@/app/global/enum/issue";
-import { Session } from "@/app/global/types/auth-types";
+import { ClientSession } from "@/app/global/types/auth-types";
 import { PostResponseDTO, metadataSchema } from "@/app/global/types/post-types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function EditPost(props: {
   post?: PostResponseDTO;
-  session: Session;
+  session: ClientSession;
 }) {
   const router = useRouter();
   const { post } = props;

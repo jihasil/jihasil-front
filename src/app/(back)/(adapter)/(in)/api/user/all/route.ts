@@ -10,16 +10,18 @@ export const GET = async (nextRequest: NextRequest) => {
   const lastKeyJson = nextRequest.nextUrl.searchParams.get("lastKey");
   const lastKey = lastKeyJson ? JSON.parse(lastKeyJson) : null;
 
-  const userEntryList = await userService.getUserEntryList({
-    pageSize,
-    lastKey,
-  });
+  try {
+    const userEntryList = await userService.getUserEntryList({
+      pageSize,
+      lastKey,
+    });
 
-  if (userEntryList) {
     return new NextResponse(JSON.stringify(userEntryList), {
       status: 200,
     });
-  } else {
+  } catch (error) {
+    console.error(error);
+
     return new NextResponse(
       JSON.stringify({ message: "사용자를 가져올 수 없습니다." }),
       {

@@ -2,10 +2,9 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { authService } from "@/app/(back)/application/model/auth-service";
 import { postService } from "@/app/(back)/application/model/post-service";
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
 import { Post } from "@/app/(back)/domain/post";
-import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { Button } from "@/app/(front)/components/ui/button";
 import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
 
@@ -37,7 +36,7 @@ export default async function PageViewer({
 }: {
   params: Promise<{ postId: string }>;
 }) {
-  const session = await getSession();
+  const session = await authService.getSession();
   const postId = (await params).postId;
 
   const post = await postService.getPostById(postId);
@@ -56,8 +55,8 @@ export default async function PageViewer({
       <div className="lg:col-span-3 md:col-span-2 col-span-4 flex flex-col my-gap h-fit md:sticky top-[89px]">
         <PostThumbnail postEntry={postEntry} />
         {session &&
-        (hasEnoughRole("ROLE_SUPERUSER", session.user.role) ||
-          session.user.id === post.userId) ? (
+        (session.user.hasEnoughRole("ROLE_SUPERUSER") ||
+          session.user.info.id === post.userId) ? (
           <>
             <Link
               href={{

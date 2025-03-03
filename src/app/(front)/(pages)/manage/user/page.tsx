@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 
+import { User } from "@/app/(back)/domain/user";
 import { Button } from "@/app/(front)/components/ui/button";
 import {
   DropdownMenu,
@@ -41,7 +42,7 @@ function UserSkeleton() {
 }
 
 function UserElement(props: {
-  users: UserResponseDTO[];
+  users: UserEntry[];
   changeUserData: (user: UserEditRequestDTO) => Promise<boolean>;
   changeUserPassword: (user: UserEditRequestDTO) => Promise<void>;
   deleteUser: (index: number, user: UserEditRequestDTO) => Promise<boolean>;

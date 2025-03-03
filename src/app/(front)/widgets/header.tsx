@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
+import { authService } from "@/app/(back)/application/model/auth-service";
 import {
   Sheet,
   SheetClose,
@@ -12,14 +12,14 @@ import {
 } from "@/app/(front)/components/ui/sheet";
 
 const TransparentHeader = async () => {
-  const session = await getSession();
+  const session = await authService.getSession();
 
   const buttonStyle =
     "lg:px-6 md:px-5 px-4 hover:bg-white hover:text-background text-foreground transition-all duration-300 ease-in-out w-full h-full flex items-center justify-center md:py-0 py-4 ";
 
   let userOnlyButton = buttonStyle;
   let signInButton = buttonStyle;
-  if (!session?.user) {
+  if (!session) {
     userOnlyButton += " hidden";
   } else {
     signInButton += "hidden";

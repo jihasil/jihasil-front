@@ -1,27 +1,17 @@
-import { z } from "zod";
-
 import { UserRepository } from "@/app/(back)/(adapter)/out/user-repository";
-import { authorizeUser } from "@/app/(back)/application/model/auth";
-import { saltAndHashPassword } from "@/app/(back)/application/model/crypto";
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { Post } from "@/app/(back)/domain/post";
-import { changeUserInfo } from "@/app/(back)/domain/user";
-import { UserEntity } from "@/app/(back)/domain/userEntity";
+import { authService } from "@/app/(back)/application/model/auth-service";
+import { User } from "@/app/(back)/domain/user";
 import { INVALIDATED } from "@/app/(back)/shared/const/auth";
-import {
-  dynamoClient,
-  generateUpdateExpression,
-} from "@/app/(back)/shared/lib/dynamo-db";
+import { saltAndHashPassword } from "@/app/(back)/shared/lib/crypto";
 import { Page, PageRequest } from "@/app/global/types/page-types";
 import {
   ChangePasswordRequestDTO,
   UserEditRequestDTO,
   UserEntry,
   UserKey,
+  UserSignInRequestDTO,
   UserSignUpRequestDTO,
-  changePasswordSchema,
 } from "@/app/global/types/user-types";
-import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
 class UserService {
   private userRepository: UserRepository;
@@ -30,39 +20,51 @@ class UserService {
     this.userRepository = userRepository;
   }
 
-  getUserEntryList = async (pageRequest: PageRequest<UserKey>) => {
-    const postList = await this.userRepository.getUserList(pageRequest);
-
-    if (postList) {
-      const { data, ...pageData } = postList;
-
-      const userEntries = data.map((user: UserEntity) => {
-        return user.toUserEntry();
-      });
-
-      const userEntryList: Page<UserEntry, UserKey> = {
-        data: userEntries,
-        ...pageData,
-      };
-
-      return userEntryList;
-    } else {
-      return null;
-    }
-  };
-
-  getUserById = async (id: string) => {
-    return await this.userRepository.getUserById(id);
-  };
-
+  /**
+   * 이미 있는 ID 일 시 ConditionalCheckFailedException
+   * @param userSignUpRequestDTO
+   * @return Promise<{ id: string }>
+   */
   userSignUp = async (userSignUpRequestDTO: UserSignUpRequestDTO) => {
     userSignUpRequestDTO.password = await saltAndHashPassword(
       userSignUpRequestDTO.password,
     );
 
-    const userEntity = UserEntity.fromJSON(userSignUpRequestDTO);
+    const userEntity = User.fromJSON(userSignUpRequestDTO);
 
     return await this.userRepository.createUser(userEntity);
+  };
+
+  userSignIn = async (userSignInRequestDTO: UserSignInRequestDTO) => {
+    return await authService.authenticate(userSignInRequestDTO, true);
+  };
+
+  userSignOut = async (id: string) => {
+    Promise.all([
+      authService.invalidateAccessToken(),
+      this.invalidateUser(id),
+    ]).then();
+  };
+
+  getUserEntryList = async (pageRequest: PageRequest<UserKey>) => {
+    const userList = await this.userRepository.getUserList(pageRequest);
+
+    const { data, ...pageData } = userList;
+
+    const userEntries = data.map((user: User) => {
+      return user.toUserEntry();
+    });
+
+    const userEntryList: Page<UserEntry, UserKey> = {
+      data: userEntries,
+      ...pageData,
+    };
+
+    return userEntryList;
+  };
+
+  getUserById = async (id: string): Promise<User | null> => {
+    return await this.userRepository.getUserById(id);
   };
 
   editUserById = async (userEditRequest: UserEditRequestDTO) => {
@@ -71,31 +73,31 @@ class UserService {
       userEditRequest.refreshToken = INVALIDATED;
     }
 
-    return this.userRepository.editUserById(userEditRequest);
+    await this.userRepository.editUserById(userEditRequest);
   };
 
   deleteUserById = async (userKey: UserKey) => {
-    return this.userRepository.deleteUserById(userKey);
+    await this.userRepository.deleteUserById(userKey);
   };
 
   changePassword = async (changePasswordRequest: ChangePasswordRequestDTO) => {
-    const userExists = await authorizeUser({
+    await authService.authenticate({
       id: changePasswordRequest.id,
       password: changePasswordRequest.oldPassword,
     });
-
-    if (!userExists) {
-      return false;
-    }
 
     const newPasswordHash = await saltAndHashPassword(
       changePasswordRequest.newPassword,
     );
 
-    return this.userRepository.editUserById({
+    await this.userRepository.editUserById({
       id: changePasswordRequest.id,
       password: newPasswordHash,
     });
+  };
+
+  invalidateUser = async (id: string) => {
+    await this.editUserById({ id, refreshToken: INVALIDATED });
   };
 }
 

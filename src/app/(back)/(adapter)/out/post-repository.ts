@@ -41,26 +41,21 @@ export class PostRepository {
 
     const command = new QueryCommand(param);
 
-    try {
-      const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
-      console.log(Items);
+    const { Items, LastEvaluatedKey } = await dynamoClient.send(command);
+    console.log(Items);
 
-      // @ts-expect-error 오류 유발
-      const posts = Items.map((item) => {
-        return Post.fromJSON(item);
-      });
+    // @ts-expect-error 오류 유발
+    const posts = Items.map((item) => {
+      return Post.fromJSON(item);
+    });
 
-      const data: Page<Post, PostKey> = {
-        data: posts, // 포스트 목록
-        isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
-        lastKey: LastEvaluatedKey as PostKey,
-      };
+    const data: Page<Post, PostKey> = {
+      data: posts, // 포스트 목록
+      isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
+      lastKey: LastEvaluatedKey as PostKey,
+    };
 
-      return data;
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      return null;
-    }
+    return data;
   };
 
   getPostById = async (postId: string) => {
@@ -75,23 +70,17 @@ export class PostRepository {
 
     const getMetadataQuery = new QueryCommand(getMetadataParam);
 
-    try {
-      console.log(getMetadataQuery);
+    console.log(getMetadataQuery);
 
-      const posts = (await dynamoClient.send(getMetadataQuery))
-        ?.Items as Post[];
+    const posts = (await dynamoClient.send(getMetadataQuery))?.Items as Post[];
 
-      console.log(postId);
-      console.log(posts);
+    console.log(postId);
+    console.log(posts);
 
-      if (posts.length !== 1) {
-        return null;
-      } else {
-        return Post.fromJSON(posts[0]);
-      }
-    } catch (error) {
-      console.error(error);
+    if (posts.length !== 1) {
       return null;
+    } else {
+      return Post.fromJSON(posts[0]);
     }
   };
 
@@ -103,12 +92,7 @@ export class PostRepository {
 
     const metadataPutQuery = new PutCommand(metadataPutParam);
 
-    try {
-      await dynamoClient.send(metadataPutQuery);
-      return { postId: post.postId };
-    } catch (error: any) {
-      console.log(error);
-      return null;
-    }
+    await dynamoClient.send(metadataPutQuery);
+    return { postId: post.postId };
   };
 }

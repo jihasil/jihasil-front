@@ -1,42 +1,20 @@
-import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
 
-import {
-  bucket,
-  cfUrl,
-  postMediaPrefix,
-  s3Client,
-} from "@/app/(back)/shared/lib/s3";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { postService } from "@/app/(back)/application/model/post-service";
 
 export const POST = async (req: NextRequest): Promise<Response> => {
-  const fileId = nanoid(21);
   const { filename, contentType } = await req.json();
-
-  const key = `${postMediaPrefix}/${fileId}/${filename}`;
-
-  try {
-    const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      ContentType: contentType,
-    });
-
-    const body = {
-      presignedUrl: await getSignedUrl(s3Client, command, {
-        expiresIn: 60 * 60,
-      }),
-      fileUrl: `${cfUrl}/${bucket}/${key}`,
-      fileKey: `${bucket}/${key}`,
-    };
-
+  const body = await postService.uploadThumbnail(filename, contentType);
+  if (body) {
     return new Response(JSON.stringify(body), {
       status: 200,
     });
-  } catch (error) {
-    return new Response(JSON.stringify(error), {
-      status: 500,
-    });
+  } else {
+    return new Response(
+      JSON.stringify({ message: "썸네일 업로드에 실패했습니다." }),
+      {
+        status: 500,
+      },
+    );
   }
 };

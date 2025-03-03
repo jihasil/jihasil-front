@@ -1,5 +1,3 @@
-import { PostEntry, PostKey } from "@/app/global/types/post-types";
-
 export type Key = object;
 export type Filter = object;
 

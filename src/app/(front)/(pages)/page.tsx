@@ -1,7 +1,8 @@
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
+import { authService } from "@/app/(back)/application/model/auth-service";
 import { PostGrid } from "@/app/(front)/widgets/post-grid";
 
 export default async function Home() {
-  const session = await getSession();
-  return <PostGrid session={session} />;
+  const session = await authService.getSession();
+  const info = session?.user?.toClientSession();
+  return <PostGrid session={info} />;
 }

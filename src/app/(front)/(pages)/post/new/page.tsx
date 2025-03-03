@@ -1,12 +1,13 @@
 import { unauthorized } from "next/navigation";
 
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
+import { authService } from "@/app/(back)/application/model/auth-service";
 import EditPost from "@/app/(front)/widgets/edit-post";
 
 export default async function NewPostPage() {
-  const session = await getSession();
+  const session = await authService.getSession();
   if (!session) {
     unauthorized();
   }
-  return <EditPost session={session} />;
+  const clientSession = session.user.toClientSession();
+  return <EditPost session={clientSession} />;
 }

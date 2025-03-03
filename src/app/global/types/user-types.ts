@@ -3,14 +3,6 @@ import { z } from "zod";
 import { RoleUnion } from "@/app/global/enum/roles";
 import { Filter, Key } from "@/app/global/types/page-types";
 
-export type User = {
-  id: string;
-  name: string;
-  password: string;
-  role: RoleUnion;
-  refreshToken?: string;
-};
-
 export interface UserKey extends Key {
   id: string;
 }
@@ -78,10 +70,3 @@ export const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, "기존 비밀번호를 입력해주세요."),
   newPassword: z.string().min(1, "새 비밀번호를 입력해주세요."),
 });
-
-export type TokenPair = {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenAge: number;
-  refreshTokenAge: number;
-};

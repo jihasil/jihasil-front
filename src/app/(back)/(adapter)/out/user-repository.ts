@@ -1,17 +1,10 @@
-import { Post } from "@/app/(back)/domain/post";
-import { UserEntity } from "@/app/(back)/domain/userEntity";
-import { INVALIDATED } from "@/app/(back)/shared/const/auth";
+import { User } from "@/app/(back)/domain/user";
 import {
   dynamoClient,
   generateUpdateExpression,
 } from "@/app/(back)/shared/lib/dynamo-db";
 import { Page, PageRequest } from "@/app/global/types/page-types";
-import { PostFilter, PostKey } from "@/app/global/types/post-types";
-import {
-  UserEditRequestDTO,
-  UserFilter,
-  UserKey,
-} from "@/app/global/types/user-types";
+import { UserEditRequestDTO, UserKey } from "@/app/global/types/user-types";
 import {
   DeleteCommand,
   PutCommand,
@@ -35,29 +28,23 @@ export class UserRepository {
 
     const query = new ScanCommand(param);
 
-    try {
-      const { Items, LastEvaluatedKey } = await dynamoClient.send(query);
-      console.log(Items);
+    const { Items, LastEvaluatedKey } = await dynamoClient.send(query);
 
-      // @ts-expect-error 오류 유발
-      const userList = Items.map((item) => {
-        return UserEntity.fromJSON(item);
-      });
+    // @ts-expect-error 오류 유발
+    const userList = Items.map((item) => {
+      return User.fromJSON(item);
+    });
 
-      const data: Page<UserEntity, UserKey> = {
-        data: userList, // 포스트 목록
-        isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
-        lastKey: LastEvaluatedKey as UserKey,
-      };
+    const data: Page<User, UserKey> = {
+      data: userList, // 포스트 목록
+      isLast: !LastEvaluatedKey, // 더 이상 데이터가 없는지 여부
+      lastKey: LastEvaluatedKey as UserKey,
+    };
 
-      return data;
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      return null;
-    }
+    return data;
   };
 
-  getUserById = async (id: string) => {
+  getUserById = async (id: string): Promise<User | null> => {
     const param = {
       TableName: "user",
       KeyConditionExpression: "id = :id",
@@ -68,27 +55,22 @@ export class UserRepository {
 
     const getMetadataQuery = new QueryCommand(param);
 
-    try {
-      console.log(getMetadataQuery);
+    console.log(getMetadataQuery);
 
-      const userList = (await dynamoClient.send(getMetadataQuery))
-        ?.Items as UserEntity[];
+    const userList = (await dynamoClient.send(getMetadataQuery))
+      ?.Items as User[];
 
-      console.log(id);
-      console.log(userList);
+    console.log(id);
+    console.log(userList);
 
-      if (userList.length !== 1) {
-        return null;
-      } else {
-        return UserEntity.fromJSON(userList[0]);
-      }
-    } catch (error) {
-      console.error(error);
+    if (userList.length !== 1) {
       return null;
+    } else {
+      return User.fromJSON(userList[0]);
     }
   };
 
-  createUser = async (user: UserEntity) => {
+  createUser = async (user: User) => {
     const param: PutCommandInput = {
       TableName: "user",
       Item: user.toJSON(),
@@ -98,13 +80,8 @@ export class UserRepository {
 
     const userPutCommand = new PutCommand(param);
 
-    try {
-      await dynamoClient.send(userPutCommand);
-      return { id: user.id };
-    } catch (error: any) {
-      console.log(error);
-      return error;
-    }
+    await dynamoClient.send(userPutCommand);
+    return { id: user.id };
   };
 
   editUserById = async (userEditRequest: UserEditRequestDTO) => {
@@ -125,13 +102,7 @@ export class UserRepository {
 
     console.log(query);
 
-    try {
-      await dynamoClient.send(query);
-      return true;
-    } catch (error: any) {
-      console.log(error);
-      return error;
-    }
+    await dynamoClient.send(query);
   };
 
   deleteUserById = async (userKey: UserKey) => {
@@ -147,14 +118,7 @@ export class UserRepository {
       },
     };
 
-    try {
-      const query = new DeleteCommand(param);
-      await dynamoClient.send(query);
-
-      return true;
-    } catch (error) {
-      console.error(error);
-      return error;
-    }
+    const query = new DeleteCommand(param);
+    await dynamoClient.send(query);
   };
 }

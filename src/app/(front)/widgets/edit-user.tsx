@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { signOut } from "@/app/(back)/application/model/sign-out";
+import { signOut } from "@/app/(back)/(adapter)/(in)/api/user/signOut/route";
 import {
   Form,
   FormControl,
@@ -29,7 +29,7 @@ export default function EditUser(props: { session: Session }) {
   const router = useRouter();
   const { session } = props;
 
-  const userId = searchParams.get("userId") ?? session.user.id;
+  const userId = searchParams.get("userId") ?? session.user.info.id;
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof changePasswordSchema>>({
@@ -58,9 +58,9 @@ export default function EditUser(props: { session: Session }) {
     const body = await result.json();
 
     if (result.ok) {
-      if (userId === session.user.id) {
+      if (userId === session.user.info.id) {
         toast.success(body.message);
-        await signOut(session);
+        await signOut();
       } else {
         toast.success(body.message);
       }

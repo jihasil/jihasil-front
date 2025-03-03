@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-import {
-  authorizeUser,
-  generateTokenPair,
-  setCookiesWithToken,
-} from "@/app/(back)/application/model/auth";
+import { userService } from "@/app/(back)/application/model/user-service";
+import { AuthenticationException } from "@/app/(back)/shared/error/exception";
 import {
   UserSignInRequestDTO,
   signInSchema,
@@ -22,18 +19,7 @@ export const POST = async (nextRequest: NextRequest) => {
 
     const validCredentials = validationResult.data;
 
-    const user = await authorizeUser(validCredentials);
-
-    if (!user) {
-      throw new Error("AuthenticationError");
-    }
-
-    const tokenPair = await generateTokenPair(user);
-    if (!tokenPair) {
-      throw new Error("AuthenticationError");
-    }
-
-    await setCookiesWithToken(tokenPair);
+    const user = await userService.userSignIn(validCredentials);
 
     return new NextResponse(
       JSON.stringify({ message: `환영합니다. ${user.name} 님` }),
@@ -44,7 +30,7 @@ export const POST = async (nextRequest: NextRequest) => {
   } catch (e: any) {
     console.error(e);
 
-    if (e?.message === "AuthenticationError") {
+    if (e instanceof AuthenticationException) {
       return new NextResponse(
         JSON.stringify({ message: "아이디나 비밀번호를 확인해주세요." }),
         {

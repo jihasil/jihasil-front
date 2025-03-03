@@ -10,11 +10,11 @@ import { useInfiniteObjectList } from "@/app/(front)/shared/hooks/use-infinite-o
 import { useSessionStorage } from "@/app/(front)/shared/hooks/use-session-storage";
 import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
 import { IssueUnion, issueSelection } from "@/app/global/enum/issue";
-import { Session } from "@/app/global/types/auth-types";
+import { ClientSession } from "@/app/global/types/auth-types";
 import { PostEntry, PostKey } from "@/app/global/types/post-types";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
-export const PostGrid = (props: { id?: string; session?: Session | null }) => {
+export const PostGrid = (props: { id?: string; session?: ClientSession }) => {
   const getPageSize = () => {
     const smSize = window.matchMedia("(min-width: 640px)");
     const lgSize = window.matchMedia("(min-width: 1024px)");
@@ -78,7 +78,7 @@ export const PostGrid = (props: { id?: string; session?: Session | null }) => {
           default={issueFilter}
           className="col-span-2"
         />
-        {props.session?.user ? (
+        {props.session ? (
           <ShowNonApproved
             className="md:col-span-1 col-span-2"
             onCheckedChange={setShowNonApproved}

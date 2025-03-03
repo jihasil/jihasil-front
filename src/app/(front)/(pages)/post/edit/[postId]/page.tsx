@@ -1,9 +1,8 @@
 import { forbidden, redirect, unauthorized } from "next/navigation";
 
+import { authService } from "@/app/(back)/application/model/auth-service";
 import { postService } from "@/app/(back)/application/model/post-service";
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
 import { Post } from "@/app/(back)/domain/post";
-import { hasEnoughRole } from "@/app/(back)/domain/user";
 import EditPost from "@/app/(front)/widgets/edit-post";
 import { Session } from "@/app/global/types/auth-types";
 
@@ -18,7 +17,7 @@ export default async function EditPostPage({
     post = await postService.getPostById(postId);
   }
 
-  const session: Session | null = await getSession();
+  const session: Session | null = await authService.getSession();
 
   if (!session) {
     unauthorized();
@@ -29,12 +28,12 @@ export default async function EditPostPage({
     redirect("/post/new");
   } else {
     if (
-      !hasEnoughRole("ROLE_SUPERUSER", session.user.role) &&
-      session.user.id !== post.userId
+      !session.user.hasEnoughRole("ROLE_SUPERUSER") &&
+      session.user.info.id !== post.userId
     ) {
       forbidden();
     }
-
-    return <EditPost post={post.toPostResponseDTO()} session={session} />;
+    const clientSession = session.user.toClientSession();
+    return <EditPost post={post.toPostResponseDTO()} session={clientSession} />;
   }
 }

@@ -1,9 +1,8 @@
 import { forbidden, unauthorized } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
+import { authService } from "@/app/(back)/application/model/auth-service";
 import { postService } from "@/app/(back)/application/model/post-service";
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
-import { hasEnoughRole } from "@/app/(back)/domain/user";
 import { IssueUnion } from "@/app/global/enum/issue";
 import {
   CreatePostRequestDTO,
@@ -74,7 +73,7 @@ export const POST = async (req: NextRequest) => {
 
   const validatedPost = validatedPostResult.data;
 
-  const session = await getSession();
+  const session = await authService.getSession();
   if (!session) {
     unauthorized();
   }
@@ -82,20 +81,21 @@ export const POST = async (req: NextRequest) => {
   // 글쓴이 이름은 관리자 이상만 변경 가능
   // 다른 유저의 글 수정은 슈퍼유저만 가능
   if (
-    (!hasEnoughRole("ROLE_ADMIN", session.user.role) &&
-      validatedPost.author !== session.user.name) ||
-    (!hasEnoughRole("ROLE_SUPERUSER", session.user.role) &&
-      validatedPost.userId !== session.user.id)
+    (!session.user.hasEnoughRole("ROLE_ADMIN") &&
+      validatedPost.author !== session.user.info.name) ||
+    (!session.user.hasEnoughRole("ROLE_SUPERUSER") &&
+      validatedPost.userId !== session.user.info.id)
   ) {
     forbidden();
   }
 
-  const postId = await postService.createPost(validatedPost);
-  if (postId) {
+  try {
+    const postId = await postService.createPost(validatedPost);
     return new Response(JSON.stringify(postId), {
       status: 200,
     });
-  } else {
+  } catch (e) {
+    console.error(e);
     return new Response(
       JSON.stringify({ message: "게시글을 저장하는데 실패했습니다." }),
       {

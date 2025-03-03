@@ -1,11 +1,11 @@
 import { unauthorized } from "next/navigation";
 import { Suspense } from "react";
 
-import { getSession } from "@/app/(back)/application/model/request-sign-in";
+import { authService } from "@/app/(back)/application/model/auth-service";
 import EditUser from "@/app/(front)/widgets/edit-user";
 
 export default async function EditUserPage() {
-  const session = await getSession();
+  const session = await authService.getSession();
   if (!session) {
     unauthorized();
   }

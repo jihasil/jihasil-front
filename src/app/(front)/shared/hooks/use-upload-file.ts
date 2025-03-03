@@ -34,13 +34,20 @@ export function useUploadFile({
 
     try {
       // Get presigned URL and final URL from your backend
-      const { presignedUrl, fileUrl, fileKey } = await fetchR("/api/upload", {
+      const response = await fetchR("/api/upload", {
         method: "POST",
         body: JSON.stringify({
           filename: file.name,
           contentType: file.type,
         }),
-      }).then((r) => r.json());
+      });
+
+      const body = await response.json();
+      if (!response.ok) {
+        throw Error(body.message);
+      }
+
+      const { presignedUrl, fileUrl, fileKey } = body;
 
       await axios.put(presignedUrl, file, {
         headers: { "Content-Type": file.type },

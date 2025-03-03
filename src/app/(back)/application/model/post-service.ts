@@ -2,6 +2,12 @@ import { nanoid } from "nanoid";
 
 import { PostRepository } from "@/app/(back)/(adapter)/out/post-repository";
 import { Post } from "@/app/(back)/domain/post";
+import {
+  bucket,
+  cfUrl,
+  postMediaPrefix,
+  s3Client,
+} from "@/app/(back)/shared/lib/s3";
 import { Page, PageRequest } from "@/app/global/types/page-types";
 import {
   CreatePostRequestDTO,
@@ -9,6 +15,8 @@ import {
   PostFilter,
   PostKey,
 } from "@/app/global/types/post-types";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 class PostService {
   private postRepository: PostRepository;
@@ -21,14 +29,10 @@ class PostService {
     pageRequest: PageRequest<PostKey>,
     filter: PostFilter,
   ) => {
-    console.log("terswt");
     const postList = await this.postRepository.getPostListByFilter(
       pageRequest,
       filter,
     );
-
-    console.log("terswt");
-    console.log(postList);
 
     if (postList) {
       const { data, ...pageData } = postList;
@@ -50,6 +54,30 @@ class PostService {
 
   getPostById = async (postId: string) => {
     return await this.postRepository.getPostById(postId);
+  };
+
+  uploadThumbnail = async (fileName: string, contentType: string) => {
+    const fileId = nanoid(21);
+    const key = `${postMediaPrefix}/${fileId}/${fileName}`;
+
+    try {
+      const command = new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        ContentType: contentType,
+      });
+
+      return {
+        presignedUrl: await getSignedUrl(s3Client, command, {
+          expiresIn: 60 * 60, // 1 hour
+        }),
+        fileUrl: `${cfUrl}/${bucket}/${key}`,
+        fileKey: `${bucket}/${key}`,
+      };
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   };
 
   createPost = async (postRequestDTO: CreatePostRequestDTO) => {
