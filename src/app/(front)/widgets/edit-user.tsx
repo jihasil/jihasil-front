@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { signOut } from "@/app/(back)/(adapter)/(in)/api/user/signOut/route";
 import {
   Form,
   FormControl,
@@ -19,17 +18,17 @@ import { Input } from "@/app/(front)/components/ui/input";
 import SubmitButton from "@/app/(front)/components/ui/submit-button";
 import { fetchR } from "@/app/(front)/shared/lib/request";
 import PreventRoute from "@/app/(front)/widgets/prevent-route";
-import { Session } from "@/app/global/types/auth-types";
+import { ClientSession } from "@/app/global/types/auth-types";
 import { changePasswordSchema } from "@/app/global/types/user-types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function EditUser(props: { session: Session }) {
+export default function EditUser(props: { session: ClientSession }) {
   const searchParams = useSearchParams();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const router = useRouter();
   const { session } = props;
 
-  const userId = searchParams.get("userId") ?? session.user.info.id;
+  const userId = searchParams.get("userId") ?? session.user.id;
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof changePasswordSchema>>({
@@ -58,9 +57,17 @@ export default function EditUser(props: { session: Session }) {
     const body = await result.json();
 
     if (result.ok) {
-      if (userId === session.user.info.id) {
+      if (userId === session.user.id) {
         toast.success(body.message);
-        await signOut();
+
+        fetchR("/api/user/signOut", {
+          method: "GET",
+        }).then((response) => {
+          if (response.redirected) {
+            router.push(response.headers.get("Location") ?? "/");
+            router.refresh();
+          }
+        });
       } else {
         toast.success(body.message);
       }

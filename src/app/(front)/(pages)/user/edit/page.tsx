@@ -9,10 +9,11 @@ export default async function EditUserPage() {
   if (!session) {
     unauthorized();
   }
+  const clientSession = session.user.toClientSession();
 
   return (
     <Suspense>
-      <EditUser session={session} />
+      <EditUser session={clientSession} />
     </Suspense>
   );
 }

@@ -1,8 +1,9 @@
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
-import { unauthorized } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 
-import { signOut } from "@/app/(back)/(adapter)/(in)/api/user/signOut/route";
 import { authService } from "@/app/(back)/application/model/auth-service";
+import { userService } from "@/app/(back)/application/model/user-service";
 import { Button } from "@/app/(front)/components/ui/button";
 import { roleValue } from "@/app/global/enum/roles";
 
@@ -34,7 +35,9 @@ export default async function PageViewer() {
         <form
           action={async () => {
             "use server";
-            await signOut();
+            await userService.userSignOut(session?.user.info.id);
+            revalidatePath("/", "page");
+            redirect("/");
           }}
         >
           <Button className="w-full" type="submit">
