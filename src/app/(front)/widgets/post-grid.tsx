@@ -97,10 +97,7 @@ export const PostGrid = (props: { id?: string; session?: ClientSession }) => {
           {!isInitiated.current ? (
             <SkeletonImages />
           ) : (
-            <Images
-              postEntryList={postEntryList}
-              showNonApproved={showNonApproved}
-            />
+            <Images postEntryList={postEntryList} />
           )}
         </div>
       </div>
@@ -108,10 +105,7 @@ export const PostGrid = (props: { id?: string; session?: ClientSession }) => {
   );
 };
 
-const Images = (props: {
-  postEntryList: PostEntry[];
-  showNonApproved: CheckedState;
-}) => {
+const Images = (props: { postEntryList: PostEntry[] }) => {
   const smSize = window.matchMedia("(min-width: 640px)");
   const thumbnailSize = smSize.matches ? 700 : 500;
   console.log(thumbnailSize);

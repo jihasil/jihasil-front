@@ -1,11 +1,10 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { authService } from "@/app/(back)/application/model/auth-service";
 import { postService } from "@/app/(back)/application/model/post-service";
 import { Post } from "@/app/(back)/domain/post";
-import { Button } from "@/app/(front)/components/ui/button";
+import { EditPostTrigger } from "@/app/(front)/widgets/edit-post-trigger";
 import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
 
 export async function generateMetadata({
@@ -40,7 +39,7 @@ export default async function PageViewer({
   const postId = (await params).postId;
 
   const post = await postService.getPostById(postId);
-  if (!post) {
+  if (!post || post.isDeleted) {
     notFound();
   }
 
@@ -57,15 +56,7 @@ export default async function PageViewer({
         {session &&
         (session.user.hasEnoughRole("ROLE_SUPERUSER") ||
           session.user.info.id === post.userId) ? (
-          <>
-            <Link
-              href={{
-                pathname: `/post/edit/${postId}`,
-              }}
-            >
-              <Button className="w-full">수정</Button>
-            </Link>
-          </>
+          <EditPostTrigger postId={post.postId} />
         ) : null}
       </div>
       <div className="lg:col-span-9 md:col-span-6 col-span-4 z-0">

@@ -45,7 +45,7 @@ export default function RootLayout({
         <SpeedInsights />
         <div className="my-mx w-full my-grid min-h-screen grid-rows-[auto_1fr_auto] my-gap-x xl:max-w-7xl">
           <Header />
-          <main className="col-span-full grid grid-cols-subgrid h-fit">
+          <main className="col-span-full grid grid-cols-subgrid h-fit scrollbar-hide">
             {children}
           </main>
           <Footer />

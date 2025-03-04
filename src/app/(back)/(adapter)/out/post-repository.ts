@@ -1,11 +1,15 @@
 import { Post } from "@/app/(back)/domain/post";
-import { dynamoClient } from "@/app/(back)/shared/lib/dynamo-db";
+import {
+  dynamoClient,
+  generateUpdateExpression,
+} from "@/app/(back)/shared/lib/dynamo-db";
 import { Page, PageRequest } from "@/app/global/types/page-types";
 import { PostFilter, PostKey } from "@/app/global/types/post-types";
 import {
   PutCommand,
   PutCommandInput,
   QueryCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 export class PostRepository {
@@ -16,18 +20,21 @@ export class PostRepository {
     const param = {
       TableName: "post_metadata",
       Limit: pageRequest.pageSize,
+      FilterExpression: "is_deleted <> :is_deleted",
       ...(filter.issue_id
         ? {
             IndexName: "index_issue_id",
             KeyConditionExpression: "issue_id = :issue_id",
             ExpressionAttributeValues: {
               ":issue_id": filter.issue_id,
+              ":is_deleted": true,
             },
           }
         : {
             KeyConditionExpression: "board = :board",
             ExpressionAttributeValues: {
               ":board": "main",
+              ":is_deleted": true,
             },
           }),
       ScanIndexForward: false,
@@ -94,4 +101,21 @@ export class PostRepository {
     await dynamoClient.send(metadataPutQuery);
     return { postId: post.postId };
   };
+
+  async deletePostById(postKey: PostKey) {
+    const exp = generateUpdateExpression({}, { is_deleted: true });
+
+    const param = {
+      TableName: "post_metadata",
+      Key: postKey,
+      ...exp,
+    };
+
+    console.log(param);
+    const query = new UpdateCommand(param);
+
+    console.log(query);
+
+    await dynamoClient.send(query);
+  }
 }
