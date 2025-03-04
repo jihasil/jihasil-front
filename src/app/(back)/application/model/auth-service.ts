@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 
 import { userService } from "@/app/(back)/application/model/user-service";
+import { User } from "@/app/(back)/domain/user";
 import { UserDetails } from "@/app/(back)/domain/user-details";
 import {
   ACCESS_TOKEN,
@@ -18,8 +19,6 @@ import {
 import { Session, TokenPair } from "@/app/global/types/auth-types";
 import { UserSignInRequestDTO } from "@/app/global/types/user-types";
 import { decode, encode } from "@auth/core/jwt";
-
-import { User } from "../../domain/user";
 
 class AuthService {
   private accessTokenAge = 60 * 5; // 5 minutes

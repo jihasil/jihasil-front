@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 
-import { User } from "@/app/(back)/domain/user";
 import { Button } from "@/app/(front)/components/ui/button";
 import {
   DropdownMenu,
@@ -25,7 +24,6 @@ import {
   UserEditRequestDTO,
   UserEntry,
   UserKey,
-  UserResponseDTO,
 } from "@/app/global/types/user-types";
 
 function UserSkeleton() {

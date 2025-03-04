@@ -1,3 +1,4 @@
+import { Post } from "@/app/(back)/domain/post";
 import { dynamoClient } from "@/app/(back)/shared/lib/dynamo-db";
 import { Page, PageRequest } from "@/app/global/types/page-types";
 import { PostFilter, PostKey } from "@/app/global/types/post-types";
@@ -6,8 +7,6 @@ import {
   PutCommandInput,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-
-import { Post } from "../../domain/post";
 
 export class PostRepository {
   getPostListByFilter = async (
