@@ -1,19 +1,28 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { hasEnoughRole } from "@/entities/user";
-import { getSession, rotateRefreshToken } from "@/features/request-sign-in";
-import { RoleUnion } from "@/shared/enum/roles";
+import { authService } from "@/app/(back)/application/model/auth-service";
+import { ACCESS_TOKEN, INVALIDATED } from "@/app/(back)/shared/const/auth";
+import { RoleUnion } from "@/app/global/enum/roles";
 
 export async function middleware(request: NextRequest) {
-  const session = await getSession();
+  const rotateRefreshToken = async () => {
+    const cookieStore = await cookies();
+    const accessTokenHash = cookieStore.get(ACCESS_TOKEN)?.value;
 
-  if (!session) {
-    const response = await rotateRefreshToken(request);
-    if (response) {
-      return response;
+    if (
+      !request.nextUrl.pathname.startsWith("/api") &&
+      accessTokenHash !== INVALIDATED
+    ) {
+      const nextUrl = new URL("/api/refresh", request.url);
+      nextUrl.searchParams.set("from", request.nextUrl.pathname);
+
+      return NextResponse.redirect(nextUrl);
     }
-  }
+
+    return null;
+  };
 
   const redirectToLoginPageIfNoSession = async (
     minimumRole: RoleUnion = "ROLE_USER",
@@ -23,12 +32,21 @@ export async function middleware(request: NextRequest) {
       nextUrl.searchParams.set("from", request.nextUrl.pathname);
 
       return NextResponse.redirect(nextUrl);
-    } else if (!hasEnoughRole(minimumRole, session.user.role)) {
+    } else if (!session.user.hasEnoughRole(minimumRole)) {
       return new NextResponse("권한이 없습니다.", {
         status: 403,
       });
     }
   };
+
+  const session = await authService.getSession();
+
+  if (!session) {
+    const response = await rotateRefreshToken();
+    if (response) {
+      return response;
+    }
+  }
 
   // API
   // 로그인 혹은 회원가입 제외한 모든 비인가 POST 요청 제한
@@ -58,7 +76,7 @@ export async function middleware(request: NextRequest) {
       });
     } else if (
       // 슈퍼유저 아닌 사용자가 사용자 삭제 혹은 전체 사용자 리턴 금지
-      session.user.role !== "ROLE_SUPERUSER" &&
+      session.user.info.role !== "ROLE_SUPERUSER" &&
       (request.nextUrl.pathname.startsWith("/api/user/all") ||
         request.method === "DELETE")
     ) {
@@ -77,6 +95,7 @@ export async function middleware(request: NextRequest) {
   // 사용자 페이지 제한
   if (
     request.nextUrl.pathname.startsWith("/post/edit") ||
+    request.nextUrl.pathname.startsWith("/post/new") ||
     request.nextUrl.pathname.startsWith("/user")
   ) {
     return await redirectToLoginPageIfNoSession();
