@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -32,6 +32,14 @@ export default function SignIn() {
   const searchParams = useSearchParams();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const router = useRouter();
+  const refreshed = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!refreshed.current) {
+      router.refresh();
+      refreshed.current = true;
+    }
+  });
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof signInSchema>>({
