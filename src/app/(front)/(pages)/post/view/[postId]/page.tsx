@@ -39,7 +39,7 @@ export default async function PageViewer({
   const postId = (await params).postId;
 
   const post = await postService.getPostById(postId);
-  if (!post || post.isDeleted) {
+  if (!post) {
     notFound();
   }
 

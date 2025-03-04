@@ -69,8 +69,10 @@ export class PostRepository {
       TableName: "post_metadata",
       IndexName: "index_post_id",
       KeyConditionExpression: "post_id = :post_id",
+      FilterExpression: "is_deleted <> :is_deleted",
       ExpressionAttributeValues: {
         ":post_id": postId,
+        ":is_deleted": true,
       },
     };
 

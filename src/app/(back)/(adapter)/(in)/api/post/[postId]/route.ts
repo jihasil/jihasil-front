@@ -40,7 +40,7 @@ export const DELETE = async (
     );
   } else {
     return new NextResponse(
-      JSON.stringify({ message: `이미 삭제된 게시글입니다.` }),
+      JSON.stringify({ message: `삭제할 수 없는 게시글입니다.` }),
       {
         status: 400,
       },

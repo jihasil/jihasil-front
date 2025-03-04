@@ -29,6 +29,7 @@ export type UserEditRequestDTO = {
   name?: string;
   password?: string;
   refreshToken?: string;
+  is_deleted?: boolean;
 };
 
 export type ChangePasswordRequestDTO = {
