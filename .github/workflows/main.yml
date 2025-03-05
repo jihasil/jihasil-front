@@ -1,0 +1,44 @@
+name: deploy to vercel
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-env:
+        description: choose target environment to deploy
+        type: choice
+        default: stage
+        options:
+          - 'stage'
+          - 'prod'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: pandoc/latex
+    steps:
+      - name: Set target branch
+        run: |
+          if [[ "${{ inputs.deploy-env }}" == "stage" ]]; then
+            echo "TARGET_BRANCH=dev" >> $GITHUB_ENV
+          elif [[ "${{ inputs.deploy-env }}" == "prod" || "${{ github.base_ref }}" == "main" || "${{ github.ref_name }}" == "main" ]]; then
+            echo "TARGET_BRANCH=main" >> $GITHUB_ENV
+          fi
+
+      - uses: actions/checkout@v2
+      - name: Install mustache (to update the date)
+        run: apk add ruby && gem install mustache
+      - name: creates output
+        run: sh ./build.sh
+      - name: Pushes to another repository
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PERSONAL_TOKEN }}
+        with:
+          source-directory: "output"
+          destination-github-username: jkjan
+          destination-repository-name: jihasil-front
+          commit-message: ${{ github.event.commits[0].message }}
+          target-branch: ${{ env.TARGET_BRANCH }}
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
