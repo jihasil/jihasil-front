@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "d5ws8pqr5saw9.cloudfront.net",
+        hostname: "**.cloudfront.net",
       },
     ],
   },
@@ -23,9 +23,7 @@ const nextConfig: NextConfig = {
 
 if (process.env.VERCEL_ENV === "production") {
   nextConfig.compiler = {
-    removeConsole: {
-      exclude: ["debug", "error", "warn", "info"],
-    },
+    removeConsole: true,
   };
 }
 

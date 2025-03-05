@@ -20,9 +20,8 @@
   // eslint 미적용될 폴더나 파일 명시
   "ignorePatterns": [
     "node_modules/",
-    "src/components/**/*",
-    "src/hooks/**",
-    "src/lib/**"
+    "src/app/(front)/components/**/*",
+    "src/app/(front)/shared/**/*"
   ],
   "extends": [
     "next/core-web-vitals",
@@ -49,6 +48,11 @@
     }
   },
   "rules": {
+    // (arg: SomeTypeA) => SomeTypeB 에서 arg 이 unused var 라고 eslint 가 뭐라 해서 꺼버림
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error"
+    ],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-ts-ignore": "off",
     "prettier/prettier": [
