@@ -18,7 +18,7 @@ export class PostRepository {
     filter: PostFilter,
   ) => {
     const param = {
-      TableName: "post_metadata",
+      TableName: "post",
       Limit: pageRequest.pageSize,
       FilterExpression: "is_deleted <> :is_deleted",
       ...(filter.issue_id
@@ -66,7 +66,7 @@ export class PostRepository {
 
   getPostById = async (postId: string) => {
     const getMetadataParam = {
-      TableName: "post_metadata",
+      TableName: "post",
       IndexName: "index_post_id",
       KeyConditionExpression: "post_id = :post_id",
       FilterExpression: "is_deleted <> :is_deleted",
@@ -94,7 +94,7 @@ export class PostRepository {
 
   createPost = async (post: Post) => {
     const metadataPutParam: PutCommandInput = {
-      TableName: "post_metadata",
+      TableName: "post",
       Item: post.toJSON(),
     };
 
@@ -108,7 +108,7 @@ export class PostRepository {
     const exp = generateUpdateExpression({}, { is_deleted: true });
 
     const param = {
-      TableName: "post_metadata",
+      TableName: "post",
       Key: postKey,
       ...exp,
     };
