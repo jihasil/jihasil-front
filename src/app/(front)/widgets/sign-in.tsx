@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Checkbox } from "@/app/(front)/components/plate-ui/checkbox";
 import {
   Form,
   FormControl,

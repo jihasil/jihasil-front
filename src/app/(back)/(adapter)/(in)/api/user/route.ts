@@ -116,25 +116,25 @@ export const PATCH = async (req: NextRequest) => {
 export const DELETE = async (req: NextRequest) => {
   const userKey: UserKey = await req.json();
 
-  try {
-    await userService.deleteUserById(userKey);
+  const result = await userService.deleteUserById(userKey);
 
-    return new NextResponse(
-      JSON.stringify({ message: `${userKey.id} 사용자를 삭제했습니다.` }),
-      {
-        status: 200,
-      },
-    );
-  } catch (e) {
-    if (e instanceof ConditionalCheckFailedException) {
+  try {
+    if (result) {
       return new NextResponse(
-        JSON.stringify({ message: "슈퍼유저는 삭제할 수 없습니다." }),
+        JSON.stringify({ message: `${userKey.id} 사용자를 삭제했습니다.` }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new NextResponse(
+        JSON.stringify({ message: "삭제할 수 없는 사용자입니다." }),
         {
           status: 400,
         },
       );
     }
-
+  } catch (e) {
     console.error(e);
 
     return new NextResponse(

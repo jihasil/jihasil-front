@@ -6,6 +6,14 @@ import { authService } from "@/app/(back)/application/model/auth-service";
 import { ACCESS_TOKEN, INVALIDATED } from "@/app/(back)/shared/const/auth";
 import { RoleUnion } from "@/app/global/enum/roles";
 
+export const config = {
+  runtime: "experimental-edge",
+  unstable_allowDynamic: [
+    "**/node_modules/reflect-metadata/**/*",
+    "**/domain/*.ts",
+  ],
+};
+
 export async function middleware(request: NextRequest) {
   const rotateRefreshToken = async () => {
     const cookieStore = await cookies();

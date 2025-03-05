@@ -13,7 +13,6 @@ import {
   PilcrowIcon,
   Quote,
   RadicalIcon,
-  SparklesIcon,
   Square,
   Table,
   TableOfContentsIcon,
@@ -27,7 +26,6 @@ import {
 import { withRef } from "@udecode/cn";
 import { ParagraphPlugin, type PlateEditor } from "@udecode/plate/react";
 import { PlateElement } from "@udecode/plate/react";
-import { AIChatPlugin } from "@udecode/plate-ai/react";
 import { BlockquotePlugin } from "@udecode/plate-block-quote/react";
 import { CodeBlockPlugin } from "@udecode/plate-code-block/react";
 import { DatePlugin } from "@udecode/plate-date/react";
@@ -69,19 +67,19 @@ interface Item {
 }
 
 const groups: Group[] = [
-  {
-    group: "AI",
-    items: [
-      {
-        focusEditor: false,
-        icon: <SparklesIcon />,
-        value: "AI",
-        onSelect: (editor) => {
-          editor.getApi(AIChatPlugin).aiChat.show();
-        },
-      },
-    ],
-  },
+  // {
+  //   group: "AI",
+  //   items: [
+  //     {
+  //       focusEditor: false,
+  //       icon: <SparklesIcon />,
+  //       value: "AI",
+  //       onSelect: (editor) => {
+  //         editor.getApi(AIChatPlugin).aiChat.show();
+  //       },
+  //     },
+  //   ],
+  // },
   {
     group: "Basic blocks",
     items: [

@@ -19,6 +19,10 @@ export class UserRepository {
     const param = {
       TableName: "user",
       Limit: pageRequest.pageSize,
+      FilterExpression: "is_deleted <> :is_deleted",
+      ExpressionAttributeValues: {
+        ":is_deleted": true,
+      },
       ...(pageRequest.lastKey && {
         ExclusiveStartKey: pageRequest.lastKey,
       }),
@@ -48,8 +52,10 @@ export class UserRepository {
     const param = {
       TableName: "user",
       KeyConditionExpression: "id = :id",
+      FilterExpression: "is_deleted <> :is_deleted",
       ExpressionAttributeValues: {
         ":id": id,
+        ":is_deleted": true,
       },
     };
 
@@ -105,6 +111,7 @@ export class UserRepository {
     await dynamoClient.send(query);
   };
 
+  /** @deprecated **/
   deleteUserById = async (userKey: UserKey) => {
     const param = {
       TableName: "user",

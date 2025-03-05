@@ -77,7 +77,16 @@ class UserService {
   };
 
   deleteUserById = async (userKey: UserKey) => {
-    await this.userRepository.deleteUserById(userKey);
+    const user = await this.getUserById(userKey.id);
+    if (user && user.role !== "ROLE_SUPERUSER") {
+      await this.userRepository.editUserById({
+        id: userKey.id,
+        is_deleted: true,
+      });
+      return true;
+    } else {
+      return false;
+    }
   };
 
   changePassword = async (changePasswordRequest: ChangePasswordRequestDTO) => {

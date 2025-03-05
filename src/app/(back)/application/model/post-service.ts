@@ -95,6 +95,19 @@ class PostService {
 
     return await this.postRepository.createPost(post);
   };
+
+  deletePostById = async (postId: string) => {
+    const post = await this.getPostById(postId);
+    if (post) {
+      await this.postRepository.deletePostById({
+        board: post.board,
+        created_at: post.createdAt,
+      });
+      return true;
+    } else {
+      return false;
+    }
+  };
 }
 
 export const postService = new PostService({
