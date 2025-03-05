@@ -23,9 +23,7 @@ const nextConfig: NextConfig = {
 
 if (process.env.VERCEL_ENV === "production") {
   nextConfig.compiler = {
-    removeConsole: {
-      exclude: ["debug", "error", "warn", "info"],
-    },
+    removeConsole: true,
   };
 }
 

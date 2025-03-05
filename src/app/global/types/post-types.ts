@@ -101,7 +101,7 @@ export const metadataSchema = (thumbnailUrl: string | undefined) =>
       { required_error: "이슈를 선택하세요." },
     ),
     isApproved: z.boolean(),
-    html: z.string().min(1, "내용을 입력하세요."),
+    html: z.string().optional(),
     userId: z.string(),
     postId: z.string().optional(),
     thumbnailUrl: z.string().optional(),

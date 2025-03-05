@@ -62,6 +62,8 @@ export const POST = async (req: NextRequest) => {
     postInput,
   );
 
+  const validatedPost = validatedPostResult.data;
+
   if (validatedPostResult.error) {
     return new NextResponse(
       JSON.stringify({ message: validatedPostResult.error.message }),
@@ -70,8 +72,11 @@ export const POST = async (req: NextRequest) => {
       },
     );
   }
-
-  const validatedPost = validatedPostResult.data;
+  if (!validatedPost?.html) {
+    return new NextResponse(JSON.stringify({ message: "본문이 없습니다." }), {
+      status: 400,
+    });
+  }
 
   const session = await authService.getSession();
   if (!session) {

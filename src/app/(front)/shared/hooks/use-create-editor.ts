@@ -29,7 +29,6 @@ import { MentionElement } from "@/app/(front)/components/plate-ui/mention-elemen
 import { MentionInputElement } from "@/app/(front)/components/plate-ui/mention-input-element";
 import { ParagraphElement } from "@/app/(front)/components/plate-ui/paragraph-element";
 import { withPlaceholders } from "@/app/(front)/components/plate-ui/placeholder";
-import { SlashInputElement } from "@/app/(front)/components/plate-ui/slash-input-element";
 import { TableRowElement } from "@/app/(front)/components/plate-ui/table-row-element";
 import { TocElement } from "@/app/(front)/components/plate-ui/toc-element";
 import { ToggleElement } from "@/app/(front)/components/plate-ui/toggle-element";
@@ -39,7 +38,6 @@ import {
   PlateLeaf,
   usePlateEditor,
 } from "@udecode/plate/react";
-import { AIPlugin } from "@udecode/plate-ai/react";
 import {
   BoldPlugin,
   CodePlugin,
@@ -147,7 +145,7 @@ export const components = {
   [MentionPlugin.key]: MentionElement,
   [ParagraphPlugin.key]: ParagraphElement,
   [PlaceholderPlugin.key]: MediaPlaceholderElement,
-  [SlashInputPlugin.key]: SlashInputElement,
+  // [SlashInputPlugin.key]: SlashInputElement,
   [StrikethroughPlugin.key]: withProps(PlateLeaf, { as: "s" }),
   [SubscriptPlugin.key]: withProps(PlateLeaf, { as: "sub" }),
   [SuperscriptPlugin.key]: withProps(PlateLeaf, { as: "sup" }),

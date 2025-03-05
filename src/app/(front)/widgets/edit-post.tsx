@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -36,6 +36,10 @@ export default function EditPost(props: {
   const router = useRouter();
   const { post } = props;
 
+  const plateEditorRef = useRef<{ getHtml: () => Promise<string | null> }>(
+    null,
+  );
+
   const uploadThumbnail = async (thumbnail: File): Promise<string> => {
     // thumbnail 업로드
     const { presignedUrl, fileUrl } = await fetchR("/api/upload", {
@@ -67,7 +71,7 @@ export default function EditPost(props: {
       author: post?.author ?? props.session.user.name,
       issueId: post?.issue_id ?? issueSelection[0].value,
       isApproved: post?.isApproved ?? true,
-      html: post?.html,
+      html: post?.html ?? "",
       thumbnailUrl: post?.thumbnailUrl,
       postId: post?.post_id,
       board: post?.board,
@@ -82,18 +86,27 @@ export default function EditPost(props: {
       return;
     }
 
-    setIsUploading(true);
-
-    try {
-      const postId = await submit(values);
-      if (postId) {
-        router.push(`/post/view/${postId}`);
+    if (plateEditorRef.current) {
+      const html = await plateEditorRef.current.getHtml();
+      if (!html) {
+        return null;
       }
-    } catch (e) {
-      toast("업로드에 실패했습니다.");
-      console.error(e);
-    } finally {
-      setIsUploading(false);
+
+      values.html = html;
+
+      setIsUploading(true);
+
+      try {
+        const postId = await submit(values);
+        if (postId) {
+          router.push(`/post/view/${postId}`);
+        }
+      } catch (e) {
+        // toast("업로드에 실패했습니다.");
+        console.error(e);
+      } finally {
+        setIsUploading(false);
+      }
     }
   }
 
@@ -234,12 +247,7 @@ export default function EditPost(props: {
                 <FormLabel>본문</FormLabel>
                 <FormControl>
                   <div className="rounded-lg border ">
-                    <PlateEditor
-                      html={post?.html}
-                      onChange={(value: string) => {
-                        form.setValue("html", value);
-                      }}
-                    />
+                    <PlateEditor html={post?.html} ref={plateEditorRef} />
                   </div>
                 </FormControl>
               </FormItem>

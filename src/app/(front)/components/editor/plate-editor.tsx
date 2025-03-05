@@ -13,47 +13,51 @@ import { createSlateEditor, serializeHtml } from "@udecode/plate";
 import { Plate } from "@udecode/plate-core/react";
 
 import { useCreateEditor } from "@/app/(front)/shared/hooks/use-create-editor";
+import React, { useImperativeHandle } from "react";
 
-export const PlateEditor = (props: {
-  html: string | undefined;
-  onChange: (html: string) => void;
-}) => {
-  const editor = useCreateEditor(props.html);
-  const editorStatic = createSlateEditor({
-    plugins: plateStaticPlugins,
-  });
+export const PlateEditor = React.forwardRef(
+  (
+    props: {
+      html: string | undefined;
+      // onChange: (html: string) => void;
+    },
+    ref,
+  ) => {
+    const editor = useCreateEditor(props.html);
+    const editorStatic = createSlateEditor({
+      plugins: plateStaticPlugins,
+    });
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Plate
-        editor={editor}
-        onChange={async ({ value }) => {
-          // console.log(value);
-          editorStatic.children = value;
+    const getHtml = async () => {
+      if (editor.api.isEmpty()) {
+        return null;
+      }
+      editorStatic.children = editor.children;
+      const html = await serializeHtml(editorStatic, {
+        components: plateStaticComponents,
+        props: {
+          style: {
+            padding: "0 calc(50% - 350px)",
+            paddingBottom: "",
+          },
+        },
+      });
+      console.log(html);
+      return html;
+    };
 
-          if (editor.api.isEmpty()) {
-            props.onChange("");
-          } else {
-            const serializedHtml = await serializeHtml(editorStatic, {
-              components: plateStaticComponents,
-              props: {
-                style: {
-                  padding: "0 calc(50% - 350px)",
-                  paddingBottom: "",
-                },
-              },
-            });
+    useImperativeHandle(ref, () => ({
+      getHtml,
+    }));
 
-            // console.log(serializedHtml);
-
-            props.onChange(serializedHtml);
-          }
-        }}
-      >
-        <EditorContainer>
-          <Editor />
-        </EditorContainer>
-      </Plate>
-    </DndProvider>
-  );
-};
+    return (
+      <DndProvider backend={HTML5Backend}>
+        <Plate editor={editor}>
+          <EditorContainer>
+            <Editor />
+          </EditorContainer>
+        </Plate>
+      </DndProvider>
+    );
+  },
+);

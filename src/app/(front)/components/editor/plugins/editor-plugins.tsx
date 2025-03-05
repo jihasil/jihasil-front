@@ -81,7 +81,7 @@ export const editorPlugins = [
   ...viewPlugins,
 
   // Functionality
-  SlashPlugin,
+  // SlashPlugin,
   autoformatPlugin,
   cursorOverlayPlugin,
   ...blockMenuPlugins,

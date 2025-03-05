@@ -12,7 +12,6 @@ import { PostThumbnail } from "@/app/(front)/widgets/post-thumbnail";
 import { IssueUnion, issueSelection } from "@/app/global/enum/issue";
 import { ClientSession } from "@/app/global/types/auth-types";
 import { PostEntry, PostKey } from "@/app/global/types/post-types";
-import { CheckedState } from "@radix-ui/react-checkbox";
 
 export const PostGrid = (props: { id?: string; session?: ClientSession }) => {
   const getPageSize = () => {
