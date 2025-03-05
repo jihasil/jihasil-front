@@ -5,6 +5,7 @@ import React from "react";
 import { Toaster } from "@/app/(front)/components/ui/sonner";
 import Footer from "@/app/(front)/widgets/footer";
 import Header from "@/app/(front)/widgets/header";
+import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
@@ -43,9 +44,10 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <SpeedInsights />
+        <Analytics />
         <div className="my-mx w-full my-grid min-h-screen grid-rows-[auto_1fr_auto] my-gap-x xl:max-w-7xl">
           <Header />
-          <main className="col-span-full grid grid-cols-subgrid h-fit">
+          <main className="col-span-full grid grid-cols-subgrid h-fit scrollbar-hide">
             {children}
           </main>
           <Footer />
