@@ -26,6 +26,7 @@ import { useFilePicker } from "use-file-picker";
 
 import { Spinner } from "./spinner";
 import { useUploadFile } from "@/app/(front)/shared/hooks/use-upload-file";
+import { ImageLoader } from "@/app/(front)/components/ui/image-loader";
 
 const CONTENT: Record<
   string,

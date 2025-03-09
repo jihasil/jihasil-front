@@ -64,6 +64,8 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 
+export const MAX_FILE_SIZE = 8000000;
+
 export const metadataSchema = (thumbnailUrl: string | undefined) =>
   z.object({
     thumbnailFile: z
@@ -78,9 +80,20 @@ export const metadataSchema = (thumbnailUrl: string | undefined) =>
       }, "썸네일 파일을 입력해주세요.")
       .refine((file: FileList) => {
         return thumbnailUrl || ACCEPTED_IMAGE_TYPES.includes(file[0]?.type);
-      }, "jpg, png, webp 이미지를 입력해주세요."),
-    title: z.string().min(1, "제목을 입력해주세요."),
-    subtitle: z.string().min(1, "부제목을 입력해주세요."),
+      }, "jpg, png, webp 이미지를 입력해주세요.")
+      .refine((file: FileList) => {
+        return (
+          thumbnailUrl || (file.length === 1 && file[0].size <= MAX_FILE_SIZE)
+        );
+      }, "8mb 미만의 파일을 첨부해주세요."),
+    title: z
+      .string()
+      .min(1, "제목을 입력해주세요.")
+      .max(20, "20자 이하로 입력해주세요."),
+    subtitle: z
+      .string()
+      .min(1, "부제목을 입력해주세요.")
+      .max(20, "20자 이하로 입력해주세요."),
     category: z.union(
       [
         z.literal("magazine"),
@@ -95,7 +108,8 @@ export const metadataSchema = (thumbnailUrl: string | undefined) =>
     ),
     author: z
       .string({ required_error: "글쓴이를 입력해주세요" })
-      .min(1, "글쓴이를 입력하세요."),
+      .min(1, "1 ~ 10자 이내로 입력해주세요.")
+      .max(10, "1 ~ 10자 이내로 입력해주세요."),
     issueId: z.union(
       [z.literal("issue_001"), z.literal("issue_002"), z.literal("none")],
       { required_error: "이슈를 선택하세요." },

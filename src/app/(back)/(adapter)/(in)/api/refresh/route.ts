@@ -12,6 +12,7 @@ export const GET = async (req: NextRequest) => {
   if (!refreshTokenHash) {
     await authService.invalidateAccessToken();
   } else {
+    console.log("refreshTokenHash", refreshTokenHash);
     rotateSuccess = await authService.rotateTokenPair(refreshTokenHash);
   }
 

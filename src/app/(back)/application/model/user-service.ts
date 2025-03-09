@@ -70,7 +70,7 @@ class UserService {
   editUserById = async (userEditRequest: UserEditRequestDTO) => {
     // jwt token 에 포함되는 정보가 수정될 경우 refresh token 을 무효화 함.
     if (userEditRequest.role) {
-      userEditRequest.refreshToken = INVALIDATED;
+      userEditRequest.refresh_token = INVALIDATED;
     }
 
     await this.userRepository.editUserById(userEditRequest);
@@ -106,7 +106,7 @@ class UserService {
   };
 
   invalidateUser = async (id: string) => {
-    await this.editUserById({ id, refreshToken: INVALIDATED });
+    await this.editUserById({ id, refresh_token: INVALIDATED });
   };
 }
 

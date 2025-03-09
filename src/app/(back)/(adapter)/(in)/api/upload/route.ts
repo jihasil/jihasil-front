@@ -4,6 +4,7 @@ import { postService } from "@/app/(back)/application/model/post-service";
 
 export const POST = async (req: NextRequest): Promise<Response> => {
   const { filename, contentType } = await req.json();
+
   const body = await postService.uploadThumbnail(filename, contentType);
   if (body) {
     return new Response(JSON.stringify(body), {
