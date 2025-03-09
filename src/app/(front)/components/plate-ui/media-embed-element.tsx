@@ -17,7 +17,6 @@ import {
   Resizable,
   ResizeHandle,
 } from "./resizable";
-import { cfUrl } from "@/app/(back)/shared/lib/s3";
 
 export const MediaEmbedElement = withHOC(
   ResizableProvider,
@@ -89,24 +88,16 @@ export const MediaEmbedElement = withHOC(
                       provider === "coub" && "pb-[51.25%]",
                     )}
                   >
-                    {cfUrl && embed!.url.startsWith(cfUrl) ? (
-                      <video
-                        className={cn(
-                          "w-full max-w-full object-cover px-0",
-                          "rounded-sm",
-                        )}
-                        src={embed!.url}
-                        controls
-                      />
-                    ) : (
-                      <iframe
-                        className={cn(
-                          "w-full max-w-full object-cover px-0",
-                          "rounded-sm",
-                        )}
-                        src={embed!.url}
-                      />
-                    )}
+                    <iframe
+                      className={cn(
+                        "absolute top-0 left-0 size-full rounded-sm",
+                        isVideo && "border-0",
+                        focused && selected && "ring-2 ring-ring ring-offset-2",
+                      )}
+                      title="embed"
+                      src={embed!.url}
+                      allowFullScreen
+                    />
                   </div>
                 )
               ) : null}

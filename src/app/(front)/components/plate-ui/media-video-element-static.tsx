@@ -42,7 +42,7 @@ export function MediaVideoElementStatic({
           ) : (
             <iframe
               className={cn(
-                "w-full max-w-full object-cover px-0",
+                "w-[560px] h-[315px] object-cover px-0",
                 "rounded-sm",
               )}
               src={url}

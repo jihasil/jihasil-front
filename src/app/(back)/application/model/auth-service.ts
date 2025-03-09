@@ -174,7 +174,7 @@ class AuthService {
       ]).then(async ([saltAndAccessToken, saltAndRefreshToken]) => {
         await userService.editUserById({
           id: user.id,
-          refreshToken: saltAndRefreshToken,
+          refresh_token: saltAndRefreshToken,
         });
 
         return {

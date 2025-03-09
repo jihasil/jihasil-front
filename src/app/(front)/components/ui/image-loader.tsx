@@ -5,10 +5,11 @@ import React from "react";
 import { cn } from "@/app/(front)/shared/lib/utils";
 import { ButtonProps } from "@/app/(front)/components/ui/button";
 
-export const ImageLoader = React.forwardRef<HTMLButtonElement, ImageProps>(
+export const ImageLoader = React.forwardRef<HTMLImageElement, ImageProps>(
   ({ src, alt, className }, ref) => {
     return (
       <Image
+        ref={ref}
         data-loaded="false"
         width={1000}
         height={1000}

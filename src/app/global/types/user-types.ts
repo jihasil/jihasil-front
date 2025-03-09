@@ -18,7 +18,7 @@ export type UserEditRequestDTO = {
   role?: RoleUnion;
   name?: string;
   password?: string;
-  refreshToken?: string;
+  refresh_token?: string;
   is_deleted?: boolean;
 };
 
