@@ -42,6 +42,7 @@ import { resetBlockTypePlugin } from "./reset-block-type-plugin";
 import { softBreakPlugin } from "./soft-break-plugin";
 import { tablePlugin } from "./table-plugin";
 import { tocPlugin } from "./toc-plugin";
+import { SuggestionPlugin } from "@udecode/plate-suggestion/react";
 
 export const viewPlugins = [
   ...basicNodesPlugins,
@@ -70,7 +71,7 @@ export const viewPlugins = [
   lineHeightPlugin,
 
   // Collaboration
-  commentsPlugin,
+  // commentsPlugin,
 ] as const;
 
 export const editorPlugins = [
@@ -79,6 +80,7 @@ export const editorPlugins = [
 
   // Nodes
   ...viewPlugins,
+  SuggestionPlugin,
 
   // Functionality
   // SlashPlugin,

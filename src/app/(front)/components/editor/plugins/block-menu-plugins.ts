@@ -6,7 +6,7 @@ import { BlockMenuPlugin } from "@udecode/plate-selection/react";
 import { blockSelectionPlugins } from "./block-selection-plugins";
 
 export const blockMenuPlugins = [
-  ...blockSelectionPlugins,
+  // ...blockSelectionPlugins,
   BlockMenuPlugin.configure({
     render: { aboveEditable: BlockContextMenu },
   }),
