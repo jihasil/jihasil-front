@@ -94,7 +94,6 @@ import {
   TableCellHeaderElement,
 } from "../../components/plate-ui/table-cell-element";
 import { TableElement } from "../../components/plate-ui/table-element";
-import { SlashInputElement } from "@/app/(front)/components/plate-ui/slash-input-element";
 
 export const useCreateEditor = (value: string | undefined) => {
   return usePlateEditor({
