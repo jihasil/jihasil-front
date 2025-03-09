@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 
 import { postService } from "@/app/(back)/application/model/post-service";
-import { MAX_FILE_SIZE } from "@/app/global/types/post-types";
 
 export const POST = async (req: NextRequest): Promise<Response> => {
   const { filename, contentType } = await req.json();

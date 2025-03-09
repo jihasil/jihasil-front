@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { RoleUnion } from "@/app/global/enum/roles";
-import { Filter, Key } from "@/app/global/types/page-types";
+import { Key } from "@/app/global/types/page-types";
 
 export interface UserKey extends Key {
   id: string;
