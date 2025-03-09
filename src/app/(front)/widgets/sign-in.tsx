@@ -21,13 +21,6 @@ import {
   PopoverTrigger,
 } from "@/app/(front)/components/ui/popover";
 import SubmitButton from "@/app/(front)/components/ui/submit-button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/app/(front)/components/ui/tooltip";
-import { cn } from "@/app/(front)/shared/lib/utils";
 import PreventRoute from "@/app/(front)/widgets/prevent-route";
 import { signInSchema } from "@/app/global/types/user-types";
 import { zodResolver } from "@hookform/resolvers/zod";
