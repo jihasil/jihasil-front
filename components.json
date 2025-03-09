@@ -1,11 +1,11 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
   "aliases": {
-    "components": "@/components",
-    "hooks": "@/hooks",
-    "lib": "@/shared/lib",
-    "ui": "@/components/ui",
-    "utils": "@/shared/lib/utils"
+    "components": "@/app/(front)/components",
+    "hooks": "@/app/(front)/shared/hooks",
+    "lib": "@/app/(front)/shared/lib",
+    "ui": "@/app/(front)/components/ui",
+    "utils": "@/app/(front)/shared/lib/utils"
   },
   "iconLibrary": "lucide",
   "registries": {

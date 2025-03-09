@@ -7,17 +7,7 @@ export interface UserKey extends Key {
   id: string;
 }
 
-export interface UserFilter extends Filter {
-  id: string;
-}
-
 export type UserEntry = {
-  id: string;
-  name: string;
-  role: RoleUnion;
-};
-
-export type UserResponseDTO = {
   id: string;
   name: string;
   role: RoleUnion;
@@ -28,7 +18,7 @@ export type UserEditRequestDTO = {
   role?: RoleUnion;
   name?: string;
   password?: string;
-  refreshToken?: string;
+  refresh_token?: string;
   is_deleted?: boolean;
 };
 
@@ -38,13 +28,19 @@ export type ChangePasswordRequestDTO = {
   newPassword: string;
 };
 
+const idZod = z
+  .string({ required_error: "ID를 입력해주세요." })
+  .min(5, "ID는 5자~12자 이내로 입력해주세요.")
+  .max(12, "ID는 5자~12자 이내로 입력해주세요.");
+
+const passwordZod = z
+  .string({ required_error: "비밀번호를 입력해주세요." })
+  .min(8, "비밀번호는 8자 ~ 25자 이내로 입력해주세요.")
+  .max(25, "비밀번호는 8자 ~ 25자 이내로 입력해주세요.");
+
 export const signInSchema = z.object({
-  id: z
-    .string({ required_error: "A unique ID is required" })
-    .min(1, "A unique ID is required."),
-  password: z
-    .string({ required_error: "Password is required" })
-    .min(1, "Password is required."),
+  id: idZod,
+  password: passwordZod,
 });
 
 export type UserSignInRequestDTO = {
@@ -60,14 +56,14 @@ export type UserSignUpRequestDTO = {
 };
 
 export const signUpSchema = z.object({
-  id: z.string().min(1, "ID를 입력해주세요."),
+  id: idZod,
   name: z.string().min(1, "이름을 입력해주세요."),
-  password: z.string().min(1, "비밀번호를 입력해주세요."),
+  password: passwordZod,
   role: z.union([z.literal("ROLE_USER"), z.literal("ROLE_ADMIN")]),
 });
 
 export const changePasswordSchema = z.object({
-  id: z.string(),
-  oldPassword: z.string().min(1, "기존 비밀번호를 입력해주세요."),
-  newPassword: z.string().min(1, "새 비밀번호를 입력해주세요."),
+  id: idZod,
+  oldPassword: passwordZod,
+  newPassword: passwordZod,
 });

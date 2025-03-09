@@ -15,17 +15,17 @@ import { PostEntry, PostKey } from "@/app/global/types/post-types";
 
 export const PostGrid = (props: { id?: string; session?: ClientSession }) => {
   const getPageSize = () => {
-    const smSize = window.matchMedia("(min-width: 640px)");
+    const mdSize = window.matchMedia("(min-width: 768px)");
     const lgSize = window.matchMedia("(min-width: 1024px)");
 
-    if (smSize === undefined || lgSize === undefined) return 10;
+    if (mdSize === undefined || lgSize === undefined) return 10;
 
     let pageSize: number;
-    const isSmallScreen = smSize.matches; // sm 기준
+    const isMediumScreen = mdSize.matches; // md 기준
     const isLargeScreen = lgSize.matches; // lg 기준
     if (isLargeScreen) {
       pageSize = 30;
-    } else if (isSmallScreen) {
+    } else if (isMediumScreen) {
       pageSize = 20;
     } else {
       pageSize = 10;
@@ -105,8 +105,8 @@ export const PostGrid = (props: { id?: string; session?: ClientSession }) => {
 };
 
 const Images = (props: { postEntryList: PostEntry[] }) => {
-  const smSize = window.matchMedia("(min-width: 640px)");
-  const thumbnailSize = smSize.matches ? 700 : 500;
+  const mdSize = window.matchMedia("(min-width: 768px)");
+  const thumbnailSize = mdSize.matches ? 320 : 640;
   console.log(thumbnailSize);
 
   return props.postEntryList.map((item, index) => (

@@ -38,7 +38,7 @@ jobs:
           source-directory: "output"
           destination-github-username: jkjan
           destination-repository-name: jihasil-front
-          commit-message: ${{ github.event.commits[0].message }}
+          commit-message: uploaded
           target-branch: ${{ env.TARGET_BRANCH }}
       - name: Test get variable exported by push-to-another-repository
         run: echo $DESTINATION_CLONED_DIRECTORY
