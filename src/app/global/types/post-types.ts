@@ -82,7 +82,9 @@ export const metadataSchema = (thumbnailUrl: string | undefined) =>
         return thumbnailUrl || ACCEPTED_IMAGE_TYPES.includes(file[0]?.type);
       }, "jpg, png, webp 이미지를 입력해주세요.")
       .refine((file: FileList) => {
-        return thumbnailUrl || file[0].size <= MAX_FILE_SIZE;
+        return (
+          thumbnailUrl || (file.length === 1 && file[0].size <= MAX_FILE_SIZE)
+        );
       }, "8mb 미만의 파일을 첨부해주세요."),
     title: z
       .string()
