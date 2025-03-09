@@ -70,7 +70,7 @@ export default function SignUp() {
   }
 
   return (
-    <div className="md:col-span-4 col-span-2 lg:col-start-5 md:col-start-3 col-start-2 w-full grid grid-cols-subgrid">
+    <div className="col-span-4 lg:col-start-5 md:col-start-3 w-full grid grid-cols-subgrid">
       <PreventRoute isUploading={isUploading} />
       <Toaster />
       <Form {...form}>

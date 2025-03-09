@@ -19,6 +19,7 @@ export const EditPostTrigger = (props: { postId: string }) => {
     console.log(response);
     const body = await response.json();
     toast.info(body.message);
+    router.push("/");
     router.replace("/");
   };
 
