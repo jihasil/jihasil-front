@@ -15,14 +15,12 @@ import {
   FormMessage,
 } from "@/app/(front)/components/ui/form";
 import { Input } from "@/app/(front)/components/ui/input";
-import SubmitButton from "@/app/(front)/components/ui/submit-button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/app/(front)/components/ui/tooltip";
-import { cn } from "@/app/(front)/shared/lib/utils";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/(front)/components/ui/popover";
+import SubmitButton from "@/app/(front)/components/ui/submit-button";
 import PreventRoute from "@/app/(front)/widgets/prevent-route";
 import { signInSchema } from "@/app/global/types/user-types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -78,7 +76,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="md:col-span-4 col-span-2 lg:col-start-5 md:col-start-3 col-start-2 w-full grid grid-cols-subgrid">
+    <div className="col-span-4 lg:col-start-5 md:col-start-3 w-full grid grid-cols-subgrid">
       <PreventRoute isUploading={isUploading} />
       <Form {...form}>
         <form
@@ -119,18 +117,16 @@ export default function SignIn() {
 
           <SubmitButton isUploading={isUploading} text={"로그인"} />
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className={cn("col-start-1 col-span-2 text-sm")}>
-                  <p>비밀번호를 잊어버렸어요.</p>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>관리자에게 연락하세요.</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Popover>
+            <div className="col-start-1 col-span-2 text-sm">
+              <PopoverTrigger>
+                <p>비밀번호를 잊어버렸어요.</p>
+              </PopoverTrigger>
+            </div>
+            <PopoverContent side="bottom" className="my-mx">
+              <p>관리자에게 연락하세요.</p>
+            </PopoverContent>
+          </Popover>
         </form>
       </Form>
     </div>
