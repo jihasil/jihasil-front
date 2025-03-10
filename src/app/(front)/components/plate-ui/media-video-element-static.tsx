@@ -23,14 +23,30 @@ export function MediaVideoElementStatic({
       width: number;
     };
 
+  let youtubeEmbedUrl: string | null = null;
+
+  // https://regex101.com/r/rq2KLv/1
+  // youtube 에러 v id 추출하는 정규식
+  const youtubeRegexMatch = url.match(
+    "(?:https?:\\/\\/)?(?:www\\.)?youtu(?:\\.be\\/|be.com\\/\\S*(?:watch|embed)(?:(?:(?=\\/[-a-zA-Z0-9_]{11,}(?!\\S))\\/)|(?:\\S*v=|v\\/)))([-a-zA-Z0-9_]{11,})",
+  );
+
+  if (youtubeRegexMatch && youtubeRegexMatch.length > 1) {
+    const vId = youtubeRegexMatch[1];
+    youtubeEmbedUrl = `https://youtube.com/embed/${vId}`;
+  }
+
+  console.log("youtubeRegexMatch", youtubeRegexMatch, url);
+  console.log("youtubeEmbedUrl", youtubeEmbedUrl);
+
   return (
     <SlateElement className={cn(className, "py-2.5")} {...props}>
       <div style={{ textAlign: align }}>
-        <figure
-          className="group relative m-0 inline-block cursor-default"
-          style={{ width }}
-        >
-          {cfUrl && url.startsWith(cfUrl) ? (
+        {cfUrl && url.startsWith(cfUrl) ? (
+          <figure
+            className="group relative m-0 inline-block cursor-default"
+            style={{ width }}
+          >
             <video
               className={cn(
                 "w-full max-w-full object-cover px-0",
@@ -39,17 +55,16 @@ export function MediaVideoElementStatic({
               src={url}
               controls
             />
-          ) : (
+          </figure>
+        ) : (
+          <div className="relative w-full pb-[56.25%]">
             <iframe
-              className={cn(
-                "w-[560px] h-[315px] object-cover px-0",
-                "rounded-sm",
-              )}
-              src={url}
+              className={cn("absolute w-full h-full")}
+              src={youtubeEmbedUrl ?? url}
             />
-          )}
-          {caption && <figcaption>{NodeApi.string(caption[0])}</figcaption>}
-        </figure>
+          </div>
+        )}
+        {caption && <figcaption>{NodeApi.string(caption[0])}</figcaption>}
       </div>
       {children}
     </SlateElement>
