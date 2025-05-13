@@ -10,7 +10,23 @@ Allow: /
 User-agent: Googlebot-Image
 Allow: /
 
+User-agent: Mediapartners-Google
+Allow: /
+
 User-agent: Yeti
 Allow: /
 
-Sitemap: https://www.jihasil.com/sitemap.xml
+User-agent: Bingbot
+Allow: /
+
+User-agent: facebot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: Daum
+Allow: /
+
+User-agent: facebookexternalhit/1.1;kakaotalk-scrap/1.0
+Allow: /
