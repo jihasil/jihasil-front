@@ -30,3 +30,5 @@ Allow: /
 
 User-agent: facebookexternalhit/1.1;kakaotalk-scrap/1.0
 Allow: /
+
+Sitemap: https://www.jihasil.com/sitemap.xml
